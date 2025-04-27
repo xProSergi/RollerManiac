@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "205515140357",
+    "project_id": "rollermaniac-a54df",
+    "storage_bucket": "rollermaniac-a54df.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205515140357:android:6fa8bd1e39bf66180a5b6c",
+        "android_client_info": {
+          "package_name": "com.sergiolopez.rollermaniac"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYz9YZrZ9y_RMXWdis91zBuoi5ZqdfhwM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
