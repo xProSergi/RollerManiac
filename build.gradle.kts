@@ -5,9 +5,9 @@ buildscript {
         gradlePluginPortal() // Asegúrate de tener este repositorio
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.0") // Reemplaza con la versión más reciente o recomendada
+        classpath("com.android.tools.build:gradle:8.0.2") // Reemplaza con la versión más reciente o recomendada
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.10") // Asegúrate de que la versión coincida con settings.gradle.kts
-        classpath("com.google.gms:google-services:4.4.1") // Asegúrate de tener esta línea si usas Firebase
+        classpath("com.google.gms:google-services:4.4.2") // Asegúrate de tener esta línea si usas Firebase
     }
 }
 
