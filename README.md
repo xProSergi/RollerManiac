@@ -1,6 +1,6 @@
-# sergio_rollermaniac
+# RollerManiac
 
-A new Flutter project.
+Proyecto TFG.
 
 ## Getting Started
 
