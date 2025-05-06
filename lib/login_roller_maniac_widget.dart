@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginRollerManiacWidget extends StatefulWidget {
   const LoginRollerManiacWidget({super.key});
 
   static String routeName = 'LoginRollerManiac';
-  static String routePath = '/loginRollerManiac';
+  static String routePath = '/login';
 
   @override
   State<LoginRollerManiacWidget> createState() => _LoginRollerManiacWidgetState();
@@ -47,7 +48,6 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
             padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 60.0),
             child: Column(
               children: [
-
                 Align(
                   alignment: Alignment.topCenter,
                   child: Padding(
@@ -130,7 +130,52 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text.trim();
+
+                          if (email.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Por favor completa todos los campos')),
+                            );
+                            return;
+                          }
+
+                          try {
+                            final userCredential = await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(email: email, password: password);
+
+
+                            Navigator.pushReplacementNamed(context, '/principal');
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Bienvenido ${userCredential.user!.email}')),
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            String message = '';
+                            switch (e.code) {
+                              case 'invalid-email':
+                                message = 'Correo inválido.';
+                                break;
+                              case 'user-not-found':
+                                message = 'No existe usuario con ese correo.';
+                                break;
+                              case 'wrong-password':
+                                message = 'Contraseña incorrecta.';
+                                break;
+                              default:
+                                message = 'Error: ${e.message}';
+                            }
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(message)),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Ocurrió un error inesperado')),
+                            );
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -148,7 +193,52 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                       ),
                       const SizedBox(height: 16),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text.trim();
+
+                          if (email.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Por favor completa todos los campos')),
+                            );
+                            return;
+                          }
+
+                          try {
+                            final userCredential = await FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(email: email, password: password);
+
+
+                            // Navigator.pushReplacementNamed(context, '/home');
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Cuenta creada para ${userCredential.user!.email}')),
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            String message = '';
+                            switch (e.code) {
+                              case 'email-already-in-use':
+                                message = 'El correo ya está en uso.';
+                                break;
+                              case 'invalid-email':
+                                message = 'Correo inválido.';
+                                break;
+                              case 'weak-password':
+                                message = 'La contraseña es demasiado débil.';
+                                break;
+                              default:
+                                message = 'Error: ${e.message}';
+                            }
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(message)),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Ocurrió un error inesperado')),
+                            );
+                          }
+                        },
                         child: Text(
                           'Crear nueva cuenta',
                           style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
