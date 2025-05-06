@@ -2,7 +2,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services") // Plugin de Google Services
+    id("com.google.gms.google-services")
+    id("com.google.firebase.firebase-perf") // Plugin de Google Services
 }
 
 android {
@@ -39,7 +40,8 @@ flutter {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0")) // Dependencias de Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0")) // Dependencias de Firebase
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth") // Dependencia para autenticación
     // Añade otras dependencias de Firebase aquí
 }
