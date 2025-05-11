@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginRollerManiacWidget extends StatefulWidget {
   const LoginRollerManiacWidget({super.key});
@@ -25,6 +26,46 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
     super.dispose();
   }
 
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      Navigator.pushReplacementNamed(context, '/principal');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bienvenido ${userCredential.user?.displayName ?? 'usuario'}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al iniciar sesión con Google: $e')),
+      );
+    }
+  }
+
+  Widget _buildSocialIcon(IconData icon) {
+    return GestureDetector(
+      onTap: () {
+        if (icon == FontAwesomeIcons.google) {
+          signInWithGoogle();
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: Colors.grey[200], shape: BoxShape.circle),
+        child: FaIcon(icon, size: 20, color: Colors.black87),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -43,7 +84,6 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
               ),
             ),
           ),
-          const SizedBox(height: 120),
           SingleChildScrollView(
             padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 60.0),
             child: Column(
@@ -59,7 +99,6 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFFB0BEC5),
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -70,12 +109,8 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),
                     ],
                   ),
                   child: Column(
@@ -118,13 +153,12 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/recuperar');
+                          },
                           child: Text(
                             '¿Olvidaste tu contraseña?',
-                            style: GoogleFonts.poppins(
-                              color: Colors.black87,
-                              fontSize: 12,
-                            ),
+                            style: GoogleFonts.poppins(color: Colors.black87, fontSize: 12),
                           ),
                         ),
                       ),
@@ -144,33 +178,19 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                           try {
                             final userCredential = await FirebaseAuth.instance
                                 .signInWithEmailAndPassword(email: email, password: password);
-
-
                             Navigator.pushReplacementNamed(context, '/principal');
-
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Bienvenido ${userCredential.user!.email}')),
                             );
                           } on FirebaseAuthException catch (e) {
-                            String message = '';
-                            switch (e.code) {
-                              case 'invalid-email':
-                                message = 'Correo inválido.';
-                                break;
-                              case 'user-not-found':
-                                message = 'No existe usuario con ese correo.';
-                                break;
-                              case 'wrong-password':
-                                message = 'Contraseña incorrecta.';
-                                break;
-                              default:
-                                message = 'Error: ${e.message}';
-                            }
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(message)),
-                            );
-                          } catch (e) {
+                            String message = switch (e.code) {
+                              'invalid-email' => 'Correo inválido.',
+                              'user-not-found' => 'No existe usuario con ese correo.',
+                              'wrong-password' => 'Contraseña incorrecta.',
+                              _ => 'Error: ${e.message}',
+                            };
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                          } catch (_) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Ocurrió un error inesperado')),
                             );
@@ -179,65 +199,17 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: Text(
                           'Iniciar sesión',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
+                          style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
-                        onPressed: () async {
-                          final email = _emailController.text.trim();
-                          final password = _passwordController.text.trim();
-
-                          if (email.isEmpty || password.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Por favor completa todos los campos')),
-                            );
-                            return;
-                          }
-
-                          try {
-                            final userCredential = await FirebaseAuth.instance
-                                .createUserWithEmailAndPassword(email: email, password: password);
-
-
-                            // Navigator.pushReplacementNamed(context, '/home');
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Cuenta creada para ${userCredential.user!.email}')),
-                            );
-                          } on FirebaseAuthException catch (e) {
-                            String message = '';
-                            switch (e.code) {
-                              case 'email-already-in-use':
-                                message = 'El correo ya está en uso.';
-                                break;
-                              case 'invalid-email':
-                                message = 'Correo inválido.';
-                                break;
-                              case 'weak-password':
-                                message = 'La contraseña es demasiado débil.';
-                                break;
-                              default:
-                                message = 'Error: ${e.message}';
-                            }
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(message)),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Ocurrió un error inesperado')),
-                            );
-                          }
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/registro');
                         },
                         child: Text(
                           'Crear nueva cuenta',
@@ -255,10 +227,6 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildSocialIcon(FontAwesomeIcons.google),
-                          const SizedBox(width: 12),
-                          _buildSocialIcon(FontAwesomeIcons.facebookF),
-                          const SizedBox(width: 12),
-                          _buildSocialIcon(FontAwesomeIcons.apple),
                         ],
                       ),
                     ],
@@ -268,47 +236,19 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
               ],
             ),
           ),
-
           Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  Text(
-                    '© ',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    'Coaster Rewind',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
-                  ),
+                  Text('© ', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white)),
+                  Text('Coaster Rewind', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white)),
                 ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSocialIcon(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        shape: BoxShape.circle,
-      ),
-      child: FaIcon(
-        icon,
-        size: 20,
-        color: Colors.black87,
       ),
     );
   }
