@@ -15,6 +15,13 @@ class ParquesRepositoryImpl implements ParquesRepository {
         final data = jsonDecode(response.body) as List<dynamic>;
         final List<Parque> parques = [];
 
+        final ciudadesPorNombre = {
+          'Parque Warner Madrid': 'Madrid',
+          'Parque de Atracciones Madrid': 'Madrid',
+          'PortAventura Park': 'Tarragona',
+          'Ferrari Land': 'Tarragona',
+        };
+
         for (final grupo in data) {
           final List<dynamic>? subparques = grupo['parks'];
           if (subparques != null) {
@@ -27,7 +34,7 @@ class ParquesRepositoryImpl implements ParquesRepository {
                       : parque['id']?.toString() ?? '0';
                   final nombre = parque['name']?.toString() ?? 'Sin nombre';
                   final pais = parque['country']?.toString() ?? 'Desconocido';
-                  final ciudad = parque['city']?.toString() ?? 'Desconocida';
+                  final ciudad = ciudadesPorNombre[nombre] ?? 'Desconocida';
                   final imagenUrl = parque['image_url']?.toString();
 
                   parques.add(Parque(
