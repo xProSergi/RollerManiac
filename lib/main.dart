@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'login_roller_maniac_widget.dart';
 import 'features/tiempos/presentation/view/pantalla_principal.dart';
 import 'features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart';
 import 'features/tiempos/data/repositories/parques_repository_impl.dart';
 import 'registro_screen.dart';
 import 'recuperar_password_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,23 +18,18 @@ void main() async {
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
-        name: 'RollerManiacApp',
         options: DefaultFirebaseOptions.currentPlatform,
       );
-    }
 
-    runApp(MyApp());
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
+      );
+    }
   } catch (e) {
-    runApp(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Text('Error inicializando: $e', style: const TextStyle(color: Colors.red)),
-          ),
-        ),
-      ),
-    );
+    print('Error inicializando Firebase: $e');
   }
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -41,27 +37,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TiemposViewModel(ParquesRepositoryImpl()),
-      child: MaterialApp(
-        title: 'RollerManiac',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            primary: Colors.blue,
-            secondary: Colors.blueAccent,
-          ),
-          useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => TiemposViewModel(ParquesRepositoryImpl()),
         ),
-        initialRoute: '/auth-check',
-        routes: {
-          '/auth-check': (context) => const AuthChecker(),
-          '/login': (context) => const LoginRollerManiacWidget(),
-          '/principal': (context) => const PantallaPrincipal(),
-          '/registro': (context) => const RegistroScreen(),
-          '/recuperar': (context) => const RecuperarPasswordScreen(),
-        },
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Roller Maniac',
+        theme: ThemeData.dark(),
+        home: const AuthChecker(),
       ),
     );
   }
@@ -77,11 +63,56 @@ class AuthChecker extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: Color(0xFF0F172A),
+            body: Center(
+              child: CircularProgressIndicator(
+                color: Colors.cyanAccent,
+              ),
+            ),
           );
         }
 
-        if (snapshot.hasData) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: Color(0xFF0F172A),
+            body: Center(
+              child: Text('Error: ${snapshot.error}',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          );
+        }
+
+        final user = snapshot.data;
+        if (user != null) {
+          // MOSTRAR INFORMACIÓN DEL USUARIO (TEMPORAL PARA DEBUG)
+          print('Usuario logueado: ${user.email}');
+          print('Email verificado: ${user.emailVerified}');
+          print('UID: ${user.uid}');
+
+          if (!user.emailVerified && !user.isAnonymous) {
+            return Scaffold(
+              backgroundColor: Color(0xFF0F172A),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Usuario: ${user.email}',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(height: 20),
+                    Text('Por favor verifica tu email',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => user.sendEmailVerification(),
+                      child: Text('Reenviar email de verificación'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return const PantallaPrincipal();
         }
 
