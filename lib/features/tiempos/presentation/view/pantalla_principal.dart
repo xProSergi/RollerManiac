@@ -9,7 +9,6 @@ import '../../../perfil/presentation/view/perfil_screen.dart';
 import '../../../social/presentation/view/social_screen.dart';
 import '../../../../compartido/widgets/nav_bar.dart';
 import '../../../../services/firebase_service.dart';
-import 'package:intl/intl.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({Key? key}) : super(key: key);
@@ -26,9 +25,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     setState(() {});
   }
 
-  void _cargarVisitasDesdePrincipal() {
-
-  }
+  void _cargarVisitasDesdePrincipal() {}
 
   @override
   void initState() {
@@ -100,7 +97,6 @@ class ParquesListScreen extends StatelessWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final user = FirebaseAuth.instance.currentUser;
 
-
     if (user == null || !user.emailVerified) {
       final mensaje = user == null
           ? 'Debes iniciar sesión para registrar visitas'
@@ -116,7 +112,6 @@ class ParquesListScreen extends StatelessWidget {
         );
       return;
     }
-
 
     scaffoldMessenger
       ..hideCurrentSnackBar()
@@ -135,9 +130,7 @@ class ParquesListScreen extends StatelessWidget {
       );
 
     try {
-
       await FirebaseService.registrarVisita(parqueId, parqueNombre);
-
 
       scaffoldMessenger
         ..hideCurrentSnackBar()
@@ -148,7 +141,6 @@ class ParquesListScreen extends StatelessWidget {
           ),
         );
     } on FirebaseException catch (e) {
-
       scaffoldMessenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -158,7 +150,6 @@ class ParquesListScreen extends StatelessWidget {
           ),
         );
     } catch (e) {
-
       scaffoldMessenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -168,25 +159,6 @@ class ParquesListScreen extends StatelessWidget {
           ),
         );
     }
-  }
-
-
-
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showLoadingSnackbar(
-      BuildContext context, String message) {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const CircularProgressIndicator(color: Colors.white),
-            const SizedBox(width: 20),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        duration: const Duration(minutes: 1),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   @override

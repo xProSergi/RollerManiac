@@ -1,43 +1,63 @@
+import 'package:flutter/foundation.dart'; // Añade este import
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseService {
-  static DatabaseReference get _databaseRef {
-    return FirebaseDatabase.instanceFor(
-      app: Firebase.app(),
-      databaseURL: 'https://rollermaniac-a54df-default-rtdb.europe-west1.firebasedatabase.app',
-    ).ref();
-  }
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static Future<void> registrarVisita(String parqueId, String parqueNombre) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || !user.emailVerified) {
+        throw Exception('Usuario no autenticado o email no verificado');
+      }
 
-    final visitaRef = _databaseRef.child('usuarios/$uid/visitas').push();
-
-    await visitaRef.set({
-      'parqueId': parqueId,
-      'parqueNombre': parqueNombre,
-      'fecha': DateTime.now().toIso8601String(),
-    });
+      // Cambia doc(parqueId) por doc() para generar ID automático
+      await _firestore
+          .collection('usuarios')
+          .doc(user.uid)
+          .collection('visitas')
+          .doc() // ID automático
+          .set({
+        'parqueId': parqueId,
+        'parqueNombre': parqueNombre,
+        'fecha': FieldValue.serverTimestamp(),
+        'userId': user.uid,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error registrando visita: $e');
+      }
+      rethrow;
+    }
   }
 
   static Future<List<Map<String, dynamic>>> obtenerVisitas() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) throw Exception('Usuario no autenticado');
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('Usuario no autenticado');
+      }
 
-    final snapshot = await _databaseRef.child('usuarios/$uid/visitas').get();
+      final snapshot = await _firestore
+          .collection('usuarios')
+          .doc(user.uid)
+          .collection('visitas')
+          .get();
 
-    if (!snapshot.exists) return [];
-
-    final data = Map<String, dynamic>.from(snapshot.value as Map);
-    final visitas = <Map<String, dynamic>>[];
-
-    data.forEach((_, value) {
-      visitas.add(Map<String, dynamic>.from(value));
-    });
-
-    return visitas;
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          ...data,
+          'id': doc.id,
+        };
+      }).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error obteniendo visitas: $e');
+      }
+      rethrow;
+    }
   }
 }
