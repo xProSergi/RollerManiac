@@ -1,44 +1,104 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/parque.dart';
 import '../../domain/entities/atraccion.dart';
+import '../../domain/entities/clima.dart';
 import '../../domain/repositories/parques_repository.dart';
+import '../../domain/usecases/obtener_clima_por_ciudad.dart';
 
 class TiemposViewModel extends ChangeNotifier {
   final ParquesRepository repository;
+  final ObtenerClimaPorCiudad obtenerClimaPorCiudad;
 
-  TiemposViewModel(this.repository);
+  TiemposViewModel({
+    required this.repository,
+    required this.obtenerClimaPorCiudad,
+  });
 
   List<Parque> _parques = [];
   bool _cargando = false;
   String? _error;
+  final Map<String, Clima> _datosClima = {};
 
   List<Parque> get parques => _parques;
   bool get cargando => _cargando;
   String? get error => _error;
+  Clima? getClimaParaParque(String nombreParque) => _datosClima[nombreParque];
 
   Future<void> cargarParques() async {
-    _cargando = true;
-    _error = null;
-    notifyListeners();
+    _setCargando(true);
     try {
       _parques = await repository.obtenerParques();
+      await _cargarDatosClima();
     } catch (e) {
-      _error = e.toString();
+      _setError('Error al cargar los parques: $e');
     } finally {
-      _cargando = false;
-      notifyListeners();
+      _setCargando(false);
     }
   }
 
   Future<List<Atraccion>> cargarAtracciones(int parqueId) async {
     try {
-      final atracciones = await repository.obtenerAtraccionesDeParque(parqueId);
-      return atracciones;
+      return await repository.obtenerAtraccionesDeParque(parqueId);
     } catch (e) {
-      print('Error al cargar atracciones: $e');
+      _setError('Error al cargar atracciones: $e');
       return [];
     }
   }
 
+  Future<void> _cargarDatosClima() async {
+    for (final parque in _parques) {
+      try {
+   
+        final ciudadParaClima = obtenerCiudadParaClima(parque.nombre);
 
+      
+        final ciudadConsulta = ciudadParaClima.isNotEmpty ? ciudadParaClima : parque.ciudad;
+
+  
+        final clima = await obtenerClimaPorCiudad.ejecutar(ciudadConsulta);
+
+      
+        _datosClima[parque.nombre] = clima;
+
+       
+        _parques = _parques.map((p) {
+          if (p.nombre == parque.nombre) {
+            return Parque(
+              id: p.id,
+              nombre: p.nombre,
+              pais: p.pais,
+              ciudad: p.ciudad,
+              atracciones: p.atracciones,
+              clima: clima,
+            );
+          }
+          return p;
+        }).toList();
+      } catch (e) {
+        debugPrint('Error al cargar clima para ${parque.nombre}: $e');
+      }
+    }
+    notifyListeners();
+  }
+
+  void _setCargando(bool value) {
+    _cargando = value;
+    notifyListeners();
+  }
+
+  void _setError(String mensaje) {
+    _error = mensaje;
+    notifyListeners();
+  }
+
+ 
+  String obtenerCiudadParaClima(String nombreParque) {
+    if (nombreParque == 'Parque Warner Madrid') {
+      return 'San Martín de la Vega, Spain';
+    } else if (nombreParque == 'PortAventura Park' || nombreParque == 'Ferrari Land') {
+      return 'Salou, Tarragona, Spain';
+    } else {
+      return '';
+    }
+  }
 }

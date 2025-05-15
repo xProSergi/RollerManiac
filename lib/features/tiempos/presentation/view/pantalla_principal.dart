@@ -184,7 +184,8 @@ class ParquesListScreen extends StatelessWidget {
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
             final parque = viewModel.parques[index];
-            return GestureDetector(
+            return ParqueCard(
+              parque: parque,
               onTap: () async {
                 final atracciones =
                 await viewModel.cargarAtracciones(int.parse(parque.id));
@@ -193,8 +194,8 @@ class ParquesListScreen extends StatelessWidget {
                   nombre: parque.nombre,
                   pais: parque.pais,
                   ciudad: parque.ciudad,
-                  imagenUrl: '',
                   atracciones: atracciones,
+                  clima: parque.clima,
                 );
                 Navigator.push(
                   context,
@@ -204,66 +205,127 @@ class ParquesListScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.apartment_rounded,
-                            color: Colors.white, size: 28),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                parque.nombre,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${parque.ciudad}, ${parque.pais}',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: () => _registrarVisita(
-                              context, parque.id, parque.nombre),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF38BDF8),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text('Visita',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              onRegistrarVisita: () => _registrarVisita(context, parque.id, parque.nombre),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class ParqueCard extends StatelessWidget {
+  final Parque parque;
+  final VoidCallback onRegistrarVisita;
+  final VoidCallback onTap;
+
+  const ParqueCard({
+    Key? key,
+    required this.parque,
+    required this.onRegistrarVisita,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.apartment_rounded,
+                    color: Colors.white, size: 28),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        parque.nombre,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        (parque.nombre == 'Parque Warner Madrid')
+                            ? 'San Martín de la Vega, Madrid, Spain'
+                            : (parque.nombre == 'PortAventura Park' || parque.nombre == 'Ferrari Land')
+                            ? 'Salou, Tarragona, Spain'
+                            : '${parque.ciudad}, ${parque.pais}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+                      if (parque.clima != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Image.network(
+                                  'https:${parque.clima!.codigoIcono}',
+                                  width: 24,
+                                  height: 24,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.wb_sunny, size: 24, color: Colors.yellow),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${parque.clima!.temperatura.toStringAsFixed(1)}°C',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              parque.clima!.descripcion,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.7),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: onRegistrarVisita,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+                child: const Text(
+                  'Registrar visita',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

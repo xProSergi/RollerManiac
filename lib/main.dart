@@ -4,11 +4,11 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart';
 
+import 'core/injection_container.dart';
 import 'login_roller_maniac_widget.dart';
 import 'features/tiempos/presentation/view/pantalla_principal.dart';
-import 'features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart';
-import 'features/tiempos/data/repositories/parques_repository_impl.dart';
 import 'registro_screen.dart';
 import 'recuperar_password_screen.dart';
 
@@ -29,6 +29,8 @@ void main() async {
     print('Error inicializando Firebase: $e');
   }
 
+  await init(); 
+
   runApp(const MyApp());
 }
 
@@ -40,7 +42,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => TiemposViewModel(ParquesRepositoryImpl()),
+          create: (_) => getIt<TiemposViewModel>(),
         ),
       ],
       child: MaterialApp(
@@ -85,11 +87,6 @@ class AuthChecker extends StatelessWidget {
 
         final user = snapshot.data;
         if (user != null) {
-          // MOSTRAR INFORMACIÓN DEL USUARIO (TEMPORAL PARA DEBUG)
-          print('Usuario logueado: ${user.email}');
-          print('Email verificado: ${user.emailVerified}');
-          print('UID: ${user.uid}');
-
           if (!user.emailVerified && !user.isAnonymous) {
             return Scaffold(
               backgroundColor: Color(0xFF0F172A),
