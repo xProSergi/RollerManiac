@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../domain/entities/atraccion.dart';
@@ -7,7 +5,7 @@ import '../../domain/entities/parque.dart';
 
 abstract class ParquesRemoteDataSource {
   Future<List<Parque>> obtenerParques();
-  Future<List<Atraccion>> obtenerAtraccionesDeParque(int parqueId);
+  Future<List<Atraccion>> obtenerAtraccionesDeParque(String parqueId);
 }
 
 class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
@@ -38,9 +36,7 @@ class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
             for (final parque in subparques) {
               try {
                 if (parque['country']?.toString() == 'Spain') {
-                  final id = parque['id'] is int
-                      ? parque['id'].toString()
-                      : parque['id']?.toString() ?? '0';
+                  final id = parque['id']?.toString() ?? '0';
                   final nombre = parque['name']?.toString() ?? 'Sin nombre';
                   final pais = parque['country']?.toString() ?? 'Desconocido';
                   final ciudad = ciudadesPorNombre[nombre] ?? 'Desconocida';
@@ -72,7 +68,7 @@ class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
   }
 
   @override
-  Future<List<Atraccion>> obtenerAtraccionesDeParque(int parqueId) async {
+  Future<List<Atraccion>> obtenerAtraccionesDeParque(String parqueId) async {
     try {
       final response = await client.get(
         Uri.parse('https://queue-times.com/parks/$parqueId/queue_times.json'),
