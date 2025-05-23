@@ -3,12 +3,11 @@ plugins {
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
-    id("com.google.firebase.firebase-perf") // Plugin de Google Services
 }
 
 android {
     namespace = "com.sergiolopez.rollermaniac"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -23,25 +22,26 @@ android {
     defaultConfig {
         applicationId = "com.sergiolopez.rollermaniac"
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0.0"
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug") // TODO: Configura tu firma para la release
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
 
-flutter {
-    source = "../.."
-}
-
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0")) // Dependencias de Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth") // Dependencia para autenticación
-    // Añade otras dependencias de Firebase aquí
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-perf")
 }
