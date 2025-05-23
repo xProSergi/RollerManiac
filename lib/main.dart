@@ -11,6 +11,8 @@ import 'login_roller_maniac_widget.dart';
 import 'features/tiempos/presentation/view/pantalla_principal.dart';
 import 'registro_screen.dart';
 import 'recuperar_password_screen.dart';
+import 'features/social/presentation/viewmodel/social_viewmodel.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,13 +46,23 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => getIt<TiemposViewModel>(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => getIt<SocialViewModel>(),
+        ),
       ],
+
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Roller Maniac',
         theme: ThemeData.dark(),
         home: const AuthChecker(),
+        routes: {
+          '/registro': (context) => const RegistroScreen(),
+          '/recuperar': (context) => const RecuperarPasswordScreen(),
+          '/principal': (context) => const PantallaPrincipal(),
+        },
       ),
+
     );
   }
 }
@@ -60,6 +72,11 @@ class AuthChecker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Cerrar sesión al iniciar (se ejecuta cada vez que se reconstruye el widget)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseAuth.instance.signOut();
+    });
+
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -78,7 +95,8 @@ class AuthChecker extends StatelessWidget {
           return Scaffold(
             backgroundColor: Color(0xFF0F172A),
             body: Center(
-              child: Text('Error: ${snapshot.error}',
+              child: Text(
+                'Error: ${snapshot.error}',
                 style: const TextStyle(color: Colors.red),
               ),
             ),
@@ -96,13 +114,13 @@ class AuthChecker extends StatelessWidget {
                   children: [
                     Text('Usuario: ${user.email}',
                         style: TextStyle(color: Colors.white)),
-                    SizedBox(height: 20),
-                    Text('Por favor verifica tu email',
+                    const SizedBox(height: 20),
+                    const Text('Por favor verifica tu email',
                         style: TextStyle(color: Colors.white)),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () => user.sendEmailVerification(),
-                      child: Text('Reenviar email de verificación'),
+                      child: const Text('Reenviar email de verificación'),
                     ),
                   ],
                 ),

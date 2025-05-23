@@ -3,5 +3,5 @@ import '../entities/atraccion.dart';
 
 abstract class ParquesRepository {
   Future<List<Parque>> obtenerParques();
-  Future<List<Atraccion>> obtenerAtraccionesDeParque(int parqueId);
+  Future<List<Atraccion>> obtenerAtraccionesDeParque(String parqueId);
 }

@@ -36,7 +36,7 @@ class TiemposViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<Atraccion>> cargarAtracciones(int parqueId) async {
+  Future<List<Atraccion>> cargarAtracciones(String parqueId) async {
     try {
       return await repository.obtenerAtraccionesDeParque(parqueId);
     } catch (e) {

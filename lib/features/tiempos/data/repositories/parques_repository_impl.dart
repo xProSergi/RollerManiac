@@ -14,7 +14,7 @@ class ParquesRepositoryImpl implements ParquesRepository {
   }
 
   @override
-  Future<List<Atraccion>> obtenerAtraccionesDeParque(int parqueId) {
-    return remoteDataSource.obtenerAtraccionesDeParque(parqueId);
+  Future<List<Atraccion>> obtenerAtraccionesDeParque(String parqueId) {
+    return remoteDataSource.obtenerAtraccionesDeParque(parqueId.toString());
   }
 }

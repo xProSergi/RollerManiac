@@ -20,6 +20,7 @@ class PantallaPrincipal extends StatefulWidget {
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
+  String? userId;
 
   void _actualizarVisitas() {
     setState(() {});
@@ -30,6 +31,10 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   @override
   void initState() {
     super.initState();
+
+    final user = FirebaseAuth.instance.currentUser;
+    userId = user?.uid;
+
     _pages = [
       const ParquesListScreen(),
       HistorialScreen(
@@ -188,7 +193,7 @@ class ParquesListScreen extends StatelessWidget {
               parque: parque,
               onTap: () async {
                 final atracciones =
-                await viewModel.cargarAtracciones(int.parse(parque.id));
+                await viewModel.cargarAtracciones(parque.id);
                 final parqueConAtracciones = Parque(
                   id: parque.id,
                   nombre: parque.nombre,
@@ -205,7 +210,7 @@ class ParquesListScreen extends StatelessWidget {
                   ),
                 );
               },
-              onRegistrarVisita: () => _registrarVisita(context, parque.id, parque.nombre),
+              onRegistrarVisita: () => _registrarVisita(context, parque.id.toString(), parque.nombre),
             );
           },
         ),
