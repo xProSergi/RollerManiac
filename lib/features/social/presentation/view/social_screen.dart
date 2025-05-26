@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../viewmodel/social_viewmodel.dart';
 import '../widgets/amigos_list.dart';
 import '../widgets/ranking_list.dart';
 import '../widgets/solicitudes_list.dart';
-import '../widgets/agregar_amigo.dart'; // Importar el nuevo widget
-import '../widgets/seccion_plegable.dart'; // Importar el nuevo widget
-import '../widgets/tarjeta_contenido.dart'; // Importar el nuevo widget
-import 'package:firebase_auth/firebase_auth.dart';
+import '../widgets/agregar_amigo.dart';
+import '../widgets/seccion_plegable.dart';
+import '../widgets/tarjeta_contenido.dart';
+import '../../constantes/social_constantes.dart';
+
 
 class SocialScreen extends StatefulWidget {
   const SocialScreen({Key? key}) : super(key: key);
@@ -41,34 +44,8 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    const Color bgColor = Color(0xFF0F172A);
-    const Color cardColor = Color(0xFF1E293B);
-    const Color accentColor = Color(0xFF64B5F6);
-    const Color textColor = Colors.white;
-    const Color lightTextColor = Colors.white70;
-    const Color dimTextColor = Colors.white54;
-
-    const TextStyle titleStyle = TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-      color: textColor,
-      letterSpacing: 0.8,
-    );
-
-    const TextStyle sectionTitleStyle = TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-      color: lightTextColor,
-    );
-
-    const TextStyle dimBodyTextStyle = TextStyle(
-      fontSize: 14,
-      color: dimTextColor,
-    );
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: SocialColores.fondo,
       body: Consumer<SocialViewModel>(
         builder: (context, viewModel, _) {
           return Padding(
@@ -78,20 +55,19 @@ class _SocialScreenState extends State<SocialScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-
                   AgregarAmigo(
                     controller: usernameController,
-                    accentColor: accentColor,
-                    cardColor: cardColor,
-                    textColor: textColor,
-                    lightTextColor: lightTextColor,
+                    accentColor: SocialColores.boton,
+                    cardColor: SocialColores.tarjeta,
+                    textColor: SocialColores.textoClaro,
+                    lightTextColor: SocialColores.textoSecundario,
                     onAgregarAmigo: (username) async {
                       try {
                         await viewModel.agregarAmigoPorUsername(username);
                         usernameController.clear();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('¡Solicitud de amistad enviada a $username!'),
+                            content: Text('${SocialTextos.solicitudEnviada} $username!'),
                             backgroundColor: Colors.green,
                             duration: const Duration(seconds: 2),
                           ),
@@ -99,7 +75,7 @@ class _SocialScreenState extends State<SocialScreen> {
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Error al enviar solicitud: ${e.toString().split(':').last.trim()}'),
+                            content: Text('${SocialTextos.errorEnvioSolicitud} ${e.toString().split(':').last.trim()}'),
                             backgroundColor: Colors.redAccent,
                             duration: const Duration(seconds: 3),
                           ),
@@ -107,7 +83,6 @@ class _SocialScreenState extends State<SocialScreen> {
                       }
                     },
                   ),
-
                   if (viewModel.errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
@@ -117,28 +92,31 @@ class _SocialScreenState extends State<SocialScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-
                   const SizedBox(height: 30),
 
-                  // Solicitudes recibidas
+                  // Solicitudes
                   SeccionPlegable(
-                    titulo: 'Solicitudes recibidas',
+                    titulo: SocialTextos.tituloSolicitudes,
                     estaExpandida: solicitudesExpanded,
                     onTap: () {
                       setState(() {
                         solicitudesExpanded = !solicitudesExpanded;
                       });
                     },
-                    cardColor: cardColor,
-                    estiloTituloSeccion: sectionTitleStyle,
-                    colorTextoClaro: lightTextColor,
+                    cardColor: SocialColores.tarjeta,
+                    estiloTituloSeccion: SocialTextStyles.tituloSeccion,
+                    colorTextoClaro: SocialColores.textoSecundario,
                     widgetFinal: viewModel.solicitudes.isNotEmpty
                         ? CircleAvatar(
                       radius: 12,
-                      backgroundColor: accentColor,
+                      backgroundColor: SocialColores.boton,
                       child: Text(
                         '${viewModel.solicitudes.length}',
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     )
                         : null,
@@ -147,13 +125,13 @@ class _SocialScreenState extends State<SocialScreen> {
                     duration: const Duration(milliseconds: 300),
                     crossFadeState: solicitudesExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
                     firstChild: TarjetaContenido(
-                      cardColor: cardColor,
+                      cardColor: SocialColores.tarjeta,
                       child: viewModel.solicitudes.isEmpty
-                          ? const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
+                          ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Text(
-                          'No tienes solicitudes pendientes.',
-                          style: dimBodyTextStyle,
+                          SocialTextos.sinSolicitudes,
+                          style: SocialTextStyles.emailUsuario,
                           textAlign: TextAlign.center,
                         ),
                       )
@@ -174,26 +152,25 @@ class _SocialScreenState extends State<SocialScreen> {
                     ),
                     secondChild: const SizedBox.shrink(),
                   ),
-
                   const SizedBox(height: 20),
 
-                  // Amigos
+                  //  Amigos
                   SeccionPlegable(
-                    titulo: 'Amigos',
+                    titulo: SocialTextos.tituloAmigos,
                     estaExpandida: amigosExpanded,
                     onTap: () {
                       setState(() {
                         amigosExpanded = !amigosExpanded;
                       });
                     },
-                    cardColor: cardColor,
-                    estiloTituloSeccion: sectionTitleStyle,
-                    colorTextoClaro: lightTextColor,
+                    cardColor: SocialColores.tarjeta,
+                    estiloTituloSeccion: SocialTextStyles.tituloSeccion,
+                    colorTextoClaro: SocialColores.textoSecundario,
                     widgetFinal: Row(
                       children: [
                         Text(
                           '${viewModel.amigos.length}',
-                          style: dimBodyTextStyle.copyWith(fontWeight: FontWeight.w600),
+                          style: SocialTextStyles.emailUsuario.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(width: 8),
                       ],
@@ -203,13 +180,13 @@ class _SocialScreenState extends State<SocialScreen> {
                     duration: const Duration(milliseconds: 300),
                     crossFadeState: amigosExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
                     firstChild: TarjetaContenido(
-                      cardColor: cardColor,
+                      cardColor: SocialColores.tarjeta,
                       child: viewModel.amigos.isEmpty
-                          ? const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
+                          ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Text(
-                          'Aún no tienes amigos agregados.',
-                          style: dimBodyTextStyle,
+                          SocialTextos.sinAmigos,
+                          style: SocialTextStyles.emailUsuario,
                           textAlign: TextAlign.center,
                         ),
                       )
@@ -223,7 +200,7 @@ class _SocialScreenState extends State<SocialScreen> {
                   // Ranking
                   Container(
                     decoration: BoxDecoration(
-                      color: cardColor,
+                      color: SocialColores.tarjeta,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
@@ -234,22 +211,21 @@ class _SocialScreenState extends State<SocialScreen> {
                       ],
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                    child: Text('Ranking entre amigos', style: sectionTitleStyle),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(SocialTextos.tituloRanking, style: SocialTextStyles.tituloSeccion),
+                        const SizedBox(height: 10),
+                        viewModel.ranking.isEmpty
+                            ? Text(
+                          SocialTextos.sinRanking,
+                          style: SocialTextStyles.emailUsuario,
+                        )
+                            : RankingList(ranking: viewModel.ranking),
+                      ],
+                    ),
                   ),
-                  TarjetaContenido(
-                    cardColor: cardColor,
-                    margin: const EdgeInsets.only(top: 10, bottom: 30),
-                    child: viewModel.ranking.isEmpty
-                        ? const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Text(
-                        'No hay datos de ranking disponibles.',
-                        style: dimBodyTextStyle,
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                        : RankingList(ranking: viewModel.ranking),
-                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),

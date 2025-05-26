@@ -19,10 +19,7 @@ class AmigosList extends StatelessWidget {
             amigo.displayName.isNotEmpty ? amigo.displayName : amigo.username,
             style: const TextStyle(color: Colors.white),
           ),
-          subtitle: Text(
-            amigo.email,
-            style: const TextStyle(color: Colors.white54),
-          ),
+
         );
       },
     );

@@ -34,8 +34,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email'],
-        // Si estás en iOS y tienes un clientId explícito, puedes ponerlo así:
-        // clientId: Platform.isIOS ? '<TU_CLIENT_ID>.apps.googleusercontent.com' : null,
+        
       );
 
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
@@ -152,7 +151,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                             width: size.width > 500 ? 400 : double.infinity,
                             padding: const EdgeInsets.all(24.0),
                             decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.5), // Más gris y más transparente (0.75)
+                            color: Colors.white.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: const [
                               BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),
@@ -163,10 +162,10 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                               children: [
                                 TextField(
                                   controller: _emailController,
-                                  style: GoogleFonts.poppins(color: Colors.black87), // Texto oscuro
+                                  style: GoogleFonts.poppins(color: Colors.black87),
                                   decoration: InputDecoration(
                                     hintText: 'Correo',
-                                    hintStyle: GoogleFonts.poppins(color: Colors.grey[600]), // Hint más visible
+                                    hintStyle: GoogleFonts.poppins(color: Colors.grey[600]),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -258,7 +257,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                                     style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
                                   ),
                                 ),
-                                //
+
 
                                 const SizedBox(height: 16),
                                 Align(

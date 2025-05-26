@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import '../../constantes/social_constantes.dart';
 
 class AgregarAmigo extends StatefulWidget {
   final TextEditingController controller;
+  final Function(String username) onAgregarAmigo;
   final Color accentColor;
   final Color cardColor;
   final Color textColor;
   final Color lightTextColor;
-  final Function(String username) onAgregarAmigo;
 
   const AgregarAmigo({
     Key? key,
     required this.controller,
+    required this.onAgregarAmigo,
     required this.accentColor,
     required this.cardColor,
     required this.textColor,
     required this.lightTextColor,
-    required this.onAgregarAmigo,
   }) : super(key: key);
 
   @override
@@ -36,7 +37,7 @@ class _AgregarAmigoState extends State<AgregarAmigo> {
         labelText: 'Agregar amigo (username)',
         labelStyle: TextStyle(color: widget.lightTextColor),
         hintText: 'Introduce el nombre de usuario',
-        hintStyle: TextStyle(color: widget.lightTextColor.withOpacity(0.7), fontStyle: FontStyle.italic),
+        hintStyle: TextStyle(color: widget.lightTextColor, fontStyle: FontStyle.italic),
         suffixIcon: _isLoading
             ? Padding(
           padding: const EdgeInsets.all(8.0),
@@ -62,17 +63,17 @@ class _AgregarAmigoState extends State<AgregarAmigo> {
               }
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Por favor, introduce un nombre de usuario válido.'),
+                SnackBar(
+                  content: const Text('Por favor, introduce un nombre de usuario válido.'),
                   backgroundColor: Colors.orangeAccent,
-                  duration: Duration(seconds: 2),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             }
           },
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white24),
+          borderSide: BorderSide(color: SocialColores.separador),
           borderRadius: BorderRadius.circular(12),
         ),
         focusedBorder: OutlineInputBorder(
