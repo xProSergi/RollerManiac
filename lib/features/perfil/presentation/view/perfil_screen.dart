@@ -1,42 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/perfil_viewmodel.dart';
+import '../widgets/perfil_info_card.dart';
+import '../widgets/perfil_opciones_list.dart';
+import '../../constantes/perfil_constantes.dart';
 
 class PerfilScreen extends StatelessWidget {
-  static const routeName = '/perfil';
+  const PerfilScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Perfil'),
-        backgroundColor: const Color(0xFF1E293B),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage('https://www.example.com/avatar.png'),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Nombre de Usuario',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Email: usuario@example.com',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
+    return ChangeNotifierProvider(
+      create: (_) => PerfilViewModel(),
+      child: Consumer<PerfilViewModel>(
+        builder: (context, viewModel, _) {
+          if (!viewModel.isLoaded) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
-              },
-              child: const Text('Cerrar sesión'),
+          return Scaffold(
+            backgroundColor: PerfilConstantes.colorFondo,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    PerfilInfoCard(
+                      username: viewModel.username,
+                      email: viewModel.email,
+                      creationDate: viewModel.creationDate,
+                    ),
+                    const SizedBox(height: 24),
+                    const PerfilOpcionesList(),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: PerfilConstantes.colorBotonCerrarSesion,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        await viewModel.signOut();
+                        if (context.mounted) {
+                          Navigator.of(context).pushReplacementNamed('/login');
+                        }
+                      },
+                      icon: const Icon(PerfilConstantes.iconoCerrarSesion),
+                      label: const Text(
+                        PerfilConstantes.cerrarSesion,
+                        style: PerfilConstantes.estiloBotonCerrarSesion,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

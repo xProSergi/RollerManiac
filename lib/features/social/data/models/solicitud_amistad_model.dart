@@ -23,7 +23,7 @@ class SolicitudAmistadModel extends SolicitudAmistad {
       try {
         parsedDate = DateTime.parse(fechaData);
       } catch (e) {
-        print('Warning: Could not parse date string "$fechaData": $e');
+        print('Error parseando la fecha "$fechaData": $e');
         parsedDate = null;
       }
     } else {

@@ -9,6 +9,7 @@ import '../../../perfil/presentation/view/perfil_screen.dart';
 import '../../../social/presentation/view/social_screen.dart';
 import '../../../../compartido/widgets/nav_bar.dart';
 import '../../../../services/firebase_service.dart';
+import '../../constantes/tiempos_constantes.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({Key? key}) : super(key: key);
@@ -57,8 +58,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     } else if (!user.emailVerified) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor verifica tu email'),
-          backgroundColor: Colors.orange,
+          content: Text(TiemposTextos.errorVerificacion),
+          backgroundColor: TiemposColores.info,
         ),
       );
     }
@@ -67,19 +68,14 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: TiemposColores.fondoOscuro,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: TiemposColores.tarjetaOscura,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'RollerManiac',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            letterSpacing: 1.1,
-          ),
+        title: Text(
+          TiemposTextos.tituloApp,
+          style: TiemposEstilos.tituloAppBarOscuro,
         ),
       ),
       body: _pages[_selectedIndex],
@@ -104,15 +100,15 @@ class ParquesListScreen extends StatelessWidget {
 
     if (user == null || !user.emailVerified) {
       final mensaje = user == null
-          ? 'Debes iniciar sesión para registrar visitas'
-          : 'Por favor verifica tu email para continuar';
+          ? TiemposTextos.errorSesion
+          : TiemposTextos.errorVerificacion;
 
       scaffoldMessenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
             content: Text(mensaje),
-            backgroundColor: Colors.red,
+            backgroundColor: TiemposColores.error,
           ),
         );
       return;
@@ -124,7 +120,7 @@ class ParquesListScreen extends StatelessWidget {
         const SnackBar(
           content: Row(
             children: [
-              CircularProgressIndicator(color: Colors.white),
+              CircularProgressIndicator(color: TiemposColores.textoClaro),
               SizedBox(width: 20),
               Expanded(child: Text('Registrando visita...')),
             ],
@@ -141,8 +137,8 @@ class ParquesListScreen extends StatelessWidget {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('✅ Visita registrada en $parqueNombre'),
-            backgroundColor: Colors.green,
+            content: Text(' ${TiemposTextos.visitando} $parqueNombre'),
+            backgroundColor: TiemposColores.exito,
           ),
         );
     } on FirebaseException catch (e) {
@@ -150,8 +146,8 @@ class ParquesListScreen extends StatelessWidget {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('🔥 Error: ${e.message ?? 'Error desconocido'}'),
-            backgroundColor: Colors.red,
+            content: Text(' ${TiemposTextos.errorCargar}: ${e.message ?? 'Error desconocido'}'),
+            backgroundColor: TiemposColores.error,
           ),
         );
     } catch (e) {
@@ -159,8 +155,8 @@ class ParquesListScreen extends StatelessWidget {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('⚠️ Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            content: Text('⚠️ ${TiemposTextos.errorCargar}: ${e.toString()}'),
+            backgroundColor: TiemposColores.error,
           ),
         );
     }
@@ -171,29 +167,32 @@ class ParquesListScreen extends StatelessWidget {
     final viewModel = Provider.of<TiemposViewModel>(context);
 
     return RefreshIndicator(
-      color: Colors.white,
+      color: TiemposColores.textoClaro,
       onRefresh: viewModel.cargarParques,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(
+          horizontal: TiemposTamanos.paddingHorizontal,
+          vertical: TiemposTamanos.paddingVertical,
+        ),
         child: viewModel.cargando
-            ? const Center(child: CircularProgressIndicator(color: Colors.white))
+            ? const Center(
+            child: CircularProgressIndicator(color: TiemposColores.textoClaro))
             : viewModel.error != null
             ? Center(
           child: Text(
-            'Error: ${viewModel.error}',
-            style: const TextStyle(color: Colors.redAccent),
+            '${TiemposTextos.errorCargar}: ${viewModel.error}',
+            style: const TextStyle(color: TiemposColores.error),
           ),
         )
             : ListView.separated(
           itemCount: viewModel.parques.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
           itemBuilder: (context, index) {
             final parque = viewModel.parques[index];
             return ParqueCard(
               parque: parque,
               onTap: () async {
-                final atracciones =
-                await viewModel.cargarAtracciones(parque.id);
+                final atracciones = await viewModel.cargarAtracciones(parque.id);
                 final parqueConAtracciones = Parque(
                   id: parque.id,
                   nombre: parque.nombre,
@@ -205,8 +204,7 @@ class ParquesListScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        DetallesParqueScreen(parque: parqueConAtracciones),
+                    builder: (_) => DetallesParqueScreen(parque: parqueConAtracciones),
                   ),
                 );
               },
@@ -237,43 +235,41 @@ class ParqueCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
-          borderRadius: BorderRadius.circular(12),
+          color: TiemposColores.tarjetaOscura,
+          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.apartment_rounded,
-                    color: Colors.white, size: 28),
-                const SizedBox(width: 16),
+                const Icon(
+                  TiemposIconos.parque,
+                  color: TiemposColores.textoClaro,
+                  size: 28,
+                ),
+                const SizedBox(width: TiemposTamanos.separacionInterna),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         parque.nombre,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: TiemposEstilos.tituloParqueOscuro,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         (parque.nombre == 'Parque Warner Madrid')
-                            ? 'San Martín de la Vega, Madrid, Spain'
+                            ? TiemposTextos.warnerMadrid
                             : (parque.nombre == 'PortAventura Park' || parque.nombre == 'Ferrari Land')
-                            ? 'Salou, Tarragona, Spain'
+                            ? TiemposTextos.portAventura
                             : '${parque.ciudad}, ${parque.pais}',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
+                        style: TiemposEstilos.subtituloOscuro,
                       ),
-
                       const SizedBox(height: 4),
                       if (parque.clima != null)
                         Column(
@@ -286,24 +282,22 @@ class ParqueCard extends StatelessWidget {
                                   width: 24,
                                   height: 24,
                                   errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.wb_sunny, size: 24, color: Colors.yellow),
+                                  const Icon(
+                                    TiemposIconos.clima,
+                                    size: 24,
+                                    color: Colors.yellow,
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   '${parque.clima!.temperatura.toStringAsFixed(1)}°C',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.7),
-                                    fontSize: 14,
-                                  ),
+                                  style: TiemposEstilos.subtituloOscuro,
                                 ),
                               ],
                             ),
                             Text(
                               parque.clima!.descripcion,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 14,
-                              ),
+                              style: TiemposEstilos.subtituloOscuro,
                             ),
                           ],
                         ),
@@ -312,21 +306,24 @@ class ParqueCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: TiemposTamanos.separacionInterna),
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
                 onPressed: onRegistrarVisita,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: TiemposColores.botonPrimario,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 ),
-                child: const Text(
-                  'Registrar visita',
-                  style: TextStyle(color: Colors.white),
+                child: Text(
+                  TiemposTextos.registrarVisita,
+                  style: TiemposEstilos.botonPrimario,
                 ),
               ),
             ),

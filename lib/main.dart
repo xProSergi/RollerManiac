@@ -7,10 +7,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart';
 
 import 'core/injection_container.dart';
-import 'login_roller_maniac_widget.dart';
+import 'features/auth/presentation/login_roller_maniac_widget.dart';
 import 'features/tiempos/presentation/view/pantalla_principal.dart';
-import 'registro_screen.dart';
-import 'recuperar_password_screen.dart';
+import 'features/auth/presentation/registro_screen.dart';
+import 'features/auth/presentation/recuperar_password_screen.dart';
 import 'features/social/presentation/viewmodel/social_viewmodel.dart';
 
 
@@ -72,11 +72,6 @@ class AuthChecker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Cerrar sesión al iniciar (se ejecuta cada vez que se reconstruye el widget)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FirebaseAuth.instance.signOut();
-    });
-
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -97,7 +92,7 @@ class AuthChecker extends StatelessWidget {
             body: Center(
               child: Text(
                 'Error: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.red),
               ),
             ),
           );
@@ -105,6 +100,7 @@ class AuthChecker extends StatelessWidget {
 
         final user = snapshot.data;
         if (user != null) {
+          // Si el email no está verificado y no es un usuario anónimo
           if (!user.emailVerified && !user.isAnonymous) {
             return Scaffold(
               backgroundColor: Color(0xFF0F172A),

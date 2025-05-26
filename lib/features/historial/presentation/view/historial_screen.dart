@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../services/firebase_service.dart';
 import 'historial_atracciones_screen.dart';
+import '../../constantes/historial_constantes.dart';
 
 class HistorialScreen extends StatefulWidget {
   final Function() actualizarVisitas;
@@ -44,8 +45,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error cargando visitas: $e'),
-          backgroundColor: Colors.red,
+          content: Text('${HistorialConstantes.errorCargandoVisitas} $e'),
+          backgroundColor: HistorialConstantes.colorError,
         ),
       );
     }
@@ -54,36 +55,18 @@ class _HistorialScreenState extends State<HistorialScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text(
-          'Historial de Visitas',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            letterSpacing: 1.1,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              _cargarVisitas();
-              widget.cargarVisitasCallback?.call();
-            },
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            tooltip: 'Actualizar visitas',
-          )
-        ],
-      ),
+      backgroundColor: HistorialConstantes.colorFondo,
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))
+          ? const Center(
+        child: CircularProgressIndicator(
+          color: HistorialConstantes.colorAccento,
+        ),
+      )
           : visitas.isEmpty
           ? const Center(
         child: Text(
-          'No hay visitas registradas',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          HistorialConstantes.noHayVisitas,
+          style: HistorialConstantes.estiloVacio,
         ),
       )
           : _buildHistorialContent(),
@@ -109,26 +92,28 @@ class _HistorialScreenState extends State<HistorialScreen> {
         final parqueId = parqueVisitas.first['parqueId'].toString();
         final totalVisitas = parqueVisitas.length;
         final ultimaVisita = parqueVisitas.first['fecha'];
-        final fechaFormateada =
-            '${ultimaVisita.toDate().day}/${ultimaVisita.toDate().month}/${ultimaVisita.toDate().year}';
+        final fechaFormateada = '${ultimaVisita.toDate().day}/${ultimaVisita.toDate().month}/${ultimaVisita.toDate().year}';
 
         return ListTile(
           title: Text(
             parqueNombre,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: HistorialConstantes.estiloTitulo,
           ),
           subtitle: Text(
-            'Visitas: $totalVisitas - Última: $fechaFormateada',
-            style: TextStyle(color: Colors.white70),
+            '${HistorialConstantes.visitas}: $totalVisitas - ${HistorialConstantes.ultima}: $fechaFormateada',
+            style: HistorialConstantes.estiloSubtitulo,
           ),
           leading: CircleAvatar(
-            backgroundColor: Colors.cyan,
+            backgroundColor: HistorialConstantes.colorAvatar,
             child: Text(
               totalVisitas.toString(),
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: HistorialConstantes.colorTexto),
             ),
           ),
-          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white70),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            color: HistorialConstantes.colorTextoSecundario,
+          ),
           onTap: () {
             Navigator.push(
               context,

@@ -4,6 +4,7 @@ import '../../domain/entities/parque.dart';
 import '../../domain/entities/atraccion.dart';
 import '../viewmodel/tiempos_viewmodel.dart';
 import 'detalles_parque_screen.dart';
+import '../../constantes/tiempos_constantes.dart';
 
 class TiemposScreen extends StatefulWidget {
   @override
@@ -30,20 +31,16 @@ class _TiemposScreenState extends State<TiemposScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: TiemposColores.fondoClaro,
       appBar: AppBar(
         title: Text(
-          'Parques Temáticos',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
+          TiemposTextos.tituloParques,
+          style: TiemposEstilos.tituloAppBarClaro,
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.blue[800],
-        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: TiemposColores.botonPrimario,
+        iconTheme: const IconThemeData(color: TiemposColores.textoClaro),
       ),
       body: Consumer<TiemposViewModel>(
         builder: (context, viewModel, child) {
@@ -53,13 +50,13 @@ class _TiemposScreenState extends State<TiemposScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Colors.blue[800]),
+                    valueColor: AlwaysStoppedAnimation(TiemposColores.botonPrimario),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
-                    'Cargando parques...',
+                    TiemposTextos.cargando,
                     style: TextStyle(
-                      color: Colors.blueGrey[700],
+                      color: TiemposColores.textoSecundarioOscuro,
                     ),
                   ),
                 ],
@@ -72,13 +69,17 @@ class _TiemposScreenState extends State<TiemposScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.park, size: 60, color: Colors.blueGrey[300]),
-                  SizedBox(height: 20),
+                  Icon(
+                    TiemposIconos.parque,
+                    size: 60,
+                    color: TiemposColores.textoSecundarioOscuro,
+                  ),
+                  const SizedBox(height: 20),
                   Text(
-                    'No se encontraron parques',
+                    TiemposTextos.sinParques,
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.blueGrey[800],
+                      color: TiemposColores.textoOscuro,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -91,7 +92,7 @@ class _TiemposScreenState extends State<TiemposScreen> {
             onRefresh: () => viewModel.cargarParques(),
             child: ListView.builder(
               controller: _scrollController,
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(TiemposTamanos.paddingHorizontal),
               itemCount: viewModel.parques.length,
               itemBuilder: (context, index) {
                 final parque = viewModel.parques[index];
@@ -134,24 +135,28 @@ class _ParkCard extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.wb_sunny, size: 18, color: Colors.amber[600]),
-            SizedBox(width: 4),
+            Icon(
+              TiemposIconos.clima,
+              size: 18,
+              color: Colors.amber[600],
+            ),
+            const SizedBox(width: 4),
             Text(
               '24°C',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.blueGrey[800],
+                color: TiemposColores.textoOscuro,
               ),
             ),
           ],
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           'Soleado',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.blueGrey[600],
+            color: TiemposColores.textoSecundarioOscuro,
           ),
         ),
       ],
@@ -161,13 +166,13 @@ class _ParkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 1,
-      margin: EdgeInsets.only(bottom: 16),
+      elevation: TiemposTamanos.elevacionTarjeta,
+      margin: EdgeInsets.only(bottom: TiemposTamanos.separacionElementos),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
         onTap: onTap,
         child: IntrinsicHeight(
           child: Row(
@@ -176,23 +181,23 @@ class _ParkCard extends StatelessWidget {
               Container(
                 width: 100,
                 decoration: BoxDecoration(
-                  color: Colors.blue[50],
+                  color: TiemposColores.fondoClaro,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
+                    topLeft: Radius.circular(TiemposTamanos.radioBordes),
+                    bottomLeft: Radius.circular(TiemposTamanos.radioBordes),
                   ),
                 ),
                 child: Center(
                   child: Icon(
-                    Icons.park,
+                    TiemposIconos.parque,
                     size: 40,
-                    color: Colors.blue[800],
+                    color: TiemposColores.botonPrimario,
                   ),
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(TiemposTamanos.paddingHorizontal),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -202,40 +207,36 @@ class _ParkCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               parque.nombre,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.blueGrey[900],
-                              ),
+                              style: TiemposEstilos.tituloParqueClaro,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           _buildWeatherInfo(),
                         ],
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Icon(
-                            Icons.location_on,
+                            TiemposIconos.ubicacion,
                             size: 16,
-                            color: Colors.blueGrey[500],
+                            color: TiemposColores.textoSecundarioOscuro,
                           ),
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
                             'Madrid, España',
                             style: TextStyle(
-                              color: Colors.blueGrey[700],
+                              color: TiemposColores.textoSecundarioOscuro,
                               fontSize: 14,
                             ),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           Text(
-                            '${parque.atracciones.length} atracciones',
+                            '${parque.atracciones.length} ${TiemposTextos.registrarVisita.toLowerCase()}',
                             style: TextStyle(
-                              color: Colors.blue[800],
+                              color: TiemposColores.botonPrimario,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),

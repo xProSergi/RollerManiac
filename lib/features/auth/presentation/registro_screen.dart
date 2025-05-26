@@ -45,11 +45,16 @@ class _RegistroScreenState extends State<RegistroScreen> {
         password: password,
       );
 
+      final user = userCredential.user;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+      }
+
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/principal');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Bienvenido ${userCredential.user!.email}')),
+          const SnackBar(content: Text('Revisa tu correo para verificar tu cuenta')),
         );
+        Navigator.pushReplacementNamed(context, '/principal');
       }
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,6 +62,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

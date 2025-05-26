@@ -4,6 +4,7 @@ import '../../domain/entities/atraccion.dart';
 import '../../domain/entities/clima.dart';
 import '../../domain/repositories/parques_repository.dart';
 import '../../domain/usecases/obtener_clima_por_ciudad.dart';
+import '../../constantes/tiempos_constantes.dart';
 
 class TiemposViewModel extends ChangeNotifier {
   final ParquesRepository repository;
@@ -30,7 +31,7 @@ class TiemposViewModel extends ChangeNotifier {
       _parques = await repository.obtenerParques();
       await _cargarDatosClima();
     } catch (e) {
-      _setError('Error al cargar los parques: $e');
+      _setError('${TiemposTextos.errorCargar}: $e');
     } finally {
       _setCargando(false);
     }
@@ -40,7 +41,7 @@ class TiemposViewModel extends ChangeNotifier {
     try {
       return await repository.obtenerAtraccionesDeParque(parqueId);
     } catch (e) {
-      _setError('Error al cargar atracciones: $e');
+      _setError('${TiemposTextos.errorAtracciones}: $e');
       return [];
     }
   }
@@ -48,19 +49,12 @@ class TiemposViewModel extends ChangeNotifier {
   Future<void> _cargarDatosClima() async {
     for (final parque in _parques) {
       try {
-   
         final ciudadParaClima = obtenerCiudadParaClima(parque.nombre);
-
-      
         final ciudadConsulta = ciudadParaClima.isNotEmpty ? ciudadParaClima : parque.ciudad;
-
-  
         final clima = await obtenerClimaPorCiudad.ejecutar(ciudadConsulta);
 
-      
         _datosClima[parque.nombre] = clima;
 
-       
         _parques = _parques.map((p) {
           if (p.nombre == parque.nombre) {
             return Parque(
@@ -75,7 +69,7 @@ class TiemposViewModel extends ChangeNotifier {
           return p;
         }).toList();
       } catch (e) {
-        debugPrint('Error al cargar clima para ${parque.nombre}: $e');
+        debugPrint('${TiemposTextos.errorCargar} ${parque.nombre}: $e');
       }
     }
     notifyListeners();
@@ -91,7 +85,6 @@ class TiemposViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
- 
   String obtenerCiudadParaClima(String nombreParque) {
     if (nombreParque == 'Parque Warner Madrid') {
       return 'San Martín de la Vega, Spain';
