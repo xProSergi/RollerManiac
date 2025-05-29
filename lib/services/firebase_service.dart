@@ -11,9 +11,7 @@ class FirebaseService {
   static Future<void> registrarVisita(String parqueId, String parqueNombre) async {
     try {
       final user = _auth.currentUser;
-      if (user == null || !user.emailVerified) {
-        throw Exception('Usuario no autenticado o email no verificado');
-      }
+
 
       await _firestore
           .collection('usuarios')
@@ -41,9 +39,7 @@ class FirebaseService {
       ) async {
     try {
       final user = _auth.currentUser;
-      if (user == null || !user.emailVerified) {
-        throw Exception('Usuario no autenticado o email no verificado');
-      }
+
 
       await _firestore
           .collection('usuarios')
@@ -68,9 +64,7 @@ class FirebaseService {
   static Future<List<Map<String, dynamic>>> obtenerVisitas() async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('Usuario no autenticado');
-      }
+
 
       final snapshot = await _firestore
           .collection('usuarios')
@@ -98,9 +92,7 @@ class FirebaseService {
   static Future<List<Map<String, dynamic>>> obtenerVisitasAtracciones(String parqueId) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('Usuario no autenticado');
-      }
+
 
       final snapshot = await _firestore
           .collection('usuarios')
@@ -126,7 +118,7 @@ class FirebaseService {
   static Future<Map<String, int>> obtenerConteoVisitasAtracciones(String parqueId) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) throw Exception('Usuario no autenticado');
+
 
       final snapshot = await _firestore
           .collection('usuarios')
@@ -152,9 +144,7 @@ class FirebaseService {
 
   static Future<Map<String, Map<String, dynamic>>> obtenerDetalleVisitasAtracciones(String parqueId) async {
     final user = _auth.currentUser;
-    if (user == null) {
-      throw Exception('Usuario no autenticado');
-    }
+
 
     final visitasSnapshot = await _firestore
         .collection('usuarios')
