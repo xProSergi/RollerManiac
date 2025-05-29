@@ -19,7 +19,7 @@ class SocialRemoteDataSource {
 
   Future<List<SolicitudAmistad>> obtenerSolicitudes() async {
     final user = auth.currentUser;
-    if (user == null) throw Exception('Usuario no autenticado');
+
 
     final snapshot = await firestore
         .collection('usuarios')
@@ -35,11 +35,11 @@ class SocialRemoteDataSource {
   Future<void> agregarAmigo(String usernameInput) async {
     try {
       final currentUser = auth.currentUser;
-      if (currentUser == null) throw Exception('Usuario no autenticado');
+
 
       final currentUserId = currentUser.uid;
       final currentUserEmail = currentUser.email;
-      if (currentUserEmail == null) throw Exception('Usuario no tiene email');
+
 
       // Como el username es el correo hasta el arroba, corto el username hasta el @
       String username = usernameInput.trim().toLowerCase();
@@ -54,7 +54,7 @@ class SocialRemoteDataSource {
           .limit(1)
           .get();
 
-      if (query.docs.isEmpty) throw Exception('Usuario no encontrado');
+
 
       final targetDoc = query.docs.first;
       final targetId = targetDoc.id;
