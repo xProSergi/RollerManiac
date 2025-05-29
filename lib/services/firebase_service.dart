@@ -12,7 +12,6 @@ class FirebaseService {
     try {
       final user = _auth.currentUser;
 
-
       await _firestore
           .collection('usuarios')
           .doc(user.uid)
