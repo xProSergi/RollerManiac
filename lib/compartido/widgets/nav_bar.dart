@@ -29,6 +29,7 @@ class NavBar extends StatelessWidget {
           icon: Icon(Icons.history),
           label: 'Historial',
         ),
+
         BottomNavigationBarItem(
           icon: Icon(Icons.people_alt_rounded),
           label: 'Social',

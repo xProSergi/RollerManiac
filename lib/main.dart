@@ -100,29 +100,8 @@ class AuthChecker extends StatelessWidget {
 
         final user = snapshot.data;
         if (user != null) {
-          // Si el email no está verificado y no es un usuario anónimo
-          if (!user.emailVerified && !user.isAnonymous) {
-            return Scaffold(
-              backgroundColor: Color(0xFF0F172A),
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Usuario: ${user.email}',
-                        style: TextStyle(color: Colors.white)),
-                    const SizedBox(height: 20),
-                    const Text('Por favor verifica tu email',
-                        style: TextStyle(color: Colors.white)),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () => user.sendEmailVerification(),
-                      child: const Text('Reenviar email de verificación'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+
+
 
           return const PantallaPrincipal();
         }

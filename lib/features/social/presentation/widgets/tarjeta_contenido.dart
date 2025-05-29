@@ -16,7 +16,7 @@ class TarjetaContenido extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: margin,
-      padding: const EdgeInsets.all(16),
+      // Removed the internal padding from TarjetaContenido's Container
       decoration: BoxDecoration(
         color: cardColor.withOpacity(0.95),
         borderRadius: BorderRadius.circular(12),
@@ -28,7 +28,10 @@ class TarjetaContenido extends StatelessWidget {
           ),
         ],
       ),
-      child: child,
+      child: Padding( // Added Padding directly around the child
+        padding: const EdgeInsets.all(16), // This padding defines the internal space
+        child: child,
+      ),
     );
   }
 }

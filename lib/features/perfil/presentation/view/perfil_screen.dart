@@ -15,50 +15,78 @@ class PerfilScreen extends StatelessWidget {
       child: Consumer<PerfilViewModel>(
         builder: (context, viewModel, _) {
           if (!viewModel.isLoaded) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+            return Scaffold(
+              body: Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: PerfilConstantes.gradienteFondo,
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: PerfilConstantes.colorTextoPrincipal,
+                  ),
+                ),
+              ),
             );
           }
 
           return Scaffold(
-            backgroundColor: PerfilConstantes.colorFondo,
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    PerfilInfoCard(
-                      username: viewModel.username,
-                      email: viewModel.email,
-                      creationDate: viewModel.creationDate,
-                    ),
-                    const SizedBox(height: 24),
-                    const PerfilOpcionesList(),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: PerfilConstantes.colorBotonCerrarSesion,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () async {
-                        await viewModel.signOut();
-                        if (context.mounted) {
-                          Navigator.of(context).pushReplacementNamed('/login');
-                        }
-                      },
-                      icon: const Icon(PerfilConstantes.iconoCerrarSesion),
-                      label: const Text(
-                        PerfilConstantes.cerrarSesion,
-                        style: PerfilConstantes.estiloBotonCerrarSesion,
-                      ),
-                    ),
-                  ],
+            body: Stack(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    gradient: PerfilConstantes.gradienteFondo,
+                  ),
                 ),
-              ),
+                SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        PerfilInfoCard(
+                          username: viewModel.username,
+                          email: viewModel.email,
+                          creationDate: viewModel.creationDate,
+                        ),
+                        const SizedBox(height: 24),
+                        const PerfilOpcionesList(),
+                        const SizedBox(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: PerfilConstantes.colorBotonCerrarSesion,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              shadowColor: Colors.black.withOpacity(0.4),
+                              elevation: 6,
+                            ),
+                            onPressed: () async {
+                              await viewModel.signOut();
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacementNamed('/login');
+                              }
+                            },
+                            icon: const Icon(
+                              PerfilConstantes.iconoCerrarSesion,
+                              size: 22,
+                              color: PerfilConstantes.colorTextoPrincipal,
+                            ),
+                            label: const Text(
+                              PerfilConstantes.cerrarSesion,
+                              style: PerfilConstantes.estiloBotonCerrarSesion,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },

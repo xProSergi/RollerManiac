@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import '../../domain/entities/parque.dart';
 import '../../domain/entities/atraccion.dart';
 import '../../../../services/firebase_service.dart';
@@ -15,158 +14,154 @@ class DetallesParqueScreen extends StatelessWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null || !user.emailVerified) {
-      final mensaje = user == null
-          ? TiemposTextos.errorSesion
-          : TiemposTextos.errorVerificacion;
-
-      scaffoldMessenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(mensaje),
-            backgroundColor: TiemposColores.error,
-          ),
-        );
+    if (user == null) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(TiemposConstantes.errorSesion),
+          backgroundColor: TiemposConstantes.error,
+        ),
+      );
       return;
     }
 
-    scaffoldMessenger
+    final snackBar = ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
-            children: [
-              CircularProgressIndicator(color: TiemposColores.textoClaro),
-              SizedBox(width: 20),
-              Expanded(child: Text('Registrando visita...')),
-            ],
-          ),
-          duration: Duration(minutes: 1),
-          behavior: SnackBarBehavior.floating,
+            children: [ // Correctly opened children list
+              const CircularProgressIndicator(color: TiemposConstantes.textoPrincipal),
+              const SizedBox(width: 20),
+              Expanded(child: Text('${TiemposConstantes.registrar} $atraccionNombre...')),
+            ], // Correctly closed children list
+          ), // Correctly closed Row
+          duration: const Duration(minutes: 1),
+          backgroundColor: TiemposConstantes.tarjeta,
         ),
       );
 
     try {
-      await FirebaseService.registrarVisitaAtraccion(
-        parque.id,
-        parque.nombre,
-        atraccionNombre,
-      );
+    await FirebaseService.registrarVisitaAtraccion(
+    parque.id,
+    parque.nombre,
+    atraccionNombre,
+    );
 
-      scaffoldMessenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.visitando} $atraccionNombre'),
-            backgroundColor: TiemposColores.exito,
-          ),
-        );
-    } on FirebaseException catch (e) {
-      scaffoldMessenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.errorCargar}: ${e.message ?? 'Error desconocido'}'),
-            backgroundColor: TiemposColores.error,
-          ),
-        );
+    snackBar
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+    SnackBar(
+    content: Text('${TiemposConstantes.visitando} $atraccionNombre'),
+    backgroundColor: TiemposConstantes.exito,
+    ),
+    );
     } catch (e) {
-      scaffoldMessenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.errorCargar}: ${e.toString()}'),
-            backgroundColor: TiemposColores.error,
-          ),
-        );
+    snackBar
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+    SnackBar(
+    content: Text('${TiemposConstantes.errorAtracciones}: ${e.toString()}'),
+    backgroundColor: TiemposConstantes.error,
+    ),
+    );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TiemposColores.fondoOscuro,
-      appBar: AppBar(
-        backgroundColor: TiemposColores.tarjetaOscura,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          parque.nombre,
-          style: TiemposEstilos.tituloAppBarOscuro,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: TiemposConstantes.gradienteFondo,
         ),
-        iconTheme: const IconThemeData(color: TiemposColores.textoClaro),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: TiemposTamanos.paddingHorizontal,
-          vertical: TiemposTamanos.paddingVertical,
-        ),
-        child: ListView.separated(
-          itemCount: parque.atracciones.length,
-          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
-          itemBuilder: (context, index) {
-            final Atraccion atraccion = parque.atracciones[index];
-            final bool operativa = atraccion.operativa;
+        child: SafeArea(
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                centerTitle: true,
+                title: Text(
+                  parque.nombre,
+                  style: TiemposConstantes.estiloTituloAppBar,
+                ),
+                iconTheme: const IconThemeData(color: TiemposConstantes.textoPrincipal),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: TiemposConstantes.paddingHorizontal,
+                  ),
+                  child: ListView.separated(
+                    itemCount: parque.atracciones.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: TiemposConstantes.separacionElementos),
+                    itemBuilder: (context, index) {
+                      final atraccion = parque.atracciones[index];
+                      final bool operativa = atraccion.operativa;
 
-            return Container(
-              decoration: BoxDecoration(
-                color: TiemposColores.tarjetaOscura,
-                borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: TiemposTamanos.paddingHorizontal,
-                vertical: TiemposTamanos.separacionInterna,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    TiemposIconos.atraccion,
-                    color: operativa ? TiemposColores.operativa : TiemposColores.mantenimiento,
-                    size: 28,
-                  ),
-                  const SizedBox(width: TiemposTamanos.separacionInterna),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          atraccion.nombre,
-                          style: TiemposEstilos.tituloParqueOscuro,
+                      return Card(
+                        color: TiemposConstantes.tarjeta,
+                        elevation: TiemposConstantes.elevacionTarjeta,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(TiemposConstantes.radioBordes),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          operativa
-                              ? 'Espera: ${atraccion.tiempoEspera} min'
-                              : TiemposTextos.enMantenimiento,
-                          style: operativa
-                              ? TiemposEstilos.estadoOperativo
-                              : TiemposEstilos.estadoMantenimiento,
+                        child: Padding(
+                          padding: const EdgeInsets.all(TiemposConstantes.separacionInterna),
+                          child: Row(
+                            children: [
+                              Icon(
+                                TiemposConstantes.atraccion,
+                                color: operativa ? TiemposConstantes.operativa : TiemposConstantes.mantenimiento,
+                                size: 28,
+                              ),
+                              const SizedBox(width: TiemposConstantes.separacionInterna),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      atraccion.nombre,
+                                      style: TiemposConstantes.estiloTitulo,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      operativa
+                                          ? 'Espera: ${atraccion.tiempoEspera} min'
+                                          : TiemposConstantes.enMantenimiento,
+                                      style: operativa
+                                          ? TiemposConstantes.estiloEstadoOperativo
+                                          : TiemposConstantes.estiloEstadoMantenimiento,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: TiemposConstantes.botonPrimario,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                ),
+                                child: Text(
+                                  TiemposConstantes.registrar,
+                                  style: TiemposConstantes.estiloBotonSecundario,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                  ElevatedButton(
-                    onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: TiemposColores.botonPrimario,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    child: Text(
-                      TiemposTextos.registrar,
-                      style: TiemposEstilos.botonSecundario,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );

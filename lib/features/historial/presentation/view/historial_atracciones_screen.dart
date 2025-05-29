@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../services/firebase_service.dart';
+import '../../constantes/historial_constantes.dart';
 
 class HistorialAtraccionesScreen extends StatelessWidget {
   final String parqueId;
@@ -14,67 +15,103 @@ class HistorialAtraccionesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
-        title: Text(
-          'Atracciones en $parqueNombre',
-          style: const TextStyle(color: Colors.white),
+      backgroundColor: HistorialConstantes.colorFondo,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: HistorialConstantes.gradienteFondo,
         ),
-      ),
-      body: FutureBuilder<Map<String, int>>(
-        future: FirebaseService.obtenerConteoVisitasAtracciones(parqueId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.cyanAccent));
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                'No has registrado visitas a atracciones en este parque',
-                style: TextStyle(color: Colors.white70),
-              ),
-            );
-          }
-
-          final atracciones = snapshot.data!;
-          final atraccionesList = atracciones.entries.toList()
-            ..sort((a, b) => b.value.compareTo(a.value));
-
-          return ListView.builder(
-            itemCount: atraccionesList.length,
-            itemBuilder: (context, index) {
-              final entry = atraccionesList[index];
-              return ListTile(
-                leading: const Icon(Icons.attractions, color: Colors.cyanAccent),
+        child: SafeArea(
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                centerTitle: true,
                 title: Text(
-                  entry.key,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  parqueNombre,
+                  style: HistorialConstantes.estiloTituloAppBar,
                 ),
-                subtitle: Text(
-                  '${entry.value} ${entry.value == 1 ? 'vez' : 'veces'}',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
-                  ),
+                iconTheme: const IconThemeData(color: Colors.white),
+              ),
+              Expanded(
+                child: FutureBuilder<Map<String, int>>(
+                  future: FirebaseService.obtenerConteoVisitasAtracciones(parqueId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: HistorialConstantes.colorAccento,
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          '${HistorialConstantes.errorCargandoVisitas} ${snapshot.error}',
+                          style: const TextStyle(color: HistorialConstantes.colorError),
+                        ),
+                      );
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No has registrado visitas a atracciones en este parque',
+                          style: HistorialConstantes.estiloVacio,
+                        ),
+                      );
+                    }
+
+                    final atracciones = snapshot.data!;
+                    final atraccionesList = atracciones.entries.toList()
+                      ..sort((a, b) => b.value.compareTo(a.value));
+
+                    return ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: atraccionesList.length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final entry = atraccionesList[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: HistorialConstantes.colorSuperficie,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [HistorialConstantes.sombraTile],
+                          ),
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            leading: Icon(
+                              Icons.attractions,
+                              color: HistorialConstantes.colorAccento,
+                              size: 28,
+                            ),
+                            title: Text(
+                              entry.key,
+                              style: HistorialConstantes.estiloTitulo,
+                            ),
+                            subtitle: Text(
+                              '${entry.value} ${entry.value == 1 ? 'vez' : 'veces'}',
+                              style: HistorialConstantes.estiloSubtitulo,
+                            ),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              color: HistorialConstantes.colorAccento,
+                              size: 24,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: Colors.white.withOpacity(0.5),
-                ),
-              );
-            },
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

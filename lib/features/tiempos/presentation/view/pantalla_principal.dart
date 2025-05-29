@@ -21,29 +21,20 @@ class PantallaPrincipal extends StatefulWidget {
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-  String? userId;
-
-  void _actualizarVisitas() {
-    setState(() {});
-  }
-
-  void _cargarVisitasDesdePrincipal() {}
 
   @override
   void initState() {
     super.initState();
-
-    final user = FirebaseAuth.instance.currentUser;
-    userId = user?.uid;
-
     _pages = [
       const ParquesListScreen(),
+      // Pasamos la función actualizarVisitas al HistorialScreen
       HistorialScreen(
-        actualizarVisitas: _actualizarVisitas,
-        cargarVisitasCallback: _cargarVisitasDesdePrincipal,
+        actualizarVisitas: () {
+          Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
+        },
       ),
       const SocialScreen(),
-      PerfilScreen(),
+      const PerfilScreen(),
     ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _verifyAuth(context);
@@ -55,37 +46,38 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-    } else if (!user.emailVerified) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(TiemposTextos.errorVerificacion),
-          backgroundColor: TiemposColores.info,
-        ),
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TiemposColores.fondoOscuro,
-      appBar: AppBar(
-        backgroundColor: TiemposColores.tarjetaOscura,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          TiemposTextos.tituloApp,
-          style: TiemposEstilos.tituloAppBarOscuro,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: TiemposConstantes.gradienteFondo,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                centerTitle: true,
+                title: Text(
+                  TiemposConstantes.tituloApp,
+                  style: TiemposConstantes.estiloTituloAppBar,
+                ),
+              ),
+              Expanded(
+                child: _pages[_selectedIndex],
+              ),
+            ],
+          ),
         ),
       ),
-      body: _pages[_selectedIndex],
       bottomNavigationBar: NavBar(
         currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onTap: (index) => setState(() => _selectedIndex = index),
       ),
     );
   }
@@ -98,65 +90,51 @@ class ParquesListScreen extends StatelessWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null || !user.emailVerified) {
-      final mensaje = user == null
-          ? TiemposTextos.errorSesion
-          : TiemposTextos.errorVerificacion;
-
-      scaffoldMessenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(mensaje),
-            backgroundColor: TiemposColores.error,
-          ),
-        );
+    if (user == null) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(user == null
+              ? TiemposConstantes.errorSesion
+              : TiemposConstantes.errorVerificacion),
+          backgroundColor: TiemposConstantes.error,
+        ),
+      );
       return;
     }
 
-    scaffoldMessenger
+    final snackBar = scaffoldMessenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              CircularProgressIndicator(color: TiemposColores.textoClaro),
-              SizedBox(width: 20),
-              Expanded(child: Text('Registrando visita...')),
+              const CircularProgressIndicator(color: TiemposConstantes.textoPrincipal),
+              const SizedBox(width: 20),
+              Expanded(child: Text('${TiemposConstantes.registrarVisita}...')),
             ],
           ),
-          duration: Duration(minutes: 1),
-          behavior: SnackBarBehavior.floating,
+          duration: const Duration(minutes: 1),
+          backgroundColor: TiemposConstantes.tarjeta,
         ),
       );
 
     try {
       await FirebaseService.registrarVisita(parqueId, parqueNombre);
-
-      scaffoldMessenger
+      snackBar
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(' ${TiemposTextos.visitando} $parqueNombre'),
-            backgroundColor: TiemposColores.exito,
-          ),
-        );
-    } on FirebaseException catch (e) {
-      scaffoldMessenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(' ${TiemposTextos.errorCargar}: ${e.message ?? 'Error desconocido'}'),
-            backgroundColor: TiemposColores.error,
+            content: Text('${TiemposConstantes.visitando} $parqueNombre'),
+            backgroundColor: TiemposConstantes.exito,
           ),
         );
     } catch (e) {
-      scaffoldMessenger
+      snackBar
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('⚠️ ${TiemposTextos.errorCargar}: ${e.toString()}'),
-            backgroundColor: TiemposColores.error,
+            content: Text('${TiemposConstantes.errorCargar}: ${e.toString()}'),
+            backgroundColor: TiemposConstantes.error,
           ),
         );
     }
@@ -167,26 +145,24 @@ class ParquesListScreen extends StatelessWidget {
     final viewModel = Provider.of<TiemposViewModel>(context);
 
     return RefreshIndicator(
-      color: TiemposColores.textoClaro,
+      color: TiemposConstantes.textoPrincipal,
       onRefresh: viewModel.cargarParques,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: TiemposTamanos.paddingHorizontal,
-          vertical: TiemposTamanos.paddingVertical,
+          horizontal: TiemposConstantes.paddingHorizontal,
         ),
         child: viewModel.cargando
-            ? const Center(
-            child: CircularProgressIndicator(color: TiemposColores.textoClaro))
+            ? const Center(child: CircularProgressIndicator(color: TiemposConstantes.textoPrincipal))
             : viewModel.error != null
             ? Center(
           child: Text(
-            '${TiemposTextos.errorCargar}: ${viewModel.error}',
-            style: const TextStyle(color: TiemposColores.error),
+            '${TiemposConstantes.errorCargar}: ${viewModel.error}',
+            style: const TextStyle(color: TiemposConstantes.error),
           ),
         )
             : ListView.separated(
           itemCount: viewModel.parques.length,
-          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
+          separatorBuilder: (_, __) => const SizedBox(height: TiemposConstantes.separacionElementos),
           itemBuilder: (context, index) {
             final parque = viewModel.parques[index];
             return ParqueCard(
@@ -233,101 +209,92 @@ class ParqueCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: TiemposColores.tarjetaOscura,
-          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
+      child: Card(
+        color: TiemposConstantes.tarjeta,
+        elevation: TiemposConstantes.elevacionTarjeta,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(TiemposConstantes.radioBordes),
         ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  TiemposIconos.parque,
-                  color: TiemposColores.textoClaro,
-                  size: 28,
-                ),
-                const SizedBox(width: TiemposTamanos.separacionInterna),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        parque.nombre,
-                        style: TiemposEstilos.tituloParqueOscuro,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        (parque.nombre == 'Parque Warner Madrid')
-                            ? TiemposTextos.warnerMadrid
-                            : (parque.nombre == 'PortAventura Park' || parque.nombre == 'Ferrari Land')
-                            ? TiemposTextos.portAventura
-                            : '${parque.ciudad}, ${parque.pais}',
-                        style: TiemposEstilos.subtituloOscuro,
-                      ),
-                      const SizedBox(height: 4),
-                      if (parque.clima != null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Image.network(
-                                  'https:${parque.clima!.codigoIcono}',
-                                  width: 24,
-                                  height: 24,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    TiemposIconos.clima,
-                                    size: 24,
-                                    color: Colors.yellow,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${parque.clima!.temperatura.toStringAsFixed(1)}°C',
-                                  style: TiemposEstilos.subtituloOscuro,
-                                ),
-                              ],
-                            ),
-                            Text(
-                              parque.clima!.descripcion,
-                              style: TiemposEstilos.subtituloOscuro,
-                            ),
-                          ],
+        child: Padding(
+          padding: const EdgeInsets.all(TiemposConstantes.separacionInterna),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    TiemposConstantes.parque,
+                    color: TiemposConstantes.textoPrincipal,
+                    size: 28,
+                  ),
+                  const SizedBox(width: TiemposConstantes.separacionInterna),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          parque.nombre,
+                          style: TiemposConstantes.estiloTitulo,
                         ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          (parque.nombre == 'Parque Warner Madrid')
+                              ? TiemposConstantes.warnerMadrid
+                              : (parque.nombre == 'PortAventura Park' || parque.nombre == 'Ferrari Land')
+                              ? TiemposConstantes.portAventura
+                              : '${parque.ciudad}, ${parque.pais}',
+                          style: TiemposConstantes.estiloSubtitulo,
+                        ),
+                        if (parque.clima != null) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Image.network(
+                                'https:${parque.clima!.codigoIcono}',
+                                width: 24,
+                                height: 24,
+                                errorBuilder: (context, error, stackTrace) => const Icon(
+                                  TiemposConstantes.clima,
+                                  size: 24,
+                                  color: Colors.yellow,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${parque.clima!.temperatura.toStringAsFixed(1)}°C',
+                                style: TiemposConstantes.estiloSubtitulo,
+                              ),
+                            ],
+                          ),
+                          Text(
+                            parque.clima!.descripcion,
+                            style: TiemposConstantes.estiloSubtitulo,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: TiemposTamanos.separacionInterna),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: onRegistrarVisita,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: TiemposColores.botonPrimario,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                ],
+              ),
+              const SizedBox(height: TiemposConstantes.separacionInterna),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: onRegistrarVisita,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TiemposConstantes.botonPrimario,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                  child: Text(
+                    TiemposConstantes.registrarVisita,
+                    style: TiemposConstantes.estiloBotonPrimario,
                   ),
-                ),
-                child: Text(
-                  TiemposTextos.registrarVisita,
-                  style: TiemposEstilos.botonPrimario,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
