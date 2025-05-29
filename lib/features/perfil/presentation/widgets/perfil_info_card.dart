@@ -19,11 +19,11 @@ class PerfilInfoCard extends StatelessWidget {
       color: PerfilConstantes.colorTarjeta,
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -32,15 +32,10 @@ class PerfilInfoCard extends StatelessWidget {
               style: PerfilConstantes.estiloUsername,
             ),
             const SizedBox(height: 8),
-            Text(
-              email,
-              style: PerfilConstantes.estiloEmail,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${PerfilConstantes.miembroDesde} $creationDate',
-              style: PerfilConstantes.estiloFecha,
-            ),
+            Text(email, style: PerfilConstantes.estiloEmail),
+            const SizedBox(height: 8),
+            Text('${PerfilConstantes.miembroDesde} $creationDate',
+                style: PerfilConstantes.estiloFecha),
           ],
         ),
       ),

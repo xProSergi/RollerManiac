@@ -45,14 +45,11 @@ class _RegistroScreenState extends State<RegistroScreen> {
         password: password,
       );
 
-      final user = userCredential.user;
-      if (user != null && !user.emailVerified) {
-        await user.sendEmailVerification();
-      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Revisa tu correo para verificar tu cuenta')),
+
+          const SnackBar(content: Text('Cuenta creada exitosamente')),
         );
         Navigator.pushReplacementNamed(context, '/principal');
       }

@@ -31,7 +31,7 @@ class TiemposViewModel extends ChangeNotifier {
       _parques = await repository.obtenerParques();
       await _cargarDatosClima();
     } catch (e) {
-      _setError('${TiemposTextos.errorCargar}: $e');
+      _setError('${TiemposConstantes.errorCargar}: $e');
     } finally {
       _setCargando(false);
     }
@@ -41,7 +41,7 @@ class TiemposViewModel extends ChangeNotifier {
     try {
       return await repository.obtenerAtraccionesDeParque(parqueId);
     } catch (e) {
-      _setError('${TiemposTextos.errorAtracciones}: $e');
+      _setError('${TiemposConstantes.errorAtracciones}: $e');
       return [];
     }
   }
@@ -69,7 +69,7 @@ class TiemposViewModel extends ChangeNotifier {
           return p;
         }).toList();
       } catch (e) {
-        debugPrint('${TiemposTextos.errorCargar} ${parque.nombre}: $e');
+        debugPrint('${TiemposConstantes.errorCargar} ${parque.nombre}: $e');
       }
     }
     notifyListeners();

@@ -12,6 +12,16 @@ class SocialColores {
   static const Color textoApagado = Colors.white54;
   static const Color error = Colors.redAccent;
   static const Color exito = Colors.green;
+
+  static const LinearGradient gradienteFondo = LinearGradient(
+    colors: [
+      Color(0xFF0056B3),  // Azul intenso
+      Color(0xFF000033),  // Azul noche
+    ],
+    stops: [0.5, 1.0],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 }
 
 class SocialTextStyles {
