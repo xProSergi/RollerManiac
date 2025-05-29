@@ -11,9 +11,7 @@ class FirebaseService {
   static Future<void> registrarVisita(String parqueId, String parqueNombre) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('Usuario no autenticado o email no verificado');
-      }
+
 
       await _firestore
           .collection('usuarios')
