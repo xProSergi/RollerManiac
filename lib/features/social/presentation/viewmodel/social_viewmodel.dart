@@ -72,9 +72,7 @@ class SocialViewModel extends ChangeNotifier {
 
     try {
       final currentUser = auth.currentUser;
-      if (currentUser == null) {
-        throw Exception('Usuario no autenticado');
-      }
+
 
 
       String username = usernameInput.toLowerCase();
