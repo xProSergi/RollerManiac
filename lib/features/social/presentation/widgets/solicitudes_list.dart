@@ -4,18 +4,19 @@ import '../../domain/entities/solicitud_amistad.dart';
 class SolicitudesList extends StatelessWidget {
   final List<SolicitudAmistad> solicitudes;
   final Function(String userId) onAceptar;
+  final Function(String solicitudId) onRechazar; // NEW: Callback for rejecting
 
   const SolicitudesList({
     Key? key,
     required this.solicitudes,
     required this.onAceptar,
+    required this.onRechazar, // NEW
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Wrap ListView.builder in a SizedBox to provide explicit width
     return SizedBox(
-      width: double.infinity, // Explicitly set width to full available space
+      width: double.infinity,
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -37,24 +38,31 @@ class SolicitudesList extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              subtitle: Text(
-                solicitud.email,
-                style: const TextStyle(color: Colors.white70),
-              ),
-              trailing: ElevatedButton(
-                onPressed: () => onAceptar(solicitud.id),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF64B5F6),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              trailing: Row( // Use a Row to place buttons side-by-side
+                mainAxisSize: MainAxisSize.min, // Important to prevent Row from taking full width
+                children: [
+                  ElevatedButton(
+                    onPressed: () => onAceptar(solicitud.id),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF64B5F6),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    child: const Text("Aceptar", style: TextStyle(fontSize: 13)),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                  const SizedBox(width: 8), // Space between buttons
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.redAccent), // "X" icon
+                    onPressed: () => onRechazar(solicitud.id),
+                    tooltip: 'Rechazar solicitud',
                   ),
-                ),
-                child: const Text("Aceptar", style: TextStyle(fontSize: 13)),
+                ],
               ),
             ),
           );

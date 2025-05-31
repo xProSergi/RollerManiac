@@ -18,12 +18,9 @@ class SocialRemoteDataSource {
   String get userId => auth.currentUser!.uid;
 
   Future<List<SolicitudAmistad>> obtenerSolicitudes() async {
-    final user = auth.currentUser;
-
-
     final snapshot = await firestore
         .collection('usuarios')
-        .doc(user.uid)
+        .doc(userId)
         .collection('solicitudesRecibidas')
         .get();
 
@@ -33,68 +30,56 @@ class SocialRemoteDataSource {
   }
 
   Future<void> agregarAmigo(String usernameInput) async {
-    try {
-      final currentUser = auth.currentUser;
-
-
-      final currentUserId = currentUser.uid;
-      final currentUserEmail = currentUser.email;
-
-
-      // Como el username es el correo hasta el arroba, corto el username hasta el @
-      String username = usernameInput.trim().toLowerCase();
-      if (username.contains('@')) {
-        username = username.split('@')[0];
-      }
-
-
-      final query = await firestore
-          .collection('usuarios')
-          .where('username', isEqualTo: username)
-          .limit(1)
-          .get();
-
-
-
-      final targetDoc = query.docs.first;
-      final targetId = targetDoc.id;
-
-
-      final amigoDoc = await firestore
-          .collection('usuarios')
-          .doc(currentUserId)
-          .collection('amigos')
-          .doc(targetId)
-          .get();
-
-      if (amigoDoc.exists) {
-        throw Exception('Ya son amigos');
-      }
-
-      // Se crea la solicitud de amistad
-      final nombre = currentUser.displayName ?? currentUserEmail.split('@')[0];
-      final userUsername = currentUserEmail.split('@')[0].toLowerCase();
-
-      await firestore
-          .collection('usuarios')
-          .doc(targetId)
-          .collection('solicitudesRecibidas')
-          .doc(currentUserId)
-          .set({
-        'email': currentUserEmail,
-        'nombre': nombre,
-        'displayName': nombre,
-        'username': userUsername,
-        'fecha': FieldValue.serverTimestamp(),
-      });
-
-    } catch (e) {
-      print('Error al agregar amigo: $e');
-      rethrow;
+    final currentUser = auth.currentUser!;
+    String username = usernameInput.trim().toLowerCase();
+    if (username.contains('@')) {
+      username = username.split('@')[0];
     }
+
+    if (username == currentUser.email!.split('@')[0].toLowerCase()) {
+      throw Exception('No puedes agregarte a ti mismo');
+    }
+
+    final query = await firestore
+        .collection('usuarios')
+        .where('username', isEqualTo: username)
+        .limit(1)
+        .get();
+
+    // --- IMPORTANT CHANGE HERE ---
+    // Throw the exception immediately if the user is not found
+    if (query.docs.isEmpty) {
+      throw Exception('Usuario no encontrado');
+    }
+    // --- END IMPORTANT CHANGE ---
+
+    final targetDoc = query.docs.first;
+    final targetId = targetDoc.id;
+
+    final amigoDoc = await firestore
+        .collection('usuarios')
+        .doc(currentUser.uid)
+        .collection('amigos')
+        .doc(targetId)
+        .get();
+
+    if (amigoDoc.exists) throw Exception('Ya son amigos');
+
+    final displayName = currentUser.displayName ?? currentUser.email!.split('@')[0];
+
+    await firestore
+        .collection('usuarios')
+        .doc(targetId)
+        .collection('solicitudesRecibidas')
+        .doc(currentUser.uid)
+        .set({
+      'email': currentUser.email,
+      'nombre': displayName,
+      'displayName': displayName,
+      'username': currentUser.email!.split('@')[0].toLowerCase(),
+      'fecha': FieldValue.serverTimestamp(),
+    });
   }
-
-
 
   Future<void> aceptarSolicitud({
     required String currentUserId,
@@ -103,43 +88,50 @@ class SocialRemoteDataSource {
     required String amigoEmail,
     required String amigoDisplayName,
   }) async {
-    final currentUserDoc = await firestore.collection('usuarios').doc(currentUserId).get();
+    final currentUserDoc =
+    await firestore.collection('usuarios').doc(currentUserId).get();
     final currentUserData = currentUserDoc.data() ?? {};
-    final currentUserNombre = currentUserData['displayName'] ?? currentUserData['email']?.split('@')[0] ?? '';
 
+    final batch = firestore.batch();
 
-    await firestore
-        .collection('usuarios')
-        .doc(currentUserId)
-        .collection('amigos')
-        .doc(amigoId)
-        .set({
-      'email': amigoEmail,
-      'displayName': amigoDisplayName,
-      'username': amigoUserName.toLowerCase(),
-      'fecha': FieldValue.serverTimestamp(),
-    });
+    final currentUsername = (currentUserData['username'] ??
+        currentUserData['email']?.split('@')[0] ??
+        '')
+        .toLowerCase();
+    final currentDisplayName =
+        currentUserData['displayName'] ?? currentUserData['email']?.split('@')[0] ?? '';
 
+    // Añadir amigo a ambos usuarios
+    batch.set(
+      firestore.collection('usuarios').doc(currentUserId).collection('amigos').doc(amigoId),
+      {
+        'email': amigoEmail,
+        'displayName': amigoDisplayName,
+        'username': amigoUserName.toLowerCase(),
+        'fecha': FieldValue.serverTimestamp(),
+      },
+    );
 
-    await firestore
-        .collection('usuarios')
-        .doc(amigoId)
-        .collection('amigos')
-        .doc(currentUserId)
-        .set({
-      'email': currentUserData['email'] ?? '',
-      'displayName': currentUserNombre,
-      'username': (currentUserData['username'] ?? '').toLowerCase(),
-      'fecha': FieldValue.serverTimestamp(),
-    });
+    batch.set(
+      firestore.collection('usuarios').doc(amigoId).collection('amigos').doc(currentUserId),
+      {
+        'email': currentUserData['email'] ?? '',
+        'displayName': currentDisplayName,
+        'username': currentUsername,
+        'fecha': FieldValue.serverTimestamp(),
+      },
+    );
 
-      // Eliminar solicitud una vez aceptada
-    await firestore
-        .collection('usuarios')
-        .doc(currentUserId)
-        .collection('solicitudesRecibidas')
-        .doc(amigoId)
-        .delete();
+    // Eliminar solicitud recibida
+    batch.delete(
+      firestore
+          .collection('usuarios')
+          .doc(currentUserId)
+          .collection('solicitudesRecibidas')
+          .doc(amigoId),
+    );
+
+    await batch.commit();
   }
 
   Future<List<Amigo>> obtenerRanking() async {
@@ -154,10 +146,9 @@ class SocialRemoteDataSource {
         .toList();
 
     for (final amigo in amigos) {
-      final amigoId = amigo.id;
       final visitas = await firestore
           .collection('usuarios')
-          .doc(amigoId)
+          .doc(amigo.id)
           .collection('visitas')
           .get();
       amigo.cantidadParques = visitas.size;

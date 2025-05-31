@@ -14,7 +14,7 @@ class AgregarAmigo extends StatefulWidget {
     required this.controller,
     required this.onAgregarAmigo,
     required this.accentColor,
-    required this.cardColor,
+    required this.cardColor, // This is still used for the TextField's fillColor
     required this.textColor,
     required this.lightTextColor,
   }) : super(key: key);
@@ -33,7 +33,7 @@ class _AgregarAmigoState extends State<AgregarAmigo> {
       style: TextStyle(color: widget.textColor),
       decoration: InputDecoration(
         filled: true,
-        fillColor: widget.cardColor,
+        fillColor: widget.cardColor, // This color applies to the TextField background
         labelText: 'Agregar amigo (username)',
         labelStyle: TextStyle(color: widget.lightTextColor),
         hintText: 'Introduce el nombre de usuario',

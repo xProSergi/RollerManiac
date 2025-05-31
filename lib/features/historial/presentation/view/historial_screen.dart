@@ -103,11 +103,14 @@ class _HistorialScreenState extends State<HistorialScreen> {
         final parqueVisitas = visitasPorParque[parqueNombre]!;
         final parqueId = parqueVisitas.first['parqueId'].toString();
 
-        // La última visita suele ser la más reciente, si las fechas vienen ordenadas, si no, hay que ordenarlas
-        // Aquí suponemos que vienen ordenadas descendente, si no, se puede ordenar
         final ultimaVisita = parqueVisitas.first['fecha'];
-        final fechaFormateada =
-            '${ultimaVisita.toDate().day}/${ultimaVisita.toDate().month}/${ultimaVisita.toDate().year}';
+
+        final dia= ultimaVisita.toDate().day.toString().padLeft(2,'0');
+        final mes= ultimaVisita.toDate().month.toString().padLeft(2,'0');
+        final anio= ultimaVisita.toDate().year.toString().padLeft(2,'0');
+
+
+        final fechaFormateada = '$dia/$mes/$anio';
 
         final totalVisitas = parqueVisitas.length;
 

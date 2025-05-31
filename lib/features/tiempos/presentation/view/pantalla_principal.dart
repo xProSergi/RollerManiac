@@ -9,7 +9,7 @@ import '../../../perfil/presentation/view/perfil_screen.dart';
 import '../../../social/presentation/view/social_screen.dart';
 import '../../../../compartido/widgets/nav_bar.dart';
 import '../../../../services/firebase_service.dart';
-import '../../constantes/tiempos_constantes.dart';
+import '../../constantes/tiempos_constantes.dart'; // Import specific constant classes
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({Key? key}) : super(key: key);
@@ -27,7 +27,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     super.initState();
     _pages = [
       const ParquesListScreen(),
-      // Pasamos la función actualizarVisitas al HistorialScreen
       HistorialScreen(
         actualizarVisitas: () {
           Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
@@ -45,6 +44,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   Future<void> _verifyAuth(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
+      // Consider using Navigator.pushReplacementNamed for better UX after login/auth check
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
@@ -54,7 +54,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: TiemposConstantes.gradienteFondo,
+          gradient: TiemposColores.gradienteFondo, // Using TiemposColores
         ),
         child: SafeArea(
           child: Column(
@@ -64,8 +64,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                 elevation: 0,
                 centerTitle: true,
                 title: Text(
-                  TiemposConstantes.tituloApp,
-                  style: TiemposConstantes.estiloTituloAppBar,
+                  TiemposTextos.tituloApp, // Using TiemposTextos
+                  style: TiemposEstilos.estiloTituloAppBar, // Using TiemposEstilos
                 ),
               ),
               Expanded(
@@ -85,6 +85,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
 class ParquesListScreen extends StatelessWidget {
   const ParquesListScreen({Key? key}) : super(key: key);
+  static bool _isNavigating = false; // Using static to prevent multiple navigations
 
   Future<void> _registrarVisita(BuildContext context, String parqueId, String parqueNombre) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -93,10 +94,8 @@ class ParquesListScreen extends StatelessWidget {
     if (user == null) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text(user == null
-              ? TiemposConstantes.errorSesion
-              : TiemposConstantes.errorVerificacion),
-          backgroundColor: TiemposConstantes.error,
+          content: Text(TiemposTextos.errorSesion), // Using TiemposTextos
+          backgroundColor: TiemposColores.error, // Using TiemposColores
         ),
       );
       return;
@@ -108,13 +107,13 @@ class ParquesListScreen extends StatelessWidget {
         SnackBar(
           content: Row(
             children: [
-              const CircularProgressIndicator(color: TiemposConstantes.textoPrincipal),
+              const CircularProgressIndicator(color: TiemposColores.textoPrincipal), // Using TiemposColores
               const SizedBox(width: 20),
-              Expanded(child: Text('${TiemposConstantes.registrarVisita}...')),
+              Expanded(child: Text('${TiemposTextos.registrarVisita}...')), // Using TiemposTextos
             ],
           ),
           duration: const Duration(minutes: 1),
-          backgroundColor: TiemposConstantes.tarjeta,
+          backgroundColor: TiemposColores.tarjeta, // Using TiemposColores
         ),
       );
 
@@ -124,8 +123,8 @@ class ParquesListScreen extends StatelessWidget {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('${TiemposConstantes.visitando} $parqueNombre'),
-            backgroundColor: TiemposConstantes.exito,
+            content: Text('${TiemposTextos.visitando} $parqueNombre'), // Using TiemposTextos
+            backgroundColor: TiemposColores.exito, // Using TiemposColores
           ),
         );
     } catch (e) {
@@ -133,8 +132,8 @@ class ParquesListScreen extends StatelessWidget {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('${TiemposConstantes.errorCargar}: ${e.toString()}'),
-            backgroundColor: TiemposConstantes.error,
+            content: Text('${TiemposTextos.errorCargar}: ${e.toString()}'), // Using TiemposTextos
+            backgroundColor: TiemposColores.error, // Using TiemposColores
           ),
         );
     }
@@ -145,44 +144,59 @@ class ParquesListScreen extends StatelessWidget {
     final viewModel = Provider.of<TiemposViewModel>(context);
 
     return RefreshIndicator(
-      color: TiemposConstantes.textoPrincipal,
+      color: TiemposColores.textoPrincipal, // Using TiemposColores
       onRefresh: viewModel.cargarParques,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: TiemposConstantes.paddingHorizontal,
+          horizontal: TiemposTamanos.paddingHorizontal, // Using TiemposTamanos
         ),
-        child: viewModel.cargando
-            ? const Center(child: CircularProgressIndicator(color: TiemposConstantes.textoPrincipal))
+        child: viewModel.cargando // Corrected from isLoading to cargando
+            ? const Center(child: CircularProgressIndicator(color: TiemposColores.textoPrincipal)) // Using TiemposColores
             : viewModel.error != null
             ? Center(
           child: Text(
-            '${TiemposConstantes.errorCargar}: ${viewModel.error}',
-            style: const TextStyle(color: TiemposConstantes.error),
+            '${TiemposTextos.errorCargar}: ${viewModel.error}', // Using TiemposTextos
+            style: const TextStyle(color: TiemposColores.error), // Using TiemposColores
           ),
         )
             : ListView.separated(
+          padding: const EdgeInsets.fromLTRB(
+            TiemposTamanos.paddingHorizontal, // Using TiemposTamanos
+            0,
+            TiemposTamanos.paddingHorizontal, // Using TiemposTamanos
+            80,
+          ),
           itemCount: viewModel.parques.length,
-          separatorBuilder: (_, __) => const SizedBox(height: TiemposConstantes.separacionElementos),
+          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos), // Using TiemposTamanos
           itemBuilder: (context, index) {
             final parque = viewModel.parques[index];
             return ParqueCard(
               parque: parque,
               onTap: () async {
-                final atracciones = await viewModel.cargarAtracciones(parque.id);
-                final parqueConAtracciones = Parque(
-                  id: parque.id,
-                  nombre: parque.nombre,
-                  pais: parque.pais,
-                  ciudad: parque.ciudad,
-                  atracciones: atracciones,
-                  clima: parque.clima,
-                );
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DetallesParqueScreen(parque: parqueConAtracciones),
-                  ),
-                );
+                if (_isNavigating) return;
+
+                _isNavigating = true;
+
+                try {
+                  final atracciones = await viewModel.cargarAtracciones(parque.id);
+                  final parqueConAtracciones = Parque(
+                    id: parque.id,
+                    nombre: parque.nombre,
+                    pais: parque.pais,
+                    ciudad: parque.ciudad,
+                    atracciones: atracciones,
+                    clima: parque.clima,
+                  );
+
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DetallesParqueScreen(parque: parqueConAtracciones),
+                    ),
+                  );
+                } finally {
+                  _isNavigating = false;
+                }
               },
               onRegistrarVisita: () => _registrarVisita(context, parque.id.toString(), parque.nombre),
             );
@@ -210,51 +224,53 @@ class ParqueCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        color: TiemposConstantes.tarjeta,
-        elevation: TiemposConstantes.elevacionTarjeta,
+        color: TiemposColores.tarjeta, // Using TiemposColores
+        elevation: TiemposTamanos.elevacionTarjeta, // Using TiemposTamanos
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(TiemposConstantes.radioBordes),
+          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes), // Using TiemposTamanos
         ),
         child: Padding(
-          padding: const EdgeInsets.all(TiemposConstantes.separacionInterna),
+          padding: const EdgeInsets.all(TiemposTamanos.separacionInterna), // Using TiemposTamanos
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   const Icon(
-                    TiemposConstantes.parque,
-                    color: TiemposConstantes.textoPrincipal,
+                    TiemposIconos.parque, // Using TiemposIconos
+                    color: TiemposColores.textoPrincipal, // Using TiemposColores
                     size: 28,
                   ),
-                  const SizedBox(width: TiemposConstantes.separacionInterna),
+                  const SizedBox(width: TiemposTamanos.separacionInterna), // Using TiemposTamanos
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           parque.nombre,
-                          style: TiemposConstantes.estiloTitulo,
+                          style: TiemposEstilos.estiloTitulo, // Using TiemposEstilos
                         ),
                         const SizedBox(height: 4),
                         Text(
                           (parque.nombre == 'Parque Warner Madrid')
-                              ? TiemposConstantes.warnerMadrid
+                              ? TiemposTextos.warnerMadrid // Using TiemposTextos
                               : (parque.nombre == 'PortAventura Park' || parque.nombre == 'Ferrari Land')
-                              ? TiemposConstantes.portAventura
+                              ? TiemposTextos.portAventura // Using TiemposTextos
                               : '${parque.ciudad}, ${parque.pais}',
-                          style: TiemposConstantes.estiloSubtitulo,
+                          style: TiemposEstilos.estiloSubtitulo, // Using TiemposEstilos
                         ),
                         if (parque.clima != null) ...[
                           const SizedBox(height: 4),
                           Row(
                             children: [
+                              // Make sure 'codigoIcono' from your 'Clima' entity correctly provides a full URL
+                              // If it's a relative path, you might need to prepend a base URL.
                               Image.network(
                                 'https:${parque.clima!.codigoIcono}',
                                 width: 24,
                                 height: 24,
                                 errorBuilder: (context, error, stackTrace) => const Icon(
-                                  TiemposConstantes.clima,
+                                  TiemposIconos.clima, // Using TiemposIconos
                                   size: 24,
                                   color: Colors.yellow,
                                 ),
@@ -262,13 +278,13 @@ class ParqueCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(
                                 '${parque.clima!.temperatura.toStringAsFixed(1)}°C',
-                                style: TiemposConstantes.estiloSubtitulo,
+                                style: TiemposEstilos.estiloSubtitulo, // Using TiemposEstilos
                               ),
                             ],
                           ),
                           Text(
                             parque.clima!.descripcion,
-                            style: TiemposConstantes.estiloSubtitulo,
+                            style: TiemposEstilos.estiloSubtitulo, // Using TiemposEstilos
                           ),
                         ],
                       ],
@@ -276,20 +292,20 @@ class ParqueCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: TiemposConstantes.separacionInterna),
+              const SizedBox(height: TiemposTamanos.separacionInterna), // Using TiemposTamanos
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   onPressed: onRegistrarVisita,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: TiemposConstantes.botonPrimario,
+                    backgroundColor: TiemposColores.botonPrimario, // Using TiemposColores
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: Text(
-                    TiemposConstantes.registrarVisita,
-                    style: TiemposConstantes.estiloBotonPrimario,
+                    TiemposTextos.registrarVisita, // Using TiemposTextos
+                    style: TiemposEstilos.estiloBotonPrimario, // Using TiemposEstilos
                   ),
                 ),
               ),

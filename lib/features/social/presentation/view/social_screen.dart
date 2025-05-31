@@ -60,7 +60,6 @@ class _SocialScreenState extends State<SocialScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Widget AgregarAmigo
                     _buildAgregarAmigoCard(viewModel),
 
                     if (viewModel.errorMessage.isNotEmpty) _buildErrorMessage(viewModel),
@@ -83,49 +82,45 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildAgregarAmigoCard(SocialViewModel viewModel) {
-    return Card(
-      elevation: 4,
-      color: SocialColores.tarjeta.withOpacity(0.9),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: AgregarAmigo(
-          controller: usernameController,
-          accentColor: SocialColores.boton,
-          cardColor: Colors.transparent,
-          textColor: SocialColores.textoClaro,
-          lightTextColor: SocialColores.textoSecundario,
-          onAgregarAmigo: (username) async {
-            try {
-              await viewModel.agregarAmigoPorUsername(username);
-              usernameController.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${SocialTextos.solicitudEnviada} $username!'),
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${SocialTextos.errorEnvioSolicitud} ${e.toString().split(':').last.trim()}'),
-                  backgroundColor: Colors.redAccent,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
-          },
-        ),
+    return TarjetaContenido(
+      cardColor: SocialColores.tarjeta.withOpacity(0.9),
+      margin: EdgeInsets.zero,
+      child: AgregarAmigo(
+        controller: usernameController,
+        accentColor: SocialColores.boton,
+        cardColor: Colors.transparent,
+        textColor: SocialColores.textoClaro,
+        lightTextColor: SocialColores.textoSecundario,
+        onAgregarAmigo: (username) async {
+          try {
+            await viewModel.agregarAmigoPorUsername(username); // This will now throw if already friends/pending
+            usernameController.clear();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${SocialTextos.solicitudEnviada} $username!'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+            viewModel.errorMessage = '';
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${SocialTextos.errorEnvioSolicitud} ${e.toString().replaceFirst('Exception: ', '').trim()}'),
+                backgroundColor: Colors.redAccent,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        },
       ),
     );
   }
 
   Widget _buildErrorMessage(SocialViewModel viewModel) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
+    return TarjetaContenido(
+      cardColor: SocialColores.tarjeta.withOpacity(0.9),
+      margin: const EdgeInsets.only(top: 12.0),
       child: Text(
         viewModel.errorMessage,
         style: SocialTextStyles.textoError.copyWith(
@@ -174,12 +169,15 @@ class _SocialScreenState extends State<SocialScreen> {
           firstChild: TarjetaContenido(
             cardColor: SocialColores.tarjeta.withOpacity(0.85),
             child: viewModel.solicitudes.isEmpty
-                ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                SocialTextos.sinSolicitudes,
-                style: SocialTextStyles.emailUsuario,
-                textAlign: TextAlign.center,
+                ? SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  SocialTextos.sinSolicitudes,
+                  style: SocialTextStyles.emailUsuario,
+                  textAlign: TextAlign.center,
+                ),
               ),
             )
                 : SizedBox(
@@ -196,6 +194,67 @@ class _SocialScreenState extends State<SocialScreen> {
                     amigoEmail: solicitud.email,
                     amigoDisplayName: solicitud.displayName,
                   );
+                },
+                onRechazar: (solicitudId) async {
+                  // --- NEW: Show confirmation dialog for rejecting request ---
+                  final bool? confirmReject = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext dialogContext) {
+                      return AlertDialog(
+                        backgroundColor: SocialColores.tarjeta, // Use your app's card color
+                        title: Text(
+                          'Rechazar Solicitud',
+                          style: SocialTextStyles.tituloSeccion.copyWith(color: SocialColores.textoClaro),
+                        ),
+                        content: Text(
+                          '¿Estás seguro de que quieres rechazar esta solicitud de amistad?',
+                          style: SocialTextStyles.emailUsuario.copyWith(color: SocialColores.textoSecundario),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(
+                              'Cancelar',
+                              style: SocialTextStyles.textoBoton.copyWith(color: SocialColores.textoSecundario),
+                            ),
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop(false); // Dismiss dialog and return false
+                            },
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent, // A distinct color for destructive action
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Rechazar', style: TextStyle(fontSize: 14)),
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop(true); // Dismiss dialog and return true
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (confirmReject == true) {
+                    try {
+                      await viewModel.rechazarSolicitud(solicitudId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Solicitud rechazada.'),
+                          backgroundColor: Colors.orange,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al rechazar solicitud: ${e.toString().replaceFirst('Exception: ', '').trim()}'),
+                          backgroundColor: Colors.redAccent,
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
             ),
@@ -232,15 +291,81 @@ class _SocialScreenState extends State<SocialScreen> {
             child: viewModel.amigos.isEmpty
                 ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                SocialTextos.sinAmigos,
-                style: SocialTextStyles.emailUsuario,
-                textAlign: TextAlign.center,
+              // --- FIX: Wrap Text with Center widget ---
+              child: Center(
+                child: Text(
+                  SocialTextos.sinAmigos,
+                  style: SocialTextStyles.emailUsuario,
+                  textAlign: TextAlign.center, // This is already good for internal text alignment
+                ),
               ),
             )
                 : SizedBox(
               width: double.infinity,
-              child: AmigosList(amigos: viewModel.amigos),
+              child: AmigosList(
+                amigos: viewModel.amigos,
+                onEliminar: (amigoId) async {
+                  // --- NEW: Show confirmation dialog ---
+                  final bool? confirmDelete = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext dialogContext) {
+                      return AlertDialog(
+                        backgroundColor: SocialColores.tarjeta, // Use your app's card color
+                        title: Text(
+                          'Eliminar Amigo',
+                          style: SocialTextStyles.tituloSeccion.copyWith(color: SocialColores.textoClaro),
+                        ),
+                        content: Text(
+                          '¿Estás seguro de que quieres eliminar a este amigo?',
+                          style: SocialTextStyles.emailUsuario.copyWith(color: SocialColores.textoSecundario),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(
+                              'Cancelar',
+                              style: SocialTextStyles.textoBoton.copyWith(color: SocialColores.textoSecundario),
+                            ),
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop(false); // Dismiss dialog and return false
+                            },
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent, // A distinct color for destructive action
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Eliminar', style: TextStyle(fontSize: 14)),
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop(true); // Dismiss dialog and return true
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (confirmDelete == true) {
+                    try {
+                      await viewModel.eliminarAmigo(amigoId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Amigo eliminado correctamente.'),
+                          backgroundColor: Colors.orange,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al eliminar amigo: ${e.toString().replaceFirst('Exception: ', '').trim()}'),
+                          backgroundColor: Colors.redAccent,
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
             ),
           ),
           secondChild: const SizedBox.shrink(),
@@ -250,37 +375,31 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildSeccionRanking(SocialViewModel viewModel) {
-    return Card(
-      elevation: 4,
-      color: SocialColores.tarjeta.withOpacity(0.9),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              SocialTextos.tituloRanking,
-              style: SocialTextStyles.tituloSeccion,
+    return TarjetaContenido(
+      cardColor: SocialColores.tarjeta.withOpacity(0.9),
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            SocialTextos.tituloRanking,
+            style: SocialTextStyles.tituloSeccion,
+          ),
+          const SizedBox(height: 10),
+          viewModel.ranking.isEmpty
+              ? Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              SocialTextos.sinRanking,
+              style: SocialTextStyles.emailUsuario,
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
-            viewModel.ranking.isEmpty
-                ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                SocialTextos.sinRanking,
-                style: SocialTextStyles.emailUsuario,
-                textAlign: TextAlign.center,
-              ),
-            )
-                : SizedBox(
-              width: double.infinity,
-              child: RankingList(ranking: viewModel.ranking),
-            ),
-          ],
-        ),
+          )
+              : SizedBox(
+            width: double.infinity,
+            child: RankingList(ranking: viewModel.ranking),
+          ),
+        ],
       ),
     );
   }

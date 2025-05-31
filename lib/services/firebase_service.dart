@@ -7,10 +7,11 @@ class FirebaseService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
+  // Registrar visita en un parque
   static Future<void> registrarVisita(String parqueId, String parqueNombre) async {
     try {
       final user = _auth.currentUser;
+      if (user == null) throw Exception('Usuario no autenticado');
 
       await _firestore
           .collection('usuarios')
@@ -30,7 +31,7 @@ class FirebaseService {
     }
   }
 
-
+  // Registrar visita a atracción
   static Future<void> registrarVisitaAtraccion(
       String parqueId,
       String parqueNombre,
@@ -38,10 +39,8 @@ class FirebaseService {
       ) async {
     try {
       final user = _auth.currentUser;
+      if (user == null) throw Exception('Usuario no autenticado');
 
-      if (user == null) {
-        throw Exception('Usuario no autenticado');
-      }
       await _firestore
           .collection('usuarios')
           .doc(user.uid)
@@ -61,13 +60,11 @@ class FirebaseService {
     }
   }
 
-
+  // Obtener lista de visitas
   static Future<List<Map<String, dynamic>>> obtenerVisitas() async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('Usuario no autenticado');
-      }
+      if (user == null) throw Exception('Usuario no autenticado');
 
       final snapshot = await _firestore
           .collection('usuarios')
@@ -91,13 +88,11 @@ class FirebaseService {
     }
   }
 
-
+  // Obtener visitas a atracciones de un parque específico
   static Future<List<Map<String, dynamic>>> obtenerVisitasAtracciones(String parqueId) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('Usuario no autenticado');
-      }
+      if (user == null) throw Exception('Usuario no autenticado');
 
       final snapshot = await _firestore
           .collection('usuarios')
@@ -119,7 +114,7 @@ class FirebaseService {
     }
   }
 
-
+  // Obtener conteo de visitas por atracción en un parque
   static Future<Map<String, int>> obtenerConteoVisitasAtracciones(String parqueId) async {
     try {
       final user = _auth.currentUser;
@@ -142,11 +137,14 @@ class FirebaseService {
 
       return conteo;
     } catch (e) {
-      debugPrint('Error en obtenerConteoVisitasAtracciones: $e');
+      if (kDebugMode) {
+        print('Error en obtenerConteoVisitasAtracciones: $e');
+      }
       rethrow;
     }
   }
 
+  // Obtener detalle con visitas y última fecha por atracción
   static Future<Map<String, Map<String, dynamic>>> obtenerDetalleVisitasAtracciones(String parqueId) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -176,7 +174,6 @@ class FirebaseService {
 
       conteo[atraccionNombre]!['visitas'] = (conteo[atraccionNombre]!['visitas'] as int) + 1;
 
-
       if (fecha != null) {
         final ultimaFecha = conteo[atraccionNombre]!['ultimaFecha'] as Timestamp?;
         if (ultimaFecha == null || fecha.toDate().isAfter(ultimaFecha.toDate())) {
@@ -187,8 +184,4 @@ class FirebaseService {
 
     return conteo;
   }
-
-
 }
-
-

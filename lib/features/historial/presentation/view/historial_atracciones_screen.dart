@@ -77,14 +77,14 @@ class HistorialAtraccionesScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: HistorialConstantes.colorSuperficie,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [HistorialConstantes.sombraTile],
+                            boxShadow: const [HistorialConstantes.sombraTile],
                           ),
                           margin: const EdgeInsets.symmetric(vertical: 4),
                           child: ListTile(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            leading: Icon(
+                            leading: const Icon(
                               Icons.attractions,
                               color: HistorialConstantes.colorAccento,
                               size: 28,
@@ -96,11 +96,6 @@ class HistorialAtraccionesScreen extends StatelessWidget {
                             subtitle: Text(
                               '${entry.value} ${entry.value == 1 ? 'vez' : 'veces'}',
                               style: HistorialConstantes.estiloSubtitulo,
-                            ),
-                            trailing: Icon(
-                              Icons.chevron_right,
-                              color: HistorialConstantes.colorAccento,
-                              size: 24,
                             ),
                           ),
                         );

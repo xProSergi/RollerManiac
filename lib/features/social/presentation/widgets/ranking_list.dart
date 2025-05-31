@@ -26,7 +26,7 @@ class RankingList extends StatelessWidget {
             style: const TextStyle(color: Colors.white),
           ),
           trailing: Text(
-            '${amigo.cantidadParques} parques visitados',
+            '${amigo.cantidadParques} visitas a parques',
             style: const TextStyle(color: Colors.white70),
           ),
         );

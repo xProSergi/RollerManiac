@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../constantes/perfil_constantes.dart';
 
 class PerfilInfoCard extends StatelessWidget {
   final String username;
   final String email;
-  final String creationDate;
+  final DateTime? creationDate;
 
   const PerfilInfoCard({
     super.key,
@@ -15,6 +16,10 @@ class PerfilInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String fechaFormateada = creationDate != null
+        ? DateFormat('dd/MM/yyyy').format(creationDate!)
+        : PerfilConstantes.fechaNoDisponible;
+
     return Card(
       color: PerfilConstantes.colorTarjeta,
       elevation: 4,
@@ -34,8 +39,10 @@ class PerfilInfoCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(email, style: PerfilConstantes.estiloEmail),
             const SizedBox(height: 8),
-            Text('${PerfilConstantes.miembroDesde} $creationDate',
-                style: PerfilConstantes.estiloFecha),
+            Text(
+              '${PerfilConstantes.miembroDesde} $fechaFormateada',
+              style: PerfilConstantes.estiloFecha,
+            ),
           ],
         ),
       ),

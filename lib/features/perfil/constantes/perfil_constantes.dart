@@ -17,14 +17,15 @@ class PerfilConstantes {
   static const String tituloCambiarContrasena = 'Cambiar contraseña';
   static const String labelNuevaContrasena = 'Nueva contraseña';
   static const String hintNuevaContrasena = 'Introduce tu nueva contraseña';
-  static const String textoCancelar = 'Cancelar';
+  static const String textoCancelar = 'Cerrar';
   static const String textoGuardar = 'Guardar';
   static const String errorContrasenaCorta = 'La contraseña debe tener al menos 6 caracteres';
   static const String exitoContrasenaActualizada = 'Contraseña actualizada correctamente';
   static const String errorContrasena =  'Error al actualizar la contraseña';
+  static const String fechaNoDisponible = 'Fecha no disponible';
   // Colores
   static const Color colorFondo = Color(0xFF0F172A);
-  static const Color colorTarjeta = Color(0xE61E293B); // 90% opacidad
+  static const Color colorTarjeta = Color(0xFF1E293B);
   static const Color colorBotonCerrarSesion = Colors.redAccent;
   static const Color colorTextoPrincipal = Colors.white;
   static const Color colorTextoSecundario = Color(0xFFCBD5E1);

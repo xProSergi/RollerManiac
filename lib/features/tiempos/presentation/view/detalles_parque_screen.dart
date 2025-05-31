@@ -17,8 +17,8 @@ class DetallesParqueScreen extends StatelessWidget {
     if (user == null) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text(TiemposConstantes.errorSesion),
-          backgroundColor: TiemposConstantes.error,
+          content: Text(TiemposTextos.errorSesion),
+          backgroundColor: TiemposColores.error,
         ),
       );
       return;
@@ -29,41 +29,41 @@ class DetallesParqueScreen extends StatelessWidget {
       ..showSnackBar(
         SnackBar(
           content: Row(
-            children: [ // Correctly opened children list
-              const CircularProgressIndicator(color: TiemposConstantes.textoPrincipal),
+            children: [
+              const CircularProgressIndicator(color: TiemposColores.textoPrincipal),
               const SizedBox(width: 20),
-              Expanded(child: Text('${TiemposConstantes.registrar} $atraccionNombre...')),
-            ], // Correctly closed children list
-          ), // Correctly closed Row
+              Expanded(child: Text('${TiemposTextos.registrar} $atraccionNombre...')),
+            ],
+          ),
           duration: const Duration(minutes: 1),
-          backgroundColor: TiemposConstantes.tarjeta,
+          backgroundColor: TiemposColores.tarjeta,
         ),
       );
 
     try {
-    await FirebaseService.registrarVisitaAtraccion(
-    parque.id,
-    parque.nombre,
-    atraccionNombre,
-    );
+      await FirebaseService.registrarVisitaAtraccion(
+        parque.id,
+        parque.nombre,
+        atraccionNombre,
+      );
 
-    snackBar
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-    SnackBar(
-    content: Text('${TiemposConstantes.visitando} $atraccionNombre'),
-    backgroundColor: TiemposConstantes.exito,
-    ),
-    );
+      snackBar
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('${TiemposTextos.visitando} $atraccionNombre'),
+            backgroundColor: TiemposColores.exito,
+          ),
+        );
     } catch (e) {
-    snackBar
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-    SnackBar(
-    content: Text('${TiemposConstantes.errorAtracciones}: ${e.toString()}'),
-    backgroundColor: TiemposConstantes.error,
-    ),
-    );
+      snackBar
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('${TiemposTextos.errorAtracciones}: ${e.toString()}'),
+            backgroundColor: TiemposColores.error,
+          ),
+        );
     }
   }
 
@@ -72,7 +72,7 @@ class DetallesParqueScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: TiemposConstantes.gradienteFondo,
+          gradient: TiemposColores.gradienteFondo,
         ),
         child: SafeArea(
           child: Column(
@@ -83,54 +83,54 @@ class DetallesParqueScreen extends StatelessWidget {
                 centerTitle: true,
                 title: Text(
                   parque.nombre,
-                  style: TiemposConstantes.estiloTituloAppBar,
+                  style: TiemposEstilos.estiloTituloAppBar,
                 ),
-                iconTheme: const IconThemeData(color: TiemposConstantes.textoPrincipal),
+                iconTheme: const IconThemeData(color: TiemposColores.textoPrincipal),
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: TiemposConstantes.paddingHorizontal,
+                    horizontal: TiemposTamanos.paddingHorizontal,
                   ),
                   child: ListView.separated(
                     itemCount: parque.atracciones.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: TiemposConstantes.separacionElementos),
+                    separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
                     itemBuilder: (context, index) {
                       final atraccion = parque.atracciones[index];
                       final bool operativa = atraccion.operativa;
 
                       return Card(
-                        color: TiemposConstantes.tarjeta,
-                        elevation: TiemposConstantes.elevacionTarjeta,
+                        color: TiemposColores.tarjeta,
+                        elevation: TiemposTamanos.elevacionTarjeta,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(TiemposConstantes.radioBordes),
+                          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(TiemposConstantes.separacionInterna),
+                          padding: const EdgeInsets.all(TiemposTamanos.separacionInterna),
                           child: Row(
                             children: [
                               Icon(
-                                TiemposConstantes.atraccion,
-                                color: operativa ? TiemposConstantes.operativa : TiemposConstantes.mantenimiento,
+                                TiemposIconos.atraccion,
+                                color: operativa ? TiemposColores.operativa : TiemposColores.mantenimiento,
                                 size: 28,
                               ),
-                              const SizedBox(width: TiemposConstantes.separacionInterna),
+                              const SizedBox(width: TiemposTamanos.separacionInterna),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       atraccion.nombre,
-                                      style: TiemposConstantes.estiloTitulo,
+                                      style: TiemposEstilos.estiloTitulo,
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
                                       operativa
                                           ? 'Espera: ${atraccion.tiempoEspera} min'
-                                          : TiemposConstantes.enMantenimiento,
+                                          : TiemposTextos.enMantenimiento,
                                       style: operativa
-                                          ? TiemposConstantes.estiloEstadoOperativo
-                                          : TiemposConstantes.estiloEstadoMantenimiento,
+                                          ? TiemposEstilos.estiloEstadoOperativo
+                                          : TiemposEstilos.estiloEstadoMantenimiento,
                                     ),
                                   ],
                                 ),
@@ -138,7 +138,7 @@ class DetallesParqueScreen extends StatelessWidget {
                               ElevatedButton(
                                 onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: TiemposConstantes.botonPrimario,
+                                  backgroundColor: TiemposColores.botonPrimario,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -148,8 +148,8 @@ class DetallesParqueScreen extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  TiemposConstantes.registrar,
-                                  style: TiemposConstantes.estiloBotonSecundario,
+                                  TiemposTextos.registrar,
+                                  style: TiemposEstilos.estiloBotonSecundario,
                                 ),
                               ),
                             ],

@@ -10,15 +10,17 @@ class PerfilViewModel extends ChangeNotifier {
   String? _username;
   String? _displayName;
   String? _email;
-  String _creationDate = '';
+  DateTime? _creationDate;
 
   User? get firebaseUser => _firebaseUser;
+
   String get username => _username ?? '';
   String get displayName => _displayName ?? '';
   String get email => _email ?? '';
-  String get creationDate => _creationDate;
+  DateTime? get creationDate => _creationDate;
 
-  bool get isLoaded => _firebaseUser != null;
+
+  bool get isLoaded => _firebaseUser != null && _username != null;
 
   PerfilViewModel() {
     _loadUser();
@@ -29,18 +31,23 @@ class PerfilViewModel extends ChangeNotifier {
     if (_firebaseUser != null) {
       _email = _firebaseUser!.email;
       _displayName = _firebaseUser!.displayName;
-      _creationDate = _firebaseUser!.metadata.creationTime
-          ?.toLocal()
-          .toString()
-          .split(' ')[0] ??
-          '';
+      _creationDate = _firebaseUser!.metadata.creationTime?.toLocal();
 
       final userDoc = await _firestore.collection('usuarios').doc(_firebaseUser!.uid).get();
-
       if (userDoc.exists) {
         final data = userDoc.data();
-        _username = data?['username'] ?? '';
+        _username = data?['username'] as String?; // Cast to String?
+
+        if (_username == null || _username!.isEmpty) {
+          _username = 'Usuario';
+        }
+      } else {
+
+        _username = 'Usuario';
       }
+    } else {
+
+      _username = null;
     }
     notifyListeners();
   }

@@ -93,7 +93,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
                 children: [
                   const SizedBox(height: 60),
                   Text(
-                    'Crear Cuenta',
+                    'Crear cuenta',
                     style: GoogleFonts.interTight(
                       fontSize: 42,
                       fontWeight: FontWeight.bold,
@@ -190,6 +190,17 @@ class _RegistroScreenState extends State<RegistroScreen> {
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  // --- Add this Padding widget here ---
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text('© ', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white)),
+                        Text('Coaster Rewind', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white)),
+                      ],
                     ),
                   ),
                 ],
