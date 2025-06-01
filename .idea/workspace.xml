@@ -9,7 +9,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Agregar amigos por correo y corrección errores" />
+    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Agregar amigos por correo y corrección errores">
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/widgets/agregar_amigo.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/widgets/agregar_amigo.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
