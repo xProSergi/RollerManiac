@@ -3,7 +3,17 @@ import '../../domain/entities/solicitud_amistad.dart';
 import '../../constantes/social_constantes.dart';
 
 class SocialWidgets {
-  static Widget solicitudesList(List<SolicitudAmistad> solicitudes, Function(SolicitudAmistad) onAceptar) {
+  static Widget solicitudesList(
+      List<SolicitudAmistad> solicitudes,
+      Function(SolicitudAmistad) onAceptar,
+      {bool isLoading = false}
+      ) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     if (solicitudes.isEmpty) {
       return Container(
         width: double.infinity,
@@ -37,8 +47,18 @@ class SocialWidgets {
         return Card(
           color: SocialColores.tarjeta,
           child: ListTile(
-            title: Text(solicitud.displayName, style: SocialTextStyles.nombreUsuario),
-            subtitle: Text(solicitud.email, style: SocialTextStyles.emailUsuario),
+            title: Text(
+              solicitud.displayName,
+              style: SocialTextStyles.nombreUsuario,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            subtitle: Text(
+              solicitud.email,
+              style: SocialTextStyles.emailUsuario,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
             trailing: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: SocialColores.boton,

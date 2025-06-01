@@ -9,7 +9,25 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Corrección de errores" />
+    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Corrección de errores">
+      <change afterPath="$PROJECT_DIR$/lib/core/utils/validation_utils.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/presentation/login_roller_maniac_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/presentation/login_roller_maniac_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/presentation/recuperar_password_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/presentation/recuperar_password_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/presentation/registro_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/presentation/registro_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/view/historial_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/view/historial_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/perfil/constantes/perfil_constantes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/perfil/constantes/perfil_constantes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/perfil/presentation/widgets/perfil_opciones_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/perfil/presentation/widgets/perfil_opciones_list.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/data/datasources/social_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/data/datasources/social_remote_datasource.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/data/models/amigo_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/data/models/amigo_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/view/social_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/view/social_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/viewmodel/social_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/viewmodel/social_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/widgets/agregar_amigo.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/widgets/agregar_amigo.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/widgets/social_widgets.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/widgets/social_widgets.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/widgets/solicitudes_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/widgets/solicitudes_list.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/firebase_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/firebase_service.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -73,12 +91,12 @@
     &quot;assignee&quot;: &quot;xProSergi&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/xProSergi/RollerManiac&quot;,
-    &quot;accountId&quot;: &quot;3c1c6a35-9586-4410-9dce-dc560343e0e4&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:xProSergi/RollerManiac.git",
+    "accountId": "3c1c6a35-9586-4410-9dce-dc560343e0e4"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/lib/login_roller_maniac_widget.dart" root0="FORCE_HIGHLIGHTING" />
   </component>

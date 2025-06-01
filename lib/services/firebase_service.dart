@@ -7,7 +7,7 @@ class FirebaseService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Registrar visita en un parque
+
   static Future<void> registrarVisita(String parqueId, String parqueNombre) async {
     try {
       final user = _auth.currentUser;
@@ -31,7 +31,7 @@ class FirebaseService {
     }
   }
 
-  // Registrar visita a atracción
+
   static Future<void> registrarVisitaAtraccion(
       String parqueId,
       String parqueNombre,
@@ -60,7 +60,7 @@ class FirebaseService {
     }
   }
 
-  // Obtener lista de visitas
+
   static Future<List<Map<String, dynamic>>> obtenerVisitas() async {
     try {
       final user = _auth.currentUser;
@@ -73,12 +73,9 @@ class FirebaseService {
           .orderBy('fecha', descending: true)
           .get();
 
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return {
-          ...data,
-          'id': doc.id,
-        };
+      return snapshot.docs.map((doc) => {
+        ...doc.data(),
+        'id': doc.id,
       }).toList();
     } catch (e) {
       if (kDebugMode) {
@@ -88,7 +85,7 @@ class FirebaseService {
     }
   }
 
-  // Obtener visitas a atracciones de un parque específico
+
   static Future<List<Map<String, dynamic>>> obtenerVisitasAtracciones(String parqueId) async {
     try {
       final user = _auth.currentUser;
@@ -99,7 +96,6 @@ class FirebaseService {
           .doc(user.uid)
           .collection('visitas_atracciones')
           .where('parqueId', isEqualTo: parqueId)
-          .orderBy('fecha', descending: true)
           .get();
 
       return snapshot.docs.map((doc) => {
@@ -114,7 +110,7 @@ class FirebaseService {
     }
   }
 
-  // Obtener conteo de visitas por atracción en un parque
+
   static Future<Map<String, int>> obtenerConteoVisitasAtracciones(String parqueId) async {
     try {
       final user = _auth.currentUser;
@@ -144,7 +140,7 @@ class FirebaseService {
     }
   }
 
-  // Obtener detalle con visitas y última fecha por atracción
+
   static Future<Map<String, Map<String, dynamic>>> obtenerDetalleVisitasAtracciones(String parqueId) async {
     final user = _auth.currentUser;
     if (user == null) {

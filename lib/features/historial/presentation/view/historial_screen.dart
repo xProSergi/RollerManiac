@@ -57,7 +57,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Agrupar visitas por parque
+
     final Map<String, List<Map<String, dynamic>>> visitasPorParque = {};
     for (var visita in visitas) {
       final nombre = visita['parqueNombre'] as String;

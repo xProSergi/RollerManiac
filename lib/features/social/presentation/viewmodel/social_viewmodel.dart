@@ -9,6 +9,7 @@ import '../../domain/usecases/agregar_amigo_usecase.dart';
 import '../../domain/usecases/obtener_amigos_usecase.dart';
 import '../../domain/usecases/obtener_ranking_usecase.dart';
 import '../../domain/usecases/obtener_solicitudes_recibidas_usecase.dart';
+import '../../constantes/social_constantes.dart';
 
 class SocialViewModel extends ChangeNotifier {
   final ObtenerSolicitudesRecibidasUseCase obtenerSolicitudesRecibidasUseCase;
@@ -34,13 +35,27 @@ class SocialViewModel extends ChangeNotifier {
   });
 
   Future<void> cargarSolicitudes() async {
-    try {
-      solicitudes = await obtenerSolicitudesRecibidasUseCase();
-      errorMessage = '';
-    } catch (e) {
-      errorMessage = 'Error al cargar solicitudes: ${e.toString().replaceFirst('Exception: ', '')}';
+    int intentos = 0;
+    const maxIntentos = 3;
+
+    while (intentos < maxIntentos) {
+      try {
+        solicitudes = await obtenerSolicitudesRecibidasUseCase();
+        errorMessage = '';
+        notifyListeners();
+        return;
+      } catch (e) {
+        intentos++;
+        if (intentos == maxIntentos) {
+          errorMessage = '${SocialTextos.errorCargarSolicitudes} $maxIntentos intentos: ${e.toString().replaceFirst('Exception: ', '')}';
+          solicitudes = [];
+          notifyListeners();
+          rethrow;
+        }
+        // Esperar antes de reintentar
+        await Future.delayed(Duration(seconds: intentos));
+      }
     }
-    notifyListeners();
   }
 
   Future<void> cargarAmigos() async {
@@ -48,7 +63,7 @@ class SocialViewModel extends ChangeNotifier {
       amigos = await obtenerAmigosUseCase();
       errorMessage = '';
     } catch (e) {
-      errorMessage = 'Error al cargar amigos: ${e.toString().replaceFirst('Exception: ', '')}';
+      errorMessage = '${SocialTextos.errorCargarAmigos} ${e.toString().replaceFirst('Exception: ', '')}';
       amigos = [];
     }
     notifyListeners();
@@ -59,87 +74,55 @@ class SocialViewModel extends ChangeNotifier {
       ranking = await obtenerRankingUseCase();
       errorMessage = '';
     } catch (e) {
-      errorMessage = 'Error al cargar ranking: ${e.toString().replaceFirst('Exception: ', '')}';
+      errorMessage = '${SocialTextos.errorCargarRanking} ${e.toString().replaceFirst('Exception: ', '')}';
     }
     notifyListeners();
   }
 
-  // --- NEW: Check if user is already a friend or has a pending request ---
   Future<bool> esAmigoOConSolicitudPendiente(String targetUsername) async {
     final currentUserId = auth.currentUser?.uid;
     if (currentUserId == null) {
-      throw Exception('Usuario no autenticado.');
+      throw Exception(SocialTextos.errorUsuarioNoAutenticado);
     }
 
-    // 1. Check if already friends
-    // We can use the cached `amigos` list first for a quick check.
     if (amigos.any((amigo) => amigo.username.toLowerCase() == targetUsername.toLowerCase())) {
       return true;
     }
-    // For a more robust check, especially if `amigos` list might be outdated or not fully loaded,
-    // you could query Firestore directly:
-    // final friendDoc = await firestore.collection('usuarios').doc(currentUserId)
-    //     .collection('amigos').doc(targetUserId).get(); // You'd need targetUserId here
-    // if (friendDoc.exists) { return true; }
 
-
-    // 2. Check for pending requests sent by current user to target user
     final sentRequestDoc = await firestore.collection('usuarios').doc(targetUsername.toLowerCase()) // assuming targetUsername is the target user's UID or a unique identifier in the main users collection
         .collection('solicitudesRecibidas').doc(currentUserId).get();
 
     if (sentRequestDoc.exists) {
-      return true; // Current user already sent a request to target
+      return true;
     }
 
-    // 3. Check for pending requests received by current user from target user
-    // We can use the cached `solicitudes` list for a quick check.
     if (solicitudes.any((solicitud) => solicitud.username.toLowerCase() == targetUsername.toLowerCase())) {
       return true;
     }
-    // For a more robust check, especially if `solicitudes` list might be outdated,
-    // you could query Firestore directly:
-    // final receivedRequestDoc = await firestore.collection('usuarios').doc(currentUserId)
-    //     .collection('solicitudesRecibidas').doc(targetUserId).get(); // You'd need targetUserId here
-    // if (receivedRequestDoc.exists) { return true; }
-
 
     return false; // No existing friendship or pending request found
   }
 
   Future<void> agregarAmigoPorUsername(String usernameInput) async {
+    print(SocialTextos.logInicioAgregarAmigo);
+    print('${SocialTextos.logInputRecibido} $usernameInput');
+
     final currentUserId = auth.currentUser?.uid;
     if (currentUserId == null) {
-      throw Exception('Usuario no autenticado.');
-    }
-
-    // First, find the target user's ID based on usernameInput
-    final targetUserQuery = await firestore.collection('usuarios')
-        .where('username', isEqualTo: usernameInput.toLowerCase())
-        .limit(1)
-        .get();
-
-    if (targetUserQuery.docs.isEmpty) {
-      throw Exception('Usuario no encontrado.');
-    }
-
-    final targetUserId = targetUserQuery.docs.first.id;
-
-    // Prevent sending request to self
-    if (targetUserId == currentUserId) {
-      throw Exception('No puedes enviarte una solicitud a ti mismo.');
-    }
-
-    // Check if already friends or has pending request BEFORE sending
-    final isAlreadyRelated = await esAmigoOConSolicitudPendiente(usernameInput); // Using username for check
-    if (isAlreadyRelated) {
-      throw Exception('Ya eres amigo de este usuario o una solicitud ya está pendiente.');
+      throw Exception(SocialTextos.errorUsuarioNoAutenticado);
     }
 
     try {
-      await agregarAmigoUseCase(usernameInput); // This needs the target user's username
-      errorMessage = '';
-      notifyListeners();
+      // Validar username
+      if (usernameInput.trim().isEmpty) {
+        throw Exception(SocialTextos.errorUsernameVacio);
+      }
+
+      print('${SocialTextos.logLlamandoUseCase} $usernameInput');
+      await agregarAmigoUseCase(usernameInput);
+      print(SocialTextos.logUseCaseCompletado);
     } catch (e) {
+      print('${SocialTextos.logErrorAgregarAmigo} $e');
       rethrow;
     }
   }
@@ -158,9 +141,9 @@ class SocialViewModel extends ChangeNotifier {
       await firestore.collection('usuarios').doc(currentUserId).get();
       final currentUserData = currentUserDoc.data() ?? {};
       final currentUserNombre =
-          currentUserData['displayName'] ?? currentUserData['email']?.split('@')[0] ?? '';
+          currentUserData[SocialTextos.campoDisplayName] ?? currentUserData[SocialTextos.campoEmail]?.split('@')[0] ?? '';
       final currentUsername =
-      (currentUserData['username'] ?? currentUserData['email']?.split('@')[0] ?? '')
+      (currentUserData[SocialTextos.campoUsername] ?? currentUserData[SocialTextos.campoEmail]?.split('@')[0] ?? '')
           .toLowerCase();
 
       // Agregar amigo a mi colección
@@ -171,10 +154,10 @@ class SocialViewModel extends ChangeNotifier {
             .collection('amigos')
             .doc(amigoId),
         {
-          'email': amigoEmail,
-          'displayName': amigoDisplayName,
-          'username': amigoUserName.toLowerCase(),
-          'fecha': FieldValue.serverTimestamp(),
+          SocialTextos.campoEmail: amigoEmail,
+          SocialTextos.campoDisplayName: amigoDisplayName,
+          SocialTextos.campoUsername: amigoUserName.toLowerCase(),
+          SocialTextos.campoFecha: FieldValue.serverTimestamp(),
         },
       );
 
@@ -186,10 +169,10 @@ class SocialViewModel extends ChangeNotifier {
             .collection('amigos')
             .doc(currentUserId),
         {
-          'email': currentUserData['email'] ?? '',
-          'displayName': currentUserNombre,
-          'username': currentUsername,
-          'fecha': FieldValue.serverTimestamp(),
+          SocialTextos.campoEmail: currentUserData[SocialTextos.campoEmail] ?? '',
+          SocialTextos.campoDisplayName: currentUserNombre,
+          SocialTextos.campoUsername: currentUsername,
+          SocialTextos.campoFecha: FieldValue.serverTimestamp(),
         },
       );
 
@@ -210,7 +193,7 @@ class SocialViewModel extends ChangeNotifier {
 
       errorMessage = '';
     } catch (e) {
-      errorMessage = 'Error al aceptar solicitud: ${e.toString().replaceFirst('Exception: ', '')}';
+      errorMessage = '${SocialTextos.errorAceptarSolicitud} ${e.toString().replaceFirst('Exception: ', '')}';
       notifyListeners();
       rethrow;
     }
@@ -220,7 +203,7 @@ class SocialViewModel extends ChangeNotifier {
     try {
       final currentUserId = auth.currentUser?.uid;
       if (currentUserId == null) {
-        throw Exception('Usuario no autenticado.');
+        throw Exception(SocialTextos.errorUsuarioNoAutenticado);
       }
 
       await firestore
@@ -233,7 +216,7 @@ class SocialViewModel extends ChangeNotifier {
       await cargarSolicitudes();
       errorMessage = '';
     } catch (e) {
-      errorMessage = 'Error al rechazar solicitud: ${e.toString().replaceFirst('Exception: ', '')}';
+      errorMessage = '${SocialTextos.errorRechazarSolicitud} ${e.toString().replaceFirst('Exception: ', '')}';
       notifyListeners();
       rethrow;
     }
@@ -243,7 +226,7 @@ class SocialViewModel extends ChangeNotifier {
     try {
       final currentUserId = auth.currentUser?.uid;
       if (currentUserId == null) {
-        throw Exception('Usuario no autenticado.');
+        throw Exception(SocialTextos.errorUsuarioNoAutenticado);
       }
 
       final batch = firestore.batch();
@@ -272,7 +255,7 @@ class SocialViewModel extends ChangeNotifier {
       await cargarRanking();
       errorMessage = '';
     } catch (e) {
-      errorMessage = 'Error al eliminar amigo: ${e.toString().replaceFirst('Exception: ', '')}';
+      errorMessage = '${SocialTextos.errorEliminarAmigo} ${e.toString().replaceFirst('Exception: ', '')}';
       notifyListeners();
       rethrow;
     }

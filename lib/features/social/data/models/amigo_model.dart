@@ -1,4 +1,3 @@
-
 import '../../domain/entities/amigo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -21,8 +20,8 @@ class AmigoModel extends Amigo {
     return AmigoModel(
       id: id,
       email: map['email'] ?? '',
-      displayName: map['displayName'] ,
-      username: map['username'] ?? '',
+      displayName: map['displayName'] ?? 'Usuario',
+      username: map['username']?.toString().toLowerCase() ?? '',
       cantidadParques: map['cantidadParques'] ?? 0,
     );
   }
@@ -32,7 +31,7 @@ class AmigoModel extends Amigo {
       'email': email,
       'displayName': displayName,
       'cantidadParques': cantidadParques,
-      'username': username,
+      'username': username.toLowerCase(),
     };
   }
 }

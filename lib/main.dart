@@ -31,7 +31,7 @@ void main() async {
     print('Error inicializando Firebase: $e');
   }
 
-  await init(); 
+  await init();
 
   runApp(const MyApp());
 }
@@ -100,9 +100,10 @@ class AuthChecker extends StatelessWidget {
 
         final user = snapshot.data;
         if (user != null) {
-
-
-
+          if (!user.emailVerified) {
+            FirebaseAuth.instance.signOut();
+            return const LoginRollerManiacWidget();
+          }
           return const PantallaPrincipal();
         }
 

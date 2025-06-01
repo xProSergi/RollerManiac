@@ -61,9 +61,6 @@ class _SocialScreenState extends State<SocialScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildAgregarAmigoCard(viewModel),
-
-                    if (viewModel.errorMessage.isNotEmpty) _buildErrorMessage(viewModel),
-
                     const SizedBox(height: 20),
                     _buildSeccionSolicitudes(viewModel),
                     const SizedBox(height: 20),
@@ -83,7 +80,7 @@ class _SocialScreenState extends State<SocialScreen> {
 
   Widget _buildAgregarAmigoCard(SocialViewModel viewModel) {
     return TarjetaContenido(
-      cardColor: SocialColores.tarjeta.withOpacity(0.9),
+      cardColor: SocialColores.tarjeta.withAlpha(230),
       margin: EdgeInsets.zero,
       child: AgregarAmigo(
         controller: usernameController,
@@ -93,7 +90,7 @@ class _SocialScreenState extends State<SocialScreen> {
         lightTextColor: SocialColores.textoSecundario,
         onAgregarAmigo: (username) async {
           try {
-            await viewModel.agregarAmigoPorUsername(username); // This will now throw if already friends/pending
+            await viewModel.agregarAmigoPorUsername(username);
             usernameController.clear();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -102,7 +99,6 @@ class _SocialScreenState extends State<SocialScreen> {
                 duration: const Duration(seconds: 2),
               ),
             );
-            viewModel.errorMessage = '';
           } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -117,26 +113,6 @@ class _SocialScreenState extends State<SocialScreen> {
     );
   }
 
-  Widget _buildErrorMessage(SocialViewModel viewModel) {
-    return TarjetaContenido(
-      cardColor: SocialColores.tarjeta.withOpacity(0.9),
-      margin: const EdgeInsets.only(top: 12.0),
-      child: Text(
-        viewModel.errorMessage,
-        style: SocialTextStyles.textoError.copyWith(
-          shadows: [
-            Shadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 2,
-              offset: const Offset(1, 1),
-            ),
-          ],
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
   Widget _buildSeccionSolicitudes(SocialViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -145,7 +121,7 @@ class _SocialScreenState extends State<SocialScreen> {
           titulo: SocialTextos.tituloSolicitudes,
           estaExpandida: solicitudesExpanded,
           onTap: () => setState(() => solicitudesExpanded = !solicitudesExpanded),
-          cardColor: SocialColores.tarjeta.withOpacity(0.9),
+          cardColor: SocialColores.tarjeta.withAlpha(230),
           estiloTituloSeccion: SocialTextStyles.tituloSeccion,
           colorTextoClaro: SocialColores.textoSecundario,
           widgetFinal: viewModel.solicitudes.isNotEmpty
@@ -167,7 +143,7 @@ class _SocialScreenState extends State<SocialScreen> {
           duration: const Duration(milliseconds: 300),
           crossFadeState: solicitudesExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           firstChild: TarjetaContenido(
-            cardColor: SocialColores.tarjeta.withOpacity(0.85),
+            cardColor: SocialColores.tarjeta.withAlpha(217),
             child: viewModel.solicitudes.isEmpty
                 ? SizedBox(
               width: double.infinity,
@@ -201,19 +177,19 @@ class _SocialScreenState extends State<SocialScreen> {
                     context: context,
                     builder: (BuildContext dialogContext) {
                       return AlertDialog(
-                        backgroundColor: SocialColores.tarjeta, // Use your app's card color
+                        backgroundColor: SocialColores.tarjeta,
                         title: Text(
-                          'Rechazar Solicitud',
+                          SocialTextos.tituloRechazarSolicitud,
                           style: SocialTextStyles.tituloSeccion.copyWith(color: SocialColores.textoClaro),
                         ),
                         content: Text(
-                          '¿Estás seguro de que quieres rechazar esta solicitud de amistad?',
+                          SocialTextos.mensajeRechazarSolicitud,
                           style: SocialTextStyles.emailUsuario.copyWith(color: SocialColores.textoSecundario),
                         ),
                         actions: <Widget>[
                           TextButton(
                             child: Text(
-                              'Cancelar',
+                              SocialTextos.botonCancelar,
                               style: SocialTextStyles.textoBoton.copyWith(color: SocialColores.textoSecundario),
                             ),
                             onPressed: () {
@@ -225,7 +201,7 @@ class _SocialScreenState extends State<SocialScreen> {
                               backgroundColor: Colors.redAccent, // A distinct color for destructive action
                               foregroundColor: Colors.white,
                             ),
-                            child: const Text('Rechazar', style: TextStyle(fontSize: 14)),
+                            child: Text(SocialTextos.botonRechazar, style: const TextStyle(fontSize: 14)),
                             onPressed: () {
                               Navigator.of(dialogContext).pop(true); // Dismiss dialog and return true
                             },
@@ -240,7 +216,7 @@ class _SocialScreenState extends State<SocialScreen> {
                       await viewModel.rechazarSolicitud(solicitudId);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Solicitud rechazada.'),
+                          content: Text(SocialTextos.solicitudRechazada),
                           backgroundColor: Colors.orange,
                           duration: Duration(seconds: 2),
                         ),
@@ -248,7 +224,7 @@ class _SocialScreenState extends State<SocialScreen> {
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Error al rechazar solicitud: ${e.toString().replaceFirst('Exception: ', '').trim()}'),
+                          content: Text('${SocialTextos.errorRechazarSolicitud} ${e.toString().replaceFirst('Exception: ', '').trim()}'),
                           backgroundColor: Colors.redAccent,
                           duration: const Duration(seconds: 3),
                         ),
@@ -273,7 +249,7 @@ class _SocialScreenState extends State<SocialScreen> {
           titulo: SocialTextos.tituloAmigos,
           estaExpandida: amigosExpanded,
           onTap: () => setState(() => amigosExpanded = !amigosExpanded),
-          cardColor: SocialColores.tarjeta.withOpacity(0.9),
+          cardColor: SocialColores.tarjeta.withAlpha(230),
           estiloTituloSeccion: SocialTextStyles.tituloSeccion,
           colorTextoClaro: SocialColores.textoSecundario,
           widgetFinal: Text(
@@ -287,7 +263,7 @@ class _SocialScreenState extends State<SocialScreen> {
           duration: const Duration(milliseconds: 300),
           crossFadeState: amigosExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           firstChild: TarjetaContenido(
-            cardColor: SocialColores.tarjeta.withOpacity(0.85),
+            cardColor: SocialColores.tarjeta.withAlpha(217),
             child: viewModel.amigos.isEmpty
                 ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -310,19 +286,19 @@ class _SocialScreenState extends State<SocialScreen> {
                     context: context,
                     builder: (BuildContext dialogContext) {
                       return AlertDialog(
-                        backgroundColor: SocialColores.tarjeta, // Use your app's card color
+                        backgroundColor: SocialColores.tarjeta,
                         title: Text(
-                          'Eliminar Amigo',
+                          SocialTextos.tituloEliminarAmigo,
                           style: SocialTextStyles.tituloSeccion.copyWith(color: SocialColores.textoClaro),
                         ),
                         content: Text(
-                          '¿Estás seguro de que quieres eliminar a este amigo?',
+                          SocialTextos.mensajeEliminarAmigo,
                           style: SocialTextStyles.emailUsuario.copyWith(color: SocialColores.textoSecundario),
                         ),
                         actions: <Widget>[
                           TextButton(
                             child: Text(
-                              'Cancelar',
+                              SocialTextos.botonCancelar,
                               style: SocialTextStyles.textoBoton.copyWith(color: SocialColores.textoSecundario),
                             ),
                             onPressed: () {
@@ -334,7 +310,7 @@ class _SocialScreenState extends State<SocialScreen> {
                               backgroundColor: Colors.redAccent, // A distinct color for destructive action
                               foregroundColor: Colors.white,
                             ),
-                            child: const Text('Eliminar', style: TextStyle(fontSize: 14)),
+                            child: Text(SocialTextos.botonEliminar, style: const TextStyle(fontSize: 14)),
                             onPressed: () {
                               Navigator.of(dialogContext).pop(true); // Dismiss dialog and return true
                             },
@@ -349,7 +325,7 @@ class _SocialScreenState extends State<SocialScreen> {
                       await viewModel.eliminarAmigo(amigoId);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Amigo eliminado correctamente.'),
+                          content: Text(SocialTextos.amigoEliminado),
                           backgroundColor: Colors.orange,
                           duration: Duration(seconds: 2),
                         ),
@@ -357,7 +333,7 @@ class _SocialScreenState extends State<SocialScreen> {
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Error al eliminar amigo: ${e.toString().replaceFirst('Exception: ', '').trim()}'),
+                          content: Text('${SocialTextos.errorEliminarAmigo} ${e.toString().replaceFirst('Exception: ', '').trim()}'),
                           backgroundColor: Colors.redAccent,
                           duration: const Duration(seconds: 3),
                         ),
@@ -376,7 +352,7 @@ class _SocialScreenState extends State<SocialScreen> {
 
   Widget _buildSeccionRanking(SocialViewModel viewModel) {
     return TarjetaContenido(
-      cardColor: SocialColores.tarjeta.withOpacity(0.9),
+      cardColor: SocialColores.tarjeta.withAlpha(230),
       margin: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

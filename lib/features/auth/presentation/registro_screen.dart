@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:math' as math;
+import '../../../core/utils/validation_utils.dart';
 
 class RegistroScreen extends StatefulWidget {
   const RegistroScreen({super.key});
@@ -19,22 +20,96 @@ class _RegistroScreenState extends State<RegistroScreen> {
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
 
-  final RegExp emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _mostrarSnackBar({
+    required IconData icon,
+    required String message,
+    required Color? color,
+    required int duration,
+  }) {
+    // Encontrar el Overlay más cercano
+    final overlay = Overlay.of(context);
+
+    // Obtener el tamaño del teclado
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
+    // Crear una capa de overlay
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        // Si el teclado está visible, colocamos el mensaje justo encima
+        bottom: keyboardHeight > 0 ? keyboardHeight : 20,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Icon(icon, color: Colors.black87, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+    Future.delayed(Duration(seconds: duration), () {
+      overlayEntry.remove();
+    });
+  }
 
   Future<void> _registrarUsuario() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    if (!emailRegex.hasMatch(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Correo no válido')),
+    // Validar email
+    final validacionEmail = ValidationUtils.validateEmail(email);
+    if (validacionEmail != null) {
+      _mostrarSnackBar(
+        icon: Icons.error_outline_rounded,
+        message: validacionEmail,
+        color: Colors.red[100],
+        duration: 4,
       );
       return;
     }
 
-    if (password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La contraseña debe tener al menos 6 caracteres')),
+    // Validar contraseña
+    final validacionPassword = ValidationUtils.validatePassword(password);
+    if (validacionPassword != null) {
+      _mostrarSnackBar(
+        icon: Icons.error_outline_rounded,
+        message: validacionPassword,
+        color: Colors.red[100],
+        duration: 4,
       );
       return;
     }
@@ -45,21 +120,41 @@ class _RegistroScreenState extends State<RegistroScreen> {
         password: password,
       );
 
+      // Enviar email de verificación
+      await userCredential.user!.sendEmailVerification();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(content: Text('Cuenta creada exitosamente')),
+        _mostrarSnackBar(
+          icon: Icons.check_circle_outline_rounded,
+          message: 'Cuenta creada exitosamente. Por favor, verifica tu correo electrónico antes de iniciar sesión.',
+          color: Colors.green[100],
+          duration: 5,
         );
-        Navigator.pushReplacementNamed(context, '/principal');
+        Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.message}')),
+      String message = switch (e.code) {
+        'email-already-in-use' => 'Ya existe una cuenta con este correo electrónico.',
+        'invalid-email' => 'El correo electrónico no es válido.',
+        'operation-not-allowed' => 'La creación de cuentas está deshabilitada.',
+        'weak-password' => 'La contraseña es muy débil.',
+        _ => 'Error: ${e.message}',
+      };
+      _mostrarSnackBar(
+        icon: Icons.warning_rounded,
+        message: message,
+        color: Colors.orange[100],
+        duration: 4,
+      );
+    } catch (e) {
+      _mostrarSnackBar(
+        icon: Icons.error_rounded,
+        message: 'Ocurrió un error inesperado',
+        color: Colors.red[100],
+        duration: 4,
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +287,6 @@ class _RegistroScreenState extends State<RegistroScreen> {
                       ),
                     ),
                   ),
-                  // --- Add this Padding widget here ---
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(

@@ -11,12 +11,15 @@ class PerfilConstantes {
   static const String creditos = 'Créditos';
   static const String manualUsuario = 'Manual de usuario';
   static const String funcionNoImplementada = 'Función aún no implementada';
-  static const String textoCreditos =
-      'Tiempos de espera: Powered by Queue-times.com (2025)\n'
-      'Fotografías realizadas por Coaster Rewind';
+  static const String textoCreditos = 'Tiempos de espera: Powered by Queue-times.com (2025)\n' 'Fotografías realizadas por Coaster Rewind';
   static const String tituloCambiarContrasena = 'Cambiar contraseña';
   static const String labelNuevaContrasena = 'Nueva contraseña';
-  static const String hintNuevaContrasena = 'Introduce tu nueva contraseña';
+  static const String hintNuevaContrasena = 'Ingresa tu nueva contraseña';
+  static const String labelConfirmarContrasena = 'Confirmar contraseña';
+  static const String hintConfirmarContrasena = 'Repite tu nueva contraseña';
+  static const String errorContrasenasNoCoinciden = 'Las contraseñas no coinciden';
+  static const String errorReautenticacion = 'Debes iniciar sesión recientemente para cambiar la contraseña. Por favor, cierra sesión y vuelve a iniciarla para reautenticarte.';
+  static const String errorInesperado = 'Ocurrió un error inesperado: ';
   static const String textoCancelar = 'Cerrar';
   static const String textoGuardar = 'Guardar';
   static const String errorContrasenaCorta = 'La contraseña debe tener al menos 6 caracteres';
