@@ -37,16 +37,19 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
     required Color? color,
     required int duration,
   }) {
-    // Encontrar el Overlay más cercano
+
     final overlay = Overlay.of(context);
 
-    // Obtener el tamaño del teclado
+
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    // Crear una capa de overlay
+ /* Con el overlay hago que si tengo que mostrar un mensaje, se muestre por encima del resto
+   *y  que si el teclado está abierto, el mensaje se muestre por encima del teclado para que no tape el mensaje
+   */
+
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        // Si el teclado está visible, colocamos el mensaje justo encima
+
         bottom: keyboardHeight > 0 ? keyboardHeight : 20,
         left: 20,
         right: 20,
@@ -102,7 +105,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
       final userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // Verificar si el email está verificado
+
       if (!userCredential.user!.emailVerified) {
         if (mounted) {
           await FirebaseAuth.instance.signOut();

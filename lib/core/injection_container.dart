@@ -33,7 +33,7 @@ Future<void> init() async {
   getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
-  // ================== TIEMPOS ==================
+  // IEMPOS
   getIt.registerFactory(() => TiemposViewModel(
     repository: getIt(),
     obtenerClimaPorCiudad: getIt(),
@@ -52,7 +52,7 @@ Future<void> init() async {
   getIt.registerLazySingleton<ClimaRemoteDataSource>(
           () => ClimaRemoteDataSourceImpl(client: getIt()));
 
-  // ================== SOCIAL ==================
+  // SOCIAL
   getIt.registerLazySingleton<SocialRemoteDataSource>(
         () => SocialRemoteDataSource(
       firestore: getIt<FirebaseFirestore>(),

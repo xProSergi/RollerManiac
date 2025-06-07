@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:math' as math;
 import '../../../core/utils/validation_utils.dart';
 
@@ -33,16 +32,16 @@ class _RegistroScreenState extends State<RegistroScreen> {
     required Color? color,
     required int duration,
   }) {
-    // Encontrar el Overlay más cercano
+
     final overlay = Overlay.of(context);
 
-    // Obtener el tamaño del teclado
+
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    // Crear una capa de overlay
+
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        // Si el teclado está visible, colocamos el mensaje justo encima
+
         bottom: keyboardHeight > 0 ? keyboardHeight : 20,
         left: 20,
         right: 20,
@@ -56,7 +55,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withAlpha(26),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -90,7 +89,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    // Validar email
+
     final validacionEmail = ValidationUtils.validateEmail(email);
     if (validacionEmail != null) {
       _mostrarSnackBar(
@@ -102,7 +101,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
       return;
     }
 
-    // Validar contraseña
+
     final validacionPassword = ValidationUtils.validatePassword(password);
     if (validacionPassword != null) {
       _mostrarSnackBar(
@@ -120,7 +119,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
         password: password,
       );
 
-      // Enviar email de verificación
+
       await userCredential.user!.sendEmailVerification();
 
       if (mounted) {
@@ -205,7 +204,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
                             width: size.width > 500 ? 400 : double.infinity,
                             padding: const EdgeInsets.all(24.0),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withAlpha(128),
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: const [
                                 BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),

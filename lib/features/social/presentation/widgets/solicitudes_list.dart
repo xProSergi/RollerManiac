@@ -4,13 +4,13 @@ import '../../domain/entities/solicitud_amistad.dart';
 class SolicitudesList extends StatelessWidget {
   final List<SolicitudAmistad> solicitudes;
   final Function(String userId) onAceptar;
-  final Function(String solicitudId) onRechazar; // NEW: Callback for rejecting
+  final Function(String solicitudId) onRechazar;
 
   const SolicitudesList({
     Key? key,
     required this.solicitudes,
     required this.onAceptar,
-    required this.onRechazar, // NEW
+    required this.onRechazar,
   }) : super(key: key);
 
   @override

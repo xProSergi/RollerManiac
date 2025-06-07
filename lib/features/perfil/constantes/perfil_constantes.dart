@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PerfilConstantes {
-  // Strings
+
   static const String usuarioDefault = 'Usuario';
   static const String miembroDesde = 'Miembro desde';
   static const String cerrarSesion = 'Cerrar sesión';
@@ -35,7 +35,7 @@ class PerfilConstantes {
   static const Color colorTextoFecha = Color(0xFF94A3B8);
   static const Color colorDivisor = Color(0xFF334155);
 
-  // Gradiente
+
   static const LinearGradient gradienteFondo = LinearGradient(
     colors: [Color(0xFF0056B3), Color(0xFF000033)],
     stops: [0.5, 1.0],
@@ -53,7 +53,7 @@ class PerfilConstantes {
   static const IconData iconoArrow = Icons.arrow_forward_ios;
   static const IconData iconoCreditos = Icons.info;
 
-  // TextStyles
+
   static const TextStyle estiloUsername = TextStyle(
     color: colorTextoPrincipal,
     fontWeight: FontWeight.bold,

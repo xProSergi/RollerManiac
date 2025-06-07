@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class TarjetaContenido extends StatelessWidget {
   final Color cardColor;
   final Widget child;
-  final EdgeInsetsGeometry margin; // Make margin customizable
+  final EdgeInsetsGeometry margin;
 
   const TarjetaContenido({
     Key? key,
     required this.cardColor,
     required this.child,
-    this.margin = const EdgeInsets.only(top: 10), // Default margin
+    this.margin = const EdgeInsets.only(top: 10),
   }) : super(key: key);
 
   @override
@@ -17,7 +17,7 @@ class TarjetaContenido extends StatelessWidget {
     return Container(
       margin: margin,
       decoration: BoxDecoration(
-        color: cardColor, // Use cardColor directly
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -28,7 +28,7 @@ class TarjetaContenido extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0), // Consistent internal padding
+        padding: const EdgeInsets.all(16.0),
         child: child,
       ),
     );

@@ -85,6 +85,8 @@ class TiemposViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+
+ // Esto lo he hecho porque no me devolvía la ciudad donde está el parque
   String obtenerCiudadParaClima(String nombreParque) {
     if (nombreParque == 'Parque Warner Madrid') {
       return 'San Martín de la Vega, Spain';

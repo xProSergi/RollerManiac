@@ -69,7 +69,7 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                   image: AssetImage('img/fotoRecPassword.jpg'),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.6),
+                    Colors.black.withAlpha(153),
                     BlendMode.darken,
                   ),
                 ),
@@ -87,8 +87,8 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                   Container(
                     padding: const EdgeInsets.all(24.0),
                     decoration: BoxDecoration(
-                      color: Colors.grey[850]!.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey[850]!.withAlpha(179),
+                        borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,8 +162,8 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.green[800]!.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(12),
+                        color: Colors.green[800]!.withAlpha(179),
+                        borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           'Revisa tu correo para continuar con el cambio de contraseña.',

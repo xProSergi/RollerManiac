@@ -41,27 +41,27 @@ class SocialRemoteDataSource {
         throw Exception('Usuario no tiene email asociado');
       }
 
-      // Normalizar el input
+
       String input = usernameInput.trim().toLowerCase();
       print('Input normalizado: $input');
 
-      // Obtener el username del usuario actual
+
       final currentUsername = currentUser.email!.split('@')[0].toLowerCase();
       print('Username actual: $currentUsername');
 
-      // Determinar si es búsqueda por email o username
+
       QuerySnapshot query;
       if (input.contains('@')) {
-        // Búsqueda por email
+
         print('=== INICIO BÚSQUEDA POR EMAIL ===');
         print('Email original: $input');
         try {
-          // Siempre buscar con el email en minúsculas ya que así se guarda en la base de datos
+
           final emailLowerCase = input.toLowerCase();
           print('Email en minúsculas: $emailLowerCase');
 
           print('Iniciando búsqueda en Firestore...');
-          // Buscar usuario por email
+
           final userQuery = await firestore
               .collection('usuarios')
               .where('email', isEqualTo: emailLowerCase)
@@ -69,7 +69,7 @@ class SocialRemoteDataSource {
 
           print('Búsqueda completada. Documentos encontrados: ${userQuery.docs.length}');
 
-          // Si no encontramos, mostrar debug info
+
           if (userQuery.docs.isEmpty) {
             print('NO SE ENCONTRÓ EL USUARIO');
             print('Buscando todos los usuarios para debug...');
@@ -92,7 +92,7 @@ class SocialRemoteDataSource {
             throw Exception('No se encontró ningún usuario con ese correo electrónico');
           }
 
-          // Asignar el resultado de la búsqueda a query para el flujo normal
+
           query = userQuery;
 
           final foundUser = query.docs.first.data() as Map<String, dynamic>;
@@ -113,7 +113,7 @@ class SocialRemoteDataSource {
           rethrow;
         }
       } else {
-        // Búsqueda por username
+
         print('=== INICIO BÚSQUEDA POR USERNAME ===');
         print('Username a buscar: $input');
         query = await firestore
@@ -134,7 +134,7 @@ class SocialRemoteDataSource {
       final targetDoc = query.docs.first;
       final targetId = targetDoc.id;
 
-      // Verificar que no se esté agregando a sí mismo
+
       if (targetId == currentUser.uid) {
         throw Exception('No puedes agregarte a ti mismo');
       }
@@ -151,7 +151,7 @@ class SocialRemoteDataSource {
         throw Exception('Ya son amigos');
       }
 
-      // Verificar si ya existe una solicitud pendiente
+
       final solicitudExistente = await firestore
           .collection('usuarios')
           .doc(targetId)
@@ -167,7 +167,7 @@ class SocialRemoteDataSource {
       print('Usuario actual (remitente) ID: ${currentUser.uid}');
       print('Usuario destino ID: $targetId');
 
-      // Crear la solicitud - El ID del documento debe ser el ID del remitente
+      // Crear la solicitud
       await firestore
           .collection('usuarios')
           .doc(targetId)
@@ -198,6 +198,7 @@ class SocialRemoteDataSource {
     required String amigoEmail,
     required String amigoDisplayName,
   }) async {
+
     // Verificar que los documentos existan antes de la operación
     final solicitudDoc = await firestore
         .collection('usuarios')
@@ -259,7 +260,7 @@ class SocialRemoteDataSource {
       },
     );
 
-    // Eliminar solicitud recibida
+
     batch.delete(
       firestore
           .collection('usuarios')

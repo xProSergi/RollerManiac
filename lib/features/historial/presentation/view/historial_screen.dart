@@ -9,13 +9,14 @@ class HistorialScreen extends StatefulWidget {
   final Function()? cargarVisitasCallback;
 
   const HistorialScreen({
-    Key? key,
+    super.key,
     required this.actualizarVisitas,
     this.cargarVisitasCallback,
-  }) : super(key: key);
+  });
+
 
   @override
-  _HistorialScreenState createState() => _HistorialScreenState();
+  State<HistorialScreen> createState() => _HistorialScreenState();
 }
 
 class _HistorialScreenState extends State<HistorialScreen> {

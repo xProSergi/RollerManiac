@@ -36,7 +36,7 @@ class PerfilViewModel extends ChangeNotifier {
       final userDoc = await _firestore.collection('usuarios').doc(_firebaseUser!.uid).get();
       if (userDoc.exists) {
         final data = userDoc.data();
-        _username = data?['username'] as String?; // Cast to String?
+        _username = data?['username'] as String?;
 
         if (_username == null || _username!.isEmpty) {
           _username = 'Usuario';

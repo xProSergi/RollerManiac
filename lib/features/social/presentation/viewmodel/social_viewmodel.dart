@@ -52,7 +52,7 @@ class SocialViewModel extends ChangeNotifier {
           notifyListeners();
           rethrow;
         }
-        // Esperar antes de reintentar
+        // Espera antes de reintentar
         await Future.delayed(Duration(seconds: intentos));
       }
     }
@@ -89,7 +89,7 @@ class SocialViewModel extends ChangeNotifier {
       return true;
     }
 
-    final sentRequestDoc = await firestore.collection('usuarios').doc(targetUsername.toLowerCase()) // assuming targetUsername is the target user's UID or a unique identifier in the main users collection
+    final sentRequestDoc = await firestore.collection('usuarios').doc(targetUsername.toLowerCase())
         .collection('solicitudesRecibidas').doc(currentUserId).get();
 
     if (sentRequestDoc.exists) {
@@ -100,7 +100,7 @@ class SocialViewModel extends ChangeNotifier {
       return true;
     }
 
-    return false; // No existing friendship or pending request found
+    return false;
   }
 
   Future<void> agregarAmigoPorUsername(String usernameInput) async {
@@ -113,7 +113,7 @@ class SocialViewModel extends ChangeNotifier {
     }
 
     try {
-      // Validar username
+
       if (usernameInput.trim().isEmpty) {
         throw Exception(SocialTextos.errorUsernameVacio);
       }
@@ -176,7 +176,7 @@ class SocialViewModel extends ChangeNotifier {
         },
       );
 
-      // Eliminar la solicitud
+
       batch.delete(
         firestore
             .collection('usuarios')

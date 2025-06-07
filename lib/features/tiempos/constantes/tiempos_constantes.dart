@@ -22,7 +22,7 @@ class TiemposTextos {
 
 class TiemposColores {
   static const Color fondo = Color(0xFF0F172A);
-  static const Color tarjeta = Color(0xE61E293B); // 90% opacidad
+  static const Color tarjeta = Color(0xE61E293B);
   static const Color textoPrincipal = Colors.white;
   static const Color textoSecundario = Color(0xFF94A3B8);
   static const Color operativa = Color(0xFF4ADE80);
@@ -36,8 +36,8 @@ class TiemposColores {
 
   static const LinearGradient gradienteFondo = LinearGradient(
     colors: [
-      Color(0xFF0056B3), // Azul intenso
-      Color(0xFF000033), // Azul noche
+      Color(0xFF0056B3),
+      Color(0xFF000033),
     ],
     stops: [0.5, 1.0],
     begin: Alignment.topCenter,

@@ -75,7 +75,7 @@ class PerfilOpcionesList extends StatelessWidget {
   }
 
   void _showNotImplemented(BuildContext context) {
-    // Para mensajes de la pantalla principal, usa el ScaffoldMessenger de la pantalla principal
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
@@ -211,7 +211,7 @@ class PerfilOpcionesList extends StatelessWidget {
                 final nueva = controladorNueva.text;
                 final confirmar = controladorConfirmar.text;
 
-                // Validar contraseña
+
                 final validacionPassword = ValidationUtils.validatePassword(nueva);
                 if (validacionPassword != null) {
                   _mostrarSnackBar(
@@ -224,7 +224,7 @@ class PerfilOpcionesList extends StatelessWidget {
                   return;
                 }
 
-                // Validar que las contraseñas coincidan
+
                 if (nueva != confirmar) {
                   _mostrarSnackBar(
                     context: dialogInternalContext,
@@ -285,16 +285,18 @@ class PerfilOpcionesList extends StatelessWidget {
     required Color? color,
     required int duration,
   }) {
-    // Encontrar el Overlay más cercano
+
     final overlay = Overlay.of(context);
 
-    // Obtener el tamaño del teclado
+    // Hago esto para que si salta un mensaje salga por encima de la pantalla que esté abierta
+    // y que si el teclado está abierto, se ponga justo encima del teclado el mensaje
+
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    // Crear una capa de overlay
+
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        // Si el teclado está visible, colocamos el mensaje justo encima
+
         bottom: keyboardHeight > 0 ? keyboardHeight : 20,
         left: 20,
         right: 20,

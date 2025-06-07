@@ -86,6 +86,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 class ParquesListScreen extends StatelessWidget {
   const ParquesListScreen({Key? key}) : super(key: key);
   static bool _isNavigating = false;
+
   Future<void> _registrarVisita(BuildContext context, String parqueId, String parqueNombre) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final user = FirebaseAuth.instance.currentUser;
@@ -100,41 +101,52 @@ class ParquesListScreen extends StatelessWidget {
       return;
     }
 
-    final snackBar = scaffoldMessenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const CircularProgressIndicator(color: TiemposColores.textoPrincipal),
-              const SizedBox(width: 20),
-              Expanded(child: Text('${TiemposTextos.registrarVisita}...')),
-            ],
-          ),
-          duration: const Duration(minutes: 1),
-          backgroundColor: TiemposColores.tarjeta,
+
+    scaffoldMessenger.hideCurrentSnackBar();
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(color: TiemposColores.textoPrincipal),
+            const SizedBox(width: 20),
+            Expanded(child: Text('${TiemposTextos.registrarVisita}...')),
+          ],
         ),
-      );
+        duration: const Duration(seconds: 2),
+        backgroundColor: TiemposColores.tarjeta,
+      ),
+    );
 
     try {
       await FirebaseService.registrarVisita(parqueId, parqueNombre);
-      snackBar
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.visitando} $parqueNombre'),
-            backgroundColor: TiemposColores.exito,
-          ),
-        );
+
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!context.mounted) return;
+
+      scaffoldMessenger.hideCurrentSnackBar();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${TiemposTextos.visitando} $parqueNombre'),
+          backgroundColor: TiemposColores.exito,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     } catch (e) {
-      snackBar
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.errorCargar}: ${e.toString()}'),
-            backgroundColor: TiemposColores.error,
-          ),
-        );
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!context.mounted) return;
+
+      scaffoldMessenger.hideCurrentSnackBar();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${TiemposTextos.errorCargar}: ${e.toString()}'),
+          backgroundColor: TiemposColores.error,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -150,7 +162,7 @@ class ParquesListScreen extends StatelessWidget {
           horizontal: TiemposTamanos.paddingHorizontal,
         ),
         child: viewModel.cargando
-            ? const Center(child: CircularProgressIndicator(color: TiemposColores.textoPrincipal)) // Using TiemposColores
+            ? const Center(child: CircularProgressIndicator(color: TiemposColores.textoPrincipal))
             : viewModel.error != null
             ? Center(
           child: Text(
@@ -166,7 +178,7 @@ class ParquesListScreen extends StatelessWidget {
             80,
           ),
           itemCount: viewModel.parques.length,
-          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos), // Using TiemposTamanos
+          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
           itemBuilder: (context, index) {
             final parque = viewModel.parques[index];
             return ParqueCard(

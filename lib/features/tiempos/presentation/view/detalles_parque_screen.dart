@@ -24,21 +24,21 @@ class DetallesParqueScreen extends StatelessWidget {
       return;
     }
 
-    final snackBar = ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const CircularProgressIndicator(color: TiemposColores.textoPrincipal),
-              const SizedBox(width: 20),
-              Expanded(child: Text('${TiemposTextos.registrar} $atraccionNombre...')),
-            ],
-          ),
-          duration: const Duration(minutes: 1),
-          backgroundColor: TiemposColores.tarjeta,
+
+    scaffoldMessenger.hideCurrentSnackBar();
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(color: TiemposColores.textoPrincipal),
+            const SizedBox(width: 20),
+            Expanded(child: Text('${TiemposTextos.registrar} $atraccionNombre...')),
+          ],
         ),
-      );
+        duration: const Duration(seconds: 2),
+        backgroundColor: TiemposColores.tarjeta,
+      ),
+    );
 
     try {
       await FirebaseService.registrarVisitaAtraccion(
@@ -47,23 +47,33 @@ class DetallesParqueScreen extends StatelessWidget {
         atraccionNombre,
       );
 
-      snackBar
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.visitando} $atraccionNombre'),
-            backgroundColor: TiemposColores.exito,
-          ),
-        );
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!context.mounted) return;
+
+      scaffoldMessenger.hideCurrentSnackBar();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${TiemposTextos.visitando} $atraccionNombre'),
+          backgroundColor: TiemposColores.exito,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     } catch (e) {
-      snackBar
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('${TiemposTextos.errorAtracciones}: ${e.toString()}'),
-            backgroundColor: TiemposColores.error,
-          ),
-        );
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!context.mounted) return;
+
+      scaffoldMessenger.hideCurrentSnackBar();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${TiemposTextos.errorAtracciones}: ${e.toString()}'),
+          backgroundColor: TiemposColores.error,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 

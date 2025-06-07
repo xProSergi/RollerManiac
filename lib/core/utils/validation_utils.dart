@@ -27,7 +27,7 @@ class ValidationUtils {
       return null;
     }
 
-    // En registro y cambio de contraseña validamos el formato completo
+
     if (!passwordRegex.hasMatch(password)) {
       return 'La contraseña debe tener al menos 8 caracteres, una letra, un número y un carácter especial';
     }

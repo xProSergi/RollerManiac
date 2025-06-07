@@ -15,8 +15,8 @@ class SocialColores {
 
   static const LinearGradient gradienteFondo = LinearGradient(
     colors: [
-      Color(0xFF0056B3),  // Azul intenso
-      Color(0xFF000033),  // Azul noche
+      Color(0xFF0056B3),
+      Color(0xFF000033),
     ],
     stops: [0.5, 1.0],
     begin: Alignment.topCenter,
@@ -83,7 +83,7 @@ class SocialTextos {
   static const String solicitudEnviada = '¡Solicitud de amistad enviada a';
   static const String errorEnvioSolicitud = 'Error al enviar solicitud:';
 
-  // Diálogo de rechazar solicitud
+
   static const String tituloRechazarSolicitud = 'Rechazar Solicitud';
   static const String mensajeRechazarSolicitud = '¿Estás seguro de que quieres rechazar esta solicitud de amistad?';
   static const String botonCancelar = 'Cancelar';
@@ -91,14 +91,14 @@ class SocialTextos {
   static const String solicitudRechazada = 'Solicitud rechazada.';
   static const String errorRechazarSolicitud = 'Error al rechazar solicitud:';
 
-  // Diálogo de eliminar amigo
+
   static const String tituloEliminarAmigo = 'Eliminar Amigo';
   static const String mensajeEliminarAmigo = '¿Estás seguro de que quieres eliminar a este amigo?';
   static const String botonEliminar = 'Eliminar';
   static const String amigoEliminado = 'Amigo eliminado correctamente.';
   static const String errorEliminarAmigo = 'Error al eliminar amigo:';
 
-  // Mensajes de error del ViewModel
+
   static const String errorUsuarioNoAutenticado = 'Usuario no autenticado.';
   static const String errorUsernameVacio = 'El nombre de usuario no puede estar vacío';
   static const String errorCargarSolicitudes = 'Error al cargar solicitudes después de';
@@ -106,14 +106,14 @@ class SocialTextos {
   static const String errorCargarRanking = 'Error al cargar ranking:';
   static const String errorAceptarSolicitud = 'Error al aceptar solicitud:';
 
-  // Logs del ViewModel
+
   static const String logInicioAgregarAmigo = '=== INICIO agregarAmigoPorUsername ===';
   static const String logInputRecibido = 'Input recibido en viewmodel:';
   static const String logLlamandoUseCase = 'Llamando a agregarAmigoUseCase con input:';
   static const String logUseCaseCompletado = 'agregarAmigoUseCase completado exitosamente';
   static const String logErrorAgregarAmigo = 'Error en agregarAmigoPorUsername:';
 
-  // Campos de Firestore
+
   static const String campoEmail = 'email';
   static const String campoDisplayName = 'displayName';
   static const String campoUsername = 'username';

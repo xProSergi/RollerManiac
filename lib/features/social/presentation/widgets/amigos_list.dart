@@ -3,7 +3,7 @@ import '../../domain/entities/amigo.dart';
 
 class AmigosList extends StatelessWidget {
   final List<Amigo> amigos;
-  final Function(String amigoId) onEliminar; // NEW: Callback for removing a friend
+  final Function(String amigoId) onEliminar;
 
   const AmigosList({Key? key, required this.amigos, required this.onEliminar}) : super(key: key);
 
@@ -15,7 +15,7 @@ class AmigosList extends StatelessWidget {
       itemCount: amigos.length,
       itemBuilder: (context, index) {
         final amigo = amigos[index];
-        return Card( // Wrap ListTile in a Card for consistent styling if needed
+        return Card(
           margin: const EdgeInsets.symmetric(vertical: 6.0),
           color: Colors.blueGrey[800],
           elevation: 2,
@@ -28,7 +28,7 @@ class AmigosList extends StatelessWidget {
               amigo.displayName.isNotEmpty ? amigo.displayName : amigo.username,
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
             ),
-            trailing: IconButton( // "X" button for removing friend
+            trailing: IconButton(
               icon: const Icon(Icons.close, color: Colors.redAccent),
               onPressed: () => onEliminar(amigo.id),
               tooltip: 'Eliminar amigo',

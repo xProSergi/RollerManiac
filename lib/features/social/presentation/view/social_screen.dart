@@ -172,7 +172,7 @@ class _SocialScreenState extends State<SocialScreen> {
                   );
                 },
                 onRechazar: (solicitudId) async {
-                  // --- NEW: Show confirmation dialog for rejecting request ---
+
                   final bool? confirmReject = await showDialog<bool>(
                     context: context,
                     builder: (BuildContext dialogContext) {
@@ -193,17 +193,17 @@ class _SocialScreenState extends State<SocialScreen> {
                               style: SocialTextStyles.textoBoton.copyWith(color: SocialColores.textoSecundario),
                             ),
                             onPressed: () {
-                              Navigator.of(dialogContext).pop(false); // Dismiss dialog and return false
+                              Navigator.of(dialogContext).pop(false);
                             },
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent, // A distinct color for destructive action
+                              backgroundColor: Colors.redAccent,
                               foregroundColor: Colors.white,
                             ),
                             child: Text(SocialTextos.botonRechazar, style: const TextStyle(fontSize: 14)),
                             onPressed: () {
-                              Navigator.of(dialogContext).pop(true); // Dismiss dialog and return true
+                              Navigator.of(dialogContext).pop(true);
                             },
                           ),
                         ],
@@ -267,12 +267,12 @@ class _SocialScreenState extends State<SocialScreen> {
             child: viewModel.amigos.isEmpty
                 ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
-              // --- FIX: Wrap Text with Center widget ---
+
               child: Center(
                 child: Text(
                   SocialTextos.sinAmigos,
                   style: SocialTextStyles.emailUsuario,
-                  textAlign: TextAlign.center, // This is already good for internal text alignment
+                  textAlign: TextAlign.center,
                 ),
               ),
             )
@@ -281,7 +281,7 @@ class _SocialScreenState extends State<SocialScreen> {
               child: AmigosList(
                 amigos: viewModel.amigos,
                 onEliminar: (amigoId) async {
-                  // --- NEW: Show confirmation dialog ---
+
                   final bool? confirmDelete = await showDialog<bool>(
                     context: context,
                     builder: (BuildContext dialogContext) {
@@ -302,17 +302,17 @@ class _SocialScreenState extends State<SocialScreen> {
                               style: SocialTextStyles.textoBoton.copyWith(color: SocialColores.textoSecundario),
                             ),
                             onPressed: () {
-                              Navigator.of(dialogContext).pop(false); // Dismiss dialog and return false
+                              Navigator.of(dialogContext).pop(false);
                             },
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent, // A distinct color for destructive action
+                              backgroundColor: Colors.redAccent,
                               foregroundColor: Colors.white,
                             ),
                             child: Text(SocialTextos.botonEliminar, style: const TextStyle(fontSize: 14)),
                             onPressed: () {
-                              Navigator.of(dialogContext).pop(true); // Dismiss dialog and return true
+                              Navigator.of(dialogContext).pop(true);
                             },
                           ),
                         ],
