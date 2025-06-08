@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import '../../../historial/data/datasources/historial_remote_datasource.dart';
 import '../viewmodel/tiempos_viewmodel.dart';
 import 'detalles_parque_screen.dart';
 import '../../domain/entities/parque.dart';
-import '../../../historial/presentation/view/historial_screen.dart';
+import '../../../historial/presentation/pages/historial_screen.dart';
 import '../../../perfil/presentation/view/perfil_screen.dart';
 import '../../../social/presentation/view/social_screen.dart';
+import '../../../historial/presentation/viewmodel/historial_view_model.dart';
+import '../../../historial/data/repositories/historial_repository_impl.dart';
+import '../../../historial/data/datasources/historial_remote_datasource.dart';
+import '../../../historial/domain/usecases/obtener_visitas_usecase.dart';
+import '../../../historial/domain/usecases/obtener_visitas_por_parque_usecase.dart';
 import '../../../../compartido/widgets/nav_bar.dart';
 import '../../../../services/firebase_service.dart';
-import '../../constantes/tiempos_constantes.dart';
+import '../../constantes/tiempos_constantes.dart'; // Import specific constant classes
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({Key? key}) : super(key: key);
@@ -25,16 +31,29 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   @override
   void initState() {
     super.initState();
+
+    final historialDataSource = HistorialRemoteDataSourceImpl();
+    final historialRepository = HistorialRepositoryImpl(remoteDataSource: historialDataSource);
+    final obtenerVisitasUseCase = ObtenerVisitasUseCase(historialRepository);
+    final obtenerVisitasPorParqueUseCase = ObtenerVisitasPorParqueUseCase(historialRepository);
+
     _pages = [
       const ParquesListScreen(),
-      HistorialScreen(
-        actualizarVisitas: () {
-          Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
-        },
+      ChangeNotifierProvider(
+        create: (_) => HistorialViewModel(
+          obtenerVisitasUseCase: obtenerVisitasUseCase,
+          obtenerVisitasPorParqueUseCase: obtenerVisitasPorParqueUseCase,
+        ),
+        child: HistorialScreen(
+          actualizarVisitas: () {
+            Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
+          },
+        ),
       ),
       const SocialScreen(),
       const PerfilScreen(),
     ];
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _verifyAuth(context);
       Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
@@ -44,7 +63,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   Future<void> _verifyAuth(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-
+      // Consider using Navigator.pushReplacementNamed for better UX after login/auth check
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
@@ -54,7 +73,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: TiemposColores.gradienteFondo,
+          gradient: TiemposColores.gradienteFondo, // Using TiemposColores
         ),
         child: SafeArea(
           child: Column(
@@ -64,8 +83,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                 elevation: 0,
                 centerTitle: true,
                 title: Text(
-                  TiemposTextos.tituloApp,
-                  style: TiemposEstilos.estiloTituloAppBar,
+                  TiemposTextos.tituloApp, // Using TiemposTextos
+                  style: TiemposEstilos.estiloTituloAppBar, // Using TiemposEstilos
                 ),
               ),
               Expanded(
@@ -85,7 +104,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
 class ParquesListScreen extends StatelessWidget {
   const ParquesListScreen({Key? key}) : super(key: key);
-  static bool _isNavigating = false;
+  static bool _isNavigating = false; // Using static to prevent multiple navigations
 
   Future<void> _registrarVisita(BuildContext context, String parqueId, String parqueNombre) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -101,7 +120,7 @@ class ParquesListScreen extends StatelessWidget {
       return;
     }
 
-
+    // Mostrar SnackBar de carga
     scaffoldMessenger.hideCurrentSnackBar();
     scaffoldMessenger.showSnackBar(
       SnackBar(
@@ -120,7 +139,7 @@ class ParquesListScreen extends StatelessWidget {
     try {
       await FirebaseService.registrarVisita(parqueId, parqueNombre);
 
-
+      // Esperar a que el SnackBar de carga se cierre
       await Future.delayed(const Duration(seconds: 2));
 
       if (!context.mounted) return;
@@ -134,7 +153,7 @@ class ParquesListScreen extends StatelessWidget {
         ),
       );
     } catch (e) {
-
+      // Esperar a que el SnackBar de carga se cierre
       await Future.delayed(const Duration(seconds: 2));
 
       if (!context.mounted) return;
@@ -155,30 +174,30 @@ class ParquesListScreen extends StatelessWidget {
     final viewModel = Provider.of<TiemposViewModel>(context);
 
     return RefreshIndicator(
-      color: TiemposColores.textoPrincipal,
+      color: TiemposColores.textoPrincipal, // Using TiemposColores
       onRefresh: viewModel.cargarParques,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: TiemposTamanos.paddingHorizontal,
+          horizontal: TiemposTamanos.paddingHorizontal, // Using TiemposTamanos
         ),
-        child: viewModel.cargando
-            ? const Center(child: CircularProgressIndicator(color: TiemposColores.textoPrincipal))
+        child: viewModel.cargando // Corrected from isLoading to cargando
+            ? const Center(child: CircularProgressIndicator(color: TiemposColores.textoPrincipal)) // Using TiemposColores
             : viewModel.error != null
             ? Center(
           child: Text(
-            '${TiemposTextos.errorCargar}: ${viewModel.error}',
-            style: const TextStyle(color: TiemposColores.error),
+            '${TiemposTextos.errorCargar}: ${viewModel.error}', // Using TiemposTextos
+            style: const TextStyle(color: TiemposColores.error), // Using TiemposColores
           ),
         )
             : ListView.separated(
           padding: const EdgeInsets.fromLTRB(
-            TiemposTamanos.paddingHorizontal,
+            TiemposTamanos.paddingHorizontal, // Using TiemposTamanos
             0,
-            TiemposTamanos.paddingHorizontal,
+            TiemposTamanos.paddingHorizontal, // Using TiemposTamanos
             80,
           ),
           itemCount: viewModel.parques.length,
-          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
+          separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos), // Using TiemposTamanos
           itemBuilder: (context, index) {
             final parque = viewModel.parques[index];
             return ParqueCard(
@@ -235,51 +254,53 @@ class ParqueCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        color: TiemposColores.tarjeta,
-        elevation: TiemposTamanos.elevacionTarjeta,
+        color: TiemposColores.tarjeta, // Using TiemposColores
+        elevation: TiemposTamanos.elevacionTarjeta, // Using TiemposTamanos
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
+          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes), // Using TiemposTamanos
         ),
         child: Padding(
-          padding: const EdgeInsets.all(TiemposTamanos.separacionInterna),
+          padding: const EdgeInsets.all(TiemposTamanos.separacionInterna), // Using TiemposTamanos
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   const Icon(
-                    TiemposIconos.parque,
-                    color: TiemposColores.textoPrincipal,
+                    TiemposIconos.parque, // Using TiemposIconos
+                    color: TiemposColores.textoPrincipal, // Using TiemposColores
                     size: 28,
                   ),
-                  const SizedBox(width: TiemposTamanos.separacionInterna),
+                  const SizedBox(width: TiemposTamanos.separacionInterna), // Using TiemposTamanos
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           parque.nombre,
-                          style: TiemposEstilos.estiloTitulo,
+                          style: TiemposEstilos.estiloTitulo, // Using TiemposEstilos
                         ),
                         const SizedBox(height: 4),
                         Text(
                           (parque.nombre == 'Parque Warner Madrid')
-                              ? TiemposTextos.warnerMadrid
+                              ? TiemposTextos.warnerMadrid // Using TiemposTextos
                               : (parque.nombre == 'PortAventura Park' || parque.nombre == 'Ferrari Land')
-                              ? TiemposTextos.portAventura
+                              ? TiemposTextos.portAventura // Using TiemposTextos
                               : '${parque.ciudad}, ${parque.pais}',
-                          style: TiemposEstilos.estiloSubtitulo,
+                          style: TiemposEstilos.estiloSubtitulo, // Using TiemposEstilos
                         ),
                         if (parque.clima != null) ...[
                           const SizedBox(height: 4),
                           Row(
                             children: [
+                              // Make sure 'codigoIcono' from your 'Clima' entity correctly provides a full URL
+                              // If it's a relative path, you might need to prepend a base URL.
                               Image.network(
                                 'https:${parque.clima!.codigoIcono}',
                                 width: 24,
                                 height: 24,
                                 errorBuilder: (context, error, stackTrace) => const Icon(
-                                  TiemposIconos.clima,
+                                  TiemposIconos.clima, // Using TiemposIconos
                                   size: 24,
                                   color: Colors.yellow,
                                 ),
@@ -287,13 +308,13 @@ class ParqueCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(
                                 '${parque.clima!.temperatura.toStringAsFixed(1)}°C',
-                                style: TiemposEstilos.estiloSubtitulo,
+                                style: TiemposEstilos.estiloSubtitulo, // Using TiemposEstilos
                               ),
                             ],
                           ),
                           Text(
                             parque.clima!.descripcion,
-                            style: TiemposEstilos.estiloSubtitulo,
+                            style: TiemposEstilos.estiloSubtitulo, // Using TiemposEstilos
                           ),
                         ],
                       ],
@@ -301,20 +322,20 @@ class ParqueCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: TiemposTamanos.separacionInterna),
+              const SizedBox(height: TiemposTamanos.separacionInterna), // Using TiemposTamanos
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   onPressed: onRegistrarVisita,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: TiemposColores.botonPrimario,
+                    backgroundColor: TiemposColores.botonPrimario, // Using TiemposColores
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: Text(
-                    TiemposTextos.registrarVisita,
-                    style: TiemposEstilos.estiloBotonPrimario,
+                    TiemposTextos.registrarVisita, // Using TiemposTextos
+                    style: TiemposEstilos.estiloBotonPrimario, // Using TiemposEstilos
                   ),
                 ),
               ),
