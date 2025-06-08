@@ -31,12 +31,12 @@ class VisitaModel extends VisitaEntity {
     }
 
     return VisitaModel(
-      id: json['id']?.toString() ?? '', // Asegura conversión a String
-      parqueId: json['parqueId']?.toString() ?? '', // Asegura conversión a String
-      parqueNombre: json['parqueNombre']?.toString() ?? '', // Asegura conversión a String
-      atraccionNombre: json['atraccionNombre']?.toString(), // Asegura conversión a String
+      id: json['id']?.toString() ?? '',
+      parqueId: json['parqueId']?.toString() ?? '',
+      parqueNombre: json['parqueNombre']?.toString() ?? '',
+      atraccionNombre: json['atraccionNombre']?.toString(),
       fecha: fecha,
-      userId: json['userId']?.toString() ?? '', // Asegura conversión a String
+      userId: json['userId']?.toString() ?? '',
     );
   }
 

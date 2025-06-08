@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../domain/entities/amigo.dart';
 import '../../domain/entities/solicitud_amistad.dart';
 import '../models/amigo_model.dart';
@@ -30,99 +29,32 @@ class SocialRemoteDataSource {
   }
 
   Future<void> agregarAmigo(String usernameInput) async {
-    print('=== INICIO agregarAmigo ===');
-    print('Input recibido: $usernameInput');
-
     try {
       final currentUser = auth.currentUser!;
-      print('Usuario actual: ${currentUser.email}');
-
       if (currentUser.email == null) {
         throw Exception('Usuario no tiene email asociado');
       }
 
-
-      String input = usernameInput.trim().toLowerCase();
-      print('Input normalizado: $input');
-
-
+      final input = usernameInput.trim().toLowerCase();
       final currentUsername = currentUser.email!.split('@')[0].toLowerCase();
-      print('Username actual: $currentUsername');
-
 
       QuerySnapshot query;
       if (input.contains('@')) {
+        final emailLowerCase = input.toLowerCase();
+        query = await firestore
+            .collection('usuarios')
+            .where('email', isEqualTo: emailLowerCase)
+            .get();
 
-        print('=== INICIO BÚSQUEDA POR EMAIL ===');
-        print('Email original: $input');
-        try {
-
-          final emailLowerCase = input.toLowerCase();
-          print('Email en minúsculas: $emailLowerCase');
-
-          print('Iniciando búsqueda en Firestore...');
-
-          final userQuery = await firestore
-              .collection('usuarios')
-              .where('email', isEqualTo: emailLowerCase)
-              .get();
-
-          print('Búsqueda completada. Documentos encontrados: ${userQuery.docs.length}');
-
-
-          if (userQuery.docs.isEmpty) {
-            print('NO SE ENCONTRÓ EL USUARIO');
-            print('Buscando todos los usuarios para debug...');
-            final allUsers = await firestore
-                .collection('usuarios')
-                .get();
-
-            print('Total de usuarios en la base de datos: ${allUsers.docs.length}');
-            print('=== LISTA DE USUARIOS ===');
-            for (var doc in allUsers.docs) {
-              final userData = doc.data() as Map<String, dynamic>;
-              print('----------------------------------------');
-              print('ID: ${doc.id}');
-              print('Email: ${userData['email']}');
-              print('Username: ${userData['username']}');
-              print('DisplayName: ${userData['displayName']}');
-              print('----------------------------------------');
-            }
-
-            throw Exception('No se encontró ningún usuario con ese correo electrónico');
-          }
-
-
-          query = userQuery;
-
-          final foundUser = query.docs.first.data() as Map<String, dynamic>;
-          print('=== USUARIO ENCONTRADO ===');
-          print('ID: ${query.docs.first.id}');
-          print('Email: ${foundUser['email']}');
-          print('Username: ${foundUser['username']}');
-          print('DisplayName: ${foundUser['displayName']}');
-          print('=== FIN BÚSQUEDA POR EMAIL ===');
-        } catch (e) {
-          print('=== ERROR EN BÚSQUEDA POR EMAIL ===');
-          print('Error detallado: $e');
-          if (e is FirebaseException) {
-            print('Código de error Firebase: ${e.code}');
-            print('Mensaje de error Firebase: ${e.message}');
-          }
-          print('=== FIN ERROR ===');
-          rethrow;
+        if (query.docs.isEmpty) {
+          throw Exception('No se encontró ningún usuario con ese correo electrónico');
         }
       } else {
-
-        print('=== INICIO BÚSQUEDA POR USERNAME ===');
-        print('Username a buscar: $input');
         query = await firestore
             .collection('usuarios')
             .where('username', isEqualTo: input)
             .limit(1)
             .get();
-        print('Búsqueda completada. Documentos encontrados: ${query.docs.length}');
-        print('=== FIN BÚSQUEDA POR USERNAME ===');
       }
 
       if (query.docs.isEmpty) {
@@ -134,12 +66,11 @@ class SocialRemoteDataSource {
       final targetDoc = query.docs.first;
       final targetId = targetDoc.id;
 
-
       if (targetId == currentUser.uid) {
         throw Exception('No puedes agregarte a ti mismo');
       }
 
-      // Verificar si ya son amigos
+
       final amigoDoc = await firestore
           .collection('usuarios')
           .doc(currentUser.uid)
@@ -163,11 +94,7 @@ class SocialRemoteDataSource {
         throw Exception('Ya existe una solicitud pendiente para este usuario');
       }
 
-      print('Intentando crear solicitud:');
-      print('Usuario actual (remitente) ID: ${currentUser.uid}');
-      print('Usuario destino ID: $targetId');
 
-      // Crear la solicitud
       await firestore
           .collection('usuarios')
           .doc(targetId)
@@ -181,11 +108,8 @@ class SocialRemoteDataSource {
       });
 
     } catch (e) {
-      print('Error detallado al agregar amigo:');
-      print(e);
       if (e is FirebaseException) {
-        print('Código de error: ${e.code}');
-        print('Mensaje de error: ${e.message}');
+        throw Exception('Error en la operación: ${e.message}');
       }
       rethrow;
     }
@@ -199,7 +123,6 @@ class SocialRemoteDataSource {
     required String amigoDisplayName,
   }) async {
 
-    // Verificar que los documentos existan antes de la operación
     final solicitudDoc = await firestore
         .collection('usuarios')
         .doc(currentUserId)
@@ -234,8 +157,7 @@ class SocialRemoteDataSource {
 
     final currentUsername = (currentUserData['username'] ??
         currentUserData['email']?.split('@')[0] ??
-        '')
-        .toLowerCase();
+        '').toLowerCase();
     final currentDisplayName =
         currentUserData['displayName'] ?? currentUserData['email']?.split('@')[0] ?? '';
 
@@ -259,7 +181,6 @@ class SocialRemoteDataSource {
         'fecha': FieldValue.serverTimestamp(),
       },
     );
-
 
     batch.delete(
       firestore

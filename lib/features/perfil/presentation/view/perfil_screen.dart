@@ -62,7 +62,7 @@ class PerfilScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              shadowColor: Colors.black.withOpacity(0.4),
+                              shadowColor: Colors.black.withValues(alpha: 102),
                               elevation: 6,
                             ),
                             onPressed: () async {

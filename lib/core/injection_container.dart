@@ -26,14 +26,14 @@ import '../features/social/presentation/viewmodel/social_viewmodel.dart';
 final getIt = GetIt.instance;
 
 Future<void> init() async {
-  // HTTP Client
+  // HTTP
   getIt.registerLazySingleton(() => http.Client());
 
   // Firebase
   getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
-  // IEMPOS
+  // TIEMPOS
   getIt.registerFactory(() => TiemposViewModel(
     repository: getIt(),
     obtenerClimaPorCiudad: getIt(),

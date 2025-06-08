@@ -63,7 +63,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withAlpha(26),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -214,7 +214,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withAlpha(230),
           shape: BoxShape.circle,
         ),
         child: FaIcon(icon, size: 20, color: Colors.black87),
@@ -296,7 +296,7 @@ class _LoginRollerManiacWidgetState extends State<LoginRollerManiacWidget> {
                               width: size.width > 500 ? 400 : double.infinity,
                               padding: const EdgeInsets.all(24.0),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withAlpha(128),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: const [
                                   BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),

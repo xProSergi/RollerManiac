@@ -9,17 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Corrección de fallos y mejoras">
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/data/datasources/historial_remote_datasource.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/data/models/visita_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/data/repositories/historial_repository_impl.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/domain/entities/visita_entity.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/domain/repositories/historial_repository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/eliminar_visita_usecase.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_visitas_por_parque_usecase.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_visitas_usecase.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/presentation/viewmodel/historial_view_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/presentation/widgets/visita_card.dart" afterDir="false" />
+    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Mejoras">
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/.filecache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/app.dill" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/debug_android_application.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/debug_android_application.stamp" afterDir="false" />
@@ -27,9 +17,15 @@
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.stamp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/constantes/historial_constantes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/constantes/historial_constantes.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/view/historial_atracciones_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/pages/historial_atracciones_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/view/historial_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/pages/historial_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/injection_container.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/injection_container.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/presentation/login_roller_maniac_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/presentation/login_roller_maniac_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/datasources/historial_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/datasources/historial_remote_datasource.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/models/visita_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/models/visita_model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/perfil/presentation/view/perfil_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/perfil/presentation/view/perfil_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/constantes/social_constantes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/constantes/social_constantes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/data/datasources/social_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/data/datasources/social_remote_datasource.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/viewmodel/social_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/viewmodel/social_viewmodel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/presentation/widgets/agregar_amigo.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/presentation/widgets/agregar_amigo.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/pantalla_principal.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/pantalla_principal.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/services/firebase_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/firebase_service.dart" afterDir="false" />
     </list>
@@ -660,7 +656,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749321536215</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Mejoras">
+      <option name="closed" value="true" />
+      <created>1749373718443</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1749373718443</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -693,7 +697,8 @@
     <MESSAGE value="Agregar amigos por correo y corrección errores" />
     <MESSAGE value="Corrección de fallos" />
     <MESSAGE value="Corrección de fallos y mejoras" />
-    <option name="LAST_COMMIT_MESSAGE" value="Corrección de fallos y mejoras" />
+    <MESSAGE value="Mejoras" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mejoras" />
   </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">

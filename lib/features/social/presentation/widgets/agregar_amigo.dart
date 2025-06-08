@@ -34,7 +34,7 @@ class _AgregarAmigoState extends State<AgregarAmigo> {
       decoration: InputDecoration(
         filled: true,
         fillColor: widget.cardColor,
-        labelText: 'Agregar amigo (user o correo)',
+        labelText: SocialTextos.textoAgregar,
         labelStyle: TextStyle(color: widget.lightTextColor),
         suffixIcon: _isLoading
             ? Padding(

@@ -51,7 +51,7 @@ class HistorialRemoteDataSourceImpl implements HistorialRemoteDataSource {
   Future<void> registrarVisita(VisitaModel visita) async {
     try {
       final visitaData = visita.toJson();
-      // Convertimos la fecha a Timestamp para Firestore
+
       visitaData['fecha'] = Timestamp.fromDate(visita.fecha);
 
       await _firestore
@@ -102,7 +102,7 @@ class HistorialRemoteDataSourceImpl implements HistorialRemoteDataSource {
           .map((doc) => VisitaModel.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
 
-      // Ordenamos en memoria en lugar de en la base de datos
+
       visitas.sort((a, b) => b.fecha.compareTo(a.fecha));
 
       return visitas;

@@ -72,6 +72,7 @@ class SocialTextStyles {
 }
 
 class SocialTextos {
+  static const String textoAgregar = 'Agregar amigo (user o correo)';
   static const String tituloSolicitudes = 'Solicitudes recibidas';
   static const String tituloAmigos = 'Amigos';
   static const String tituloRanking = 'Ranking entre amigos';

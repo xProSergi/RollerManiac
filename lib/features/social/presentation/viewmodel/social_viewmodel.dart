@@ -52,7 +52,7 @@ class SocialViewModel extends ChangeNotifier {
           notifyListeners();
           rethrow;
         }
-        // Espera antes de reintentar
+
         await Future.delayed(Duration(seconds: intentos));
       }
     }
