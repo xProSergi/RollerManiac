@@ -26,6 +26,11 @@ class PerfilViewModel extends ChangeNotifier {
     _loadUser();
   }
 
+  Future<void> reloadUser() async {
+    await _auth.currentUser?.reload();
+    await _loadUser();
+  }
+
   Future<void> _loadUser() async {
     _firebaseUser = _auth.currentUser;
     if (_firebaseUser != null) {

@@ -46,7 +46,7 @@ class PerfilScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         PerfilInfoCard(
-                          username: viewModel.username,
+                          displayName: viewModel.displayName,
                           email: viewModel.email,
                           creationDate: viewModel.creationDate,
                         ),

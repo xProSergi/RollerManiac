@@ -22,6 +22,7 @@
         "flutter_pdfview",
         "flutter_svg",
         "font_awesome_flutter",
+        "geolocator",
         "get_it",
         "google_fonts",
         "google_sign_in",
@@ -32,7 +33,8 @@
         "shared_preferences",
         "sqflite",
         "timeago",
-        "url_launcher"
+        "url_launcher",
+        "visibility_detector"
       ],
       "devDependencies": [
         "flutter_launcher_icons",
@@ -92,6 +94,13 @@
         "json_annotation",
         "path",
         "yaml"
+      ]
+    },
+    {
+      "name": "visibility_detector",
+      "version": "0.4.0+2",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -157,7 +166,7 @@
     },
     {
       "name": "shared_preferences",
-      "version": "2.3.2",
+      "version": "2.5.3",
       "dependencies": [
         "flutter",
         "shared_preferences_android",
@@ -170,7 +179,7 @@
     },
     {
       "name": "provider",
-      "version": "6.1.2",
+      "version": "6.1.5",
       "dependencies": [
         "collection",
         "flutter",
@@ -275,6 +284,18 @@
         "http_parser",
         "meta",
         "web"
+      ]
+    },
+    {
+      "name": "geolocator",
+      "version": "14.0.1",
+      "dependencies": [
+        "flutter",
+        "geolocator_android",
+        "geolocator_apple",
+        "geolocator_platform_interface",
+        "geolocator_web",
+        "geolocator_windows"
       ]
     },
     {
@@ -740,7 +761,7 @@
     },
     {
       "name": "shared_preferences_android",
-      "version": "2.3.2",
+      "version": "2.4.10",
       "dependencies": [
         "flutter",
         "shared_preferences_platform_interface"
@@ -918,6 +939,52 @@
         "source_span",
         "string_scanner",
         "typed_data"
+      ]
+    },
+    {
+      "name": "geolocator_windows",
+      "version": "0.2.5",
+      "dependencies": [
+        "flutter",
+        "geolocator_platform_interface"
+      ]
+    },
+    {
+      "name": "geolocator_web",
+      "version": "4.1.3",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "geolocator_platform_interface",
+        "web"
+      ]
+    },
+    {
+      "name": "geolocator_apple",
+      "version": "2.3.13",
+      "dependencies": [
+        "flutter",
+        "geolocator_platform_interface"
+      ]
+    },
+    {
+      "name": "geolocator_android",
+      "version": "5.0.1+1",
+      "dependencies": [
+        "flutter",
+        "geolocator_platform_interface",
+        "meta",
+        "uuid"
+      ]
+    },
+    {
+      "name": "geolocator_platform_interface",
+      "version": "4.2.6",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "plugin_platform_interface",
+        "vector_math"
       ]
     },
     {

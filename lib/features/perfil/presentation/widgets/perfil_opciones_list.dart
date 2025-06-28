@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/utils/validation_utils.dart';
 import '../../constantes/perfil_constantes.dart';
-import '../../../../core/utils/validation_utils.dart';
+import '../viewmodel/perfil_viewmodel.dart';
 
 class PerfilOpcionesList extends StatelessWidget {
   const PerfilOpcionesList({super.key});
@@ -19,7 +21,7 @@ class PerfilOpcionesList extends StatelessWidget {
           _buildOptionTile(
             icon: PerfilConstantes.iconoEditar,
             text: PerfilConstantes.editarPerfil,
-            onTap: () => _showNotImplemented(context),
+            onTap: () => _mostrarDialogoEditarNombre(context),
           ),
           const Divider(height: 1, color: PerfilConstantes.colorDivisor),
           _buildOptionTile(
@@ -75,7 +77,6 @@ class PerfilOpcionesList extends StatelessWidget {
   }
 
   void _showNotImplemented(BuildContext context) {
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
@@ -116,14 +117,79 @@ class PerfilOpcionesList extends StatelessWidget {
     );
   }
 
-  Future<void> _mostrarDialogoCambiarContrasena(BuildContext contextExterno) async {
+  Future<void> _mostrarDialogoEditarNombre(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final viewModel = Provider.of<PerfilViewModel>(context, listen: false);
+    final controlador = TextEditingController(text: user?.displayName ?? viewModel.username);
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: PerfilConstantes.colorTarjeta,
+          title: const Text('Editar nombre de usuario', style: PerfilConstantes.estiloUsername),
+          content: TextField(
+            controller: controlador,
+            decoration: const InputDecoration(
+              labelText: 'Nuevo nombre de usuario',
+              labelStyle: TextStyle(color: PerfilConstantes.colorTextoPrincipal),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: PerfilConstantes.colorTextoSecundario),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: PerfilConstantes.colorTextoPrincipal),
+              ),
+            ),
+            style: const TextStyle(color: PerfilConstantes.colorTextoPrincipal),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar', style: PerfilConstantes.estiloOpcion),
+            ),
+            TextButton(
+              onPressed: () async {
+                final nuevoNombre = controlador.text.trim();
+                if (nuevoNombre.isEmpty) return;
+                try {
+                  await user?.updateDisplayName(nuevoNombre);
+                  // Si usas Firestore para el username:
+                  await FirebaseFirestore.instance
+                      .collection('usuarios')
+                      .doc(user?.uid)
+                      .update({'username': nuevoNombre});
+                  // Actualiza el ViewModel para que se refleje el cambio
+                  await viewModel.reloadUser();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Nombre actualizado')),
+                    );
+                    Navigator.pop(context);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                }
+              },
+              child: const Text('Guardar', style: PerfilConstantes.estiloOpcion),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _mostrarDialogoCambiarContrasena(BuildContext context) async {
     final controladorNueva = TextEditingController();
     final controladorConfirmar = TextEditingController();
     final obscurePasswordNueva = ValueNotifier<bool>(true);
     final obscurePasswordConfirmar = ValueNotifier<bool>(true);
 
     await showDialog(
-      context: contextExterno,
+      context: context,
       builder: (dialogInternalContext) {
         return AlertDialog(
           backgroundColor: PerfilConstantes.colorFondo,
@@ -211,7 +277,6 @@ class PerfilOpcionesList extends StatelessWidget {
                 final nueva = controladorNueva.text;
                 final confirmar = controladorConfirmar.text;
 
-
                 final validacionPassword = ValidationUtils.validatePassword(nueva);
                 if (validacionPassword != null) {
                   _mostrarSnackBar(
@@ -223,7 +288,6 @@ class PerfilOpcionesList extends StatelessWidget {
                   );
                   return;
                 }
-
 
                 if (nueva != confirmar) {
                   _mostrarSnackBar(
@@ -240,7 +304,7 @@ class PerfilOpcionesList extends StatelessWidget {
                   await FirebaseAuth.instance.currentUser?.updatePassword(nueva);
                   Navigator.pop(dialogInternalContext);
                   _mostrarSnackBar(
-                    context: contextExterno,
+                    context: context,
                     icon: Icons.check_circle_outline_rounded,
                     message: PerfilConstantes.exitoContrasenaActualizada,
                     color: Colors.green[100],
@@ -285,18 +349,11 @@ class PerfilOpcionesList extends StatelessWidget {
     required Color? color,
     required int duration,
   }) {
-
     final overlay = Overlay.of(context);
-
-    // Hago esto para que si salta un mensaje salga por encima de la pantalla que esté abierta
-    // y que si el teclado está abierto, se ponga justo encima del teclado el mensaje
-
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
 
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-
         bottom: keyboardHeight > 0 ? keyboardHeight : 20,
         left: 20,
         right: 20,
@@ -333,7 +390,6 @@ class PerfilOpcionesList extends StatelessWidget {
         ),
       ),
     );
-
 
     overlay.insert(overlayEntry);
     Future.delayed(Duration(seconds: duration), () {

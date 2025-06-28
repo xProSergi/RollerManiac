@@ -204,6 +204,21 @@ class SocialRemoteDataSource {
         .map((doc) => AmigoModel.fromMap(doc.data(), doc.id))
         .toList();
 
+    // Obtener los datos del usuario actual
+    final currentUserDoc = await firestore.collection('usuarios').doc(userId).get();
+    if (currentUserDoc.exists) {
+      final data = currentUserDoc.data()!;
+      final currentUser = AmigoModel(
+        id: userId,
+        email: data['email'] ?? '',
+        displayName: data['displayName'] ?? '',
+        username: data['username'] ?? '',
+        cantidadParques: 0, // Se calcula abajo igual que para los amigos
+      );
+      amigos.add(currentUser);
+    }
+
+    // Calcular cantidad de parques para todos (amigos + usuario)
     for (final amigo in amigos) {
       final visitas = await firestore
           .collection('usuarios')

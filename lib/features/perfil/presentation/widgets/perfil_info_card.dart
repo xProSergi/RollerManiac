@@ -3,13 +3,13 @@ import 'package:intl/intl.dart';
 import '../../constantes/perfil_constantes.dart';
 
 class PerfilInfoCard extends StatelessWidget {
-  final String username;
+  final String displayName; // Cambiado aquí
   final String email;
   final DateTime? creationDate;
 
   const PerfilInfoCard({
     super.key,
-    required this.username,
+    required this.displayName, // Cambiado aquí
     required this.email,
     required this.creationDate,
   });
@@ -33,7 +33,7 @@ class PerfilInfoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              username.isNotEmpty ? username : PerfilConstantes.usuarioDefault,
+              displayName.isNotEmpty ? displayName : PerfilConstantes.usuarioDefault, // Cambiado aquí
               style: PerfilConstantes.estiloUsername,
             ),
             const SizedBox(height: 8),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../domain/entities/atraccion.dart';
 import '../../domain/entities/parque.dart';
+import '../../utils/parque_utils.dart';
 
 abstract class ParquesRemoteDataSource {
   Future<List<Parque>> obtenerParques();
@@ -17,38 +18,35 @@ class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
   Future<List<Parque>> obtenerParques() async {
     try {
       final response = await client.get(Uri.parse('https://queue-times.com/parks.json'));
-      print('Response status: ${response.statusCode}');
+      print('Response status: [32m[1m${response.statusCode}[0m');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as List<dynamic>;
         final List<Parque> parques = [];
-
-        final ciudadesPorNombre = {
-          'Parque Warner Madrid': 'Madrid',
-          'Parque de Atracciones Madrid': 'Madrid',
-          'PortAventura Park': 'Tarragona',
-          'Ferrari Land': 'Tarragona',
-        };
 
         for (final grupo in data) {
           final List<dynamic>? subparques = grupo['parks'];
           if (subparques != null) {
             for (final parque in subparques) {
               try {
-                if (parque['country']?.toString() == 'Spain') {
-                  final id = parque['id']?.toString() ?? '0';
-                  final nombre = parque['name']?.toString() ?? 'Sin nombre';
-                  final pais = parque['country']?.toString() ?? 'Desconocido';
-                  final ciudad = ciudadesPorNombre[nombre] ?? 'Desconocida';
+                final id = parque['id']?.toString() ?? '0';
+                final nombre = parque['name']?.toString() ?? 'Sin nombre';
+                final pais = parque['country']?.toString() ?? 'Desconocido';
+                final ciudad = '';
+                final lat = double.tryParse(parque['latitude']?.toString() ?? '') ?? 0.0;
+                final lon = double.tryParse(parque['longitude']?.toString() ?? '') ?? 0.0;
+                final continente = obtenerContinente(pais);
 
-                  parques.add(Parque(
-                    id: id,
-                    nombre: nombre,
-                    pais: pais,
-                    ciudad: ciudad,
-                    atracciones: [],
-                  ));
-                }
+                parques.add(Parque(
+                  id: id,
+                  nombre: nombre,
+                  pais: pais,
+                  ciudad: ciudad,
+                  latitud: lat,
+                  longitud: lon,
+                  continente: continente,
+                  atracciones: [],
+                ));
               } catch (e) {
                 print('Error procesando parque: $e');
               }
@@ -56,7 +54,7 @@ class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
           }
         }
 
-        print('Parques de España encontrados: ${parques.length}');
+        print('Parques encontrados: [34m${parques.length}[0m');
         return parques;
       } else {
         throw Exception('Error al cargar los parques: ${response.statusCode}');

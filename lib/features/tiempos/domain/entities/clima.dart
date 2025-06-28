@@ -4,6 +4,7 @@ class Clima {
   final String codigoIcono;
   final String ciudad;
   final String ultimaActualizacion;
+  final bool esAntiguo;
 
   Clima({
     required this.temperatura,
@@ -11,6 +12,7 @@ class Clima {
     required this.codigoIcono,
     required this.ciudad,
     required this.ultimaActualizacion,
+    this.esAntiguo = false,
   });
 
   factory Clima.fromJsonWeatherAPI(Map<String, dynamic> json) {
@@ -23,6 +25,18 @@ class Clima {
       codigoIcono: current['condition']['icon'],
       ciudad: location['name'],
       ultimaActualizacion: current['last_updated'],
+      esAntiguo: false,
+    );
+  }
+
+  Clima copyWith({bool? esAntiguo}) {
+    return Clima(
+      temperatura: temperatura,
+      descripcion: descripcion,
+      codigoIcono: codigoIcono,
+      ciudad: ciudad,
+      ultimaActualizacion: ultimaActualizacion,
+      esAntiguo: esAntiguo ?? this.esAntiguo,
     );
   }
 }

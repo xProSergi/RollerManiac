@@ -16,14 +16,37 @@ class ClimaRemoteDataSourceImpl implements ClimaRemoteDataSource {
 
   @override
   Future<Clima> obtenerClimaPorCiudad(String ciudad) async {
-    final respuesta = await client.get(
-      Uri.parse('$_urlBase?key=$_claveApi&q=$ciudad&lang=es'),
-    );
+    try {
+      // Limpiar y codificar la ciudad para la URL
+      final ciudadCodificada = Uri.encodeComponent(ciudad.trim());
 
-    if (respuesta.statusCode == 200) {
-      return Clima.fromJsonWeatherAPI(json.decode(respuesta.body));
-    } else {
-      throw Exception('Error al obtener el clima: ${respuesta.statusCode}');
+      final respuesta = await client.get(
+        Uri.parse('$_urlBase?key=$_claveApi&q=$ciudadCodificada&lang=es&aqi=no'),
+      ).timeout(const Duration(seconds: 10));
+
+      if (respuesta.statusCode == 200) {
+        final data = json.decode(respuesta.body);
+
+        // Verificar si hay error en la respuesta de la API
+        if (data.containsKey('error')) {
+          throw Exception('Error de la API del clima: ${data['error']['message']}');
+        }
+
+        return Clima.fromJsonWeatherAPI(data);
+      } else if (respuesta.statusCode == 400) {
+        throw Exception('Ciudad no encontrada: $ciudad');
+      } else if (respuesta.statusCode == 401) {
+        throw Exception('Error de autenticación con la API del clima');
+      } else if (respuesta.statusCode == 429) {
+        throw Exception('Límite de consultas excedido. Inténtalo más tarde.');
+      } else {
+        throw Exception('Error al obtener el clima: ${respuesta.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Error de conexión: $e');
     }
   }
 }

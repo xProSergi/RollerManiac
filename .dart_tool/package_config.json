@@ -284,6 +284,42 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "geolocator",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/geolocator-14.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "geolocator_android",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/geolocator_android-5.0.1+1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "geolocator_apple",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "geolocator_platform_interface",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/geolocator_platform_interface-4.2.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "geolocator_web",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/geolocator_web-4.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "geolocator_windows",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/geolocator_windows-0.2.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "get_it",
       "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/get_it-8.0.3",
       "packageUri": "lib/",
@@ -489,7 +525,7 @@
     },
     {
       "name": "provider",
-      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/provider-6.1.2",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/provider-6.1.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -501,15 +537,15 @@
     },
     {
       "name": "shared_preferences",
-      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/shared_preferences-2.3.2",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/shared_preferences-2.5.3",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.5"
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/shared_preferences_android-2.3.2",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.10",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "shared_preferences_foundation",
@@ -696,6 +732,12 @@
       "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
       "languageVersion": "2.14"
+    },
+    {
+      "name": "visibility_detector",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/visibility_detector-0.4.0+2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "vm_service",

@@ -1,14 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import '../../domain/entities/parque.dart';
 import '../../domain/entities/atraccion.dart';
 import '../../../../services/firebase_service.dart';
 import '../../constantes/tiempos_constantes.dart';
 
-class DetallesParqueScreen extends StatelessWidget {
+class DetallesParqueScreen extends StatefulWidget {
   final Parque parque;
 
   const DetallesParqueScreen({Key? key, required this.parque}) : super(key: key);
+
+  @override
+  State<DetallesParqueScreen> createState() => _DetallesParqueScreenState();
+}
+
+class _DetallesParqueScreenState extends State<DetallesParqueScreen> {
+  String _ordenActual = 'Alfabético';
+
+  List<Atraccion> get _atraccionesOrdenadas {
+    final atracciones = List<Atraccion>.from(widget.parque.atracciones ?? []);
+    switch (_ordenActual) {
+      case 'Tiempo ↑':
+        atracciones.sort((a, b) => (a.tiempoEspera ?? 9999).compareTo(b.tiempoEspera ?? 9999));
+        break;
+      case 'Tiempo ↓':
+        atracciones.sort((a, b) => (b.tiempoEspera ?? -1).compareTo(a.tiempoEspera ?? -1));
+        break;
+      case 'Alfabético':
+      default:
+        atracciones.sort((a, b) => a.nombre.compareTo(b.nombre));
+    }
+    return atracciones;
+  }
 
   Future<void> _registrarVisitaAtraccion(BuildContext context, String atraccionNombre) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -23,7 +47,6 @@ class DetallesParqueScreen extends StatelessWidget {
       );
       return;
     }
-
 
     scaffoldMessenger.hideCurrentSnackBar();
     scaffoldMessenger.showSnackBar(
@@ -42,11 +65,10 @@ class DetallesParqueScreen extends StatelessWidget {
 
     try {
       await FirebaseService.registrarVisitaAtraccion(
-        parque.id,
-        parque.nombre,
+        widget.parque.id,
+        widget.parque.nombre,
         atraccionNombre,
       );
-
 
       await Future.delayed(const Duration(seconds: 2));
 
@@ -61,7 +83,6 @@ class DetallesParqueScreen extends StatelessWidget {
         ),
       );
     } catch (e) {
-
       await Future.delayed(const Duration(seconds: 2));
 
       if (!context.mounted) return;
@@ -80,6 +101,17 @@ class DetallesParqueScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          widget.parque.nombre,
+          style: TiemposEstilos.estiloTituloAppBar,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: TiemposColores.gradienteFondo,
@@ -87,92 +119,122 @@ class DetallesParqueScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                centerTitle: true,
-                title: Text(
-                  parque.nombre,
-                  style: TiemposEstilos.estiloTituloAppBar,
+              // Botones de orden justo debajo del AppBar
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: TiemposColores.tarjeta.withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                iconTheme: const IconThemeData(color: TiemposColores.textoPrincipal),
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildSortButton('Alfabético', Icons.sort_by_alpha),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildSortButton('Tiempo ↑', Icons.arrow_upward),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildSortButton('Tiempo ↓', Icons.arrow_downward),
+                    ),
+                  ],
+                ),
               ),
+              // LISTA DE ATRACCIONES
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: TiemposTamanos.paddingHorizontal,
+                child: _atraccionesOrdenadas.isEmpty
+                    ? Center(
+                  child: Text(
+                    'No hay atracciones para mostrar.',
+                    style: TextStyle(color: TiemposColores.textoSecundario),
                   ),
-                  child: ListView.separated(
-                    itemCount: parque.atracciones.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: TiemposTamanos.separacionElementos),
-                    itemBuilder: (context, index) {
-                      final atraccion = parque.atracciones[index];
-                      final bool operativa = atraccion.operativa;
-
-                      return Card(
-                        color: TiemposColores.tarjeta,
-                        elevation: TiemposTamanos.elevacionTarjeta,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(TiemposTamanos.radioBordes),
+                )
+                    : ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  itemCount: _atraccionesOrdenadas.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final atraccion = _atraccionesOrdenadas[index];
+                    return Card(
+                      color: TiemposColores.tarjeta,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Icons.attractions, color: TiemposColores.botonPrimario),
+                        title: Text(
+                          atraccion.nombre,
+                          style: TiemposEstilos.estiloTitulo.copyWith(fontSize: 18),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(TiemposTamanos.separacionInterna),
-                          child: Row(
-                            children: [
-                              Icon(
-                                TiemposIconos.atraccion,
-                                color: operativa ? TiemposColores.operativa : TiemposColores.mantenimiento,
-                                size: 28,
-                              ),
-                              const SizedBox(width: TiemposTamanos.separacionInterna),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      atraccion.nombre,
-                                      style: TiemposEstilos.estiloTitulo,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      operativa
-                                          ? 'Espera: ${atraccion.tiempoEspera} min'
-                                          : TiemposTextos.enMantenimiento,
-                                      style: operativa
-                                          ? TiemposEstilos.estiloEstadoOperativo
-                                          : TiemposEstilos.estiloEstadoMantenimiento,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: TiemposColores.botonPrimario,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                ),
-                                child: Text(
-                                  TiemposTextos.registrar,
-                                  style: TiemposEstilos.estiloBotonSecundario,
-                                ),
-                              ),
-                            ],
+                        subtitle: atraccion.tiempoEspera != null
+                            ? Text(
+                          'Espera: ${atraccion.tiempoEspera} min',
+                          style: TiemposEstilos.estiloSubtitulo,
+                        )
+                            : Text(
+                          'Sin datos de espera',
+                          style: TiemposEstilos.estiloSubtitulo,
+                        ),
+                        trailing: ElevatedButton(
+                          onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: TiemposColores.botonPrimario,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          ),
+                          child: Text(
+                            'Visitar',
+                            style: TiemposEstilos.estiloBotonPrimario.copyWith(fontSize: 12),
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSortButton(String label, IconData icon) {
+    final isSelected = _ordenActual == label;
+    return ElevatedButton(
+      onPressed: () => setState(() => _ordenActual = label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected
+            ? TiemposColores.botonPrimario
+            : Colors.white.withOpacity(0.18),
+        foregroundColor: isSelected
+            ? Colors.white
+            : TiemposColores.textoSecundario,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        elevation: isSelected ? 4 : 0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }
