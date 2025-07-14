@@ -21,10 +21,10 @@ class TiemposTextos {
 }
 
 class TiemposColores {
-  static const Color fondo = Color(0xFF0F172A);
-  static const Color tarjeta = Color(0xE61E293B);
+  static const Color fondo = Color(0xFF10172B);
+  static const Color tarjeta = Color(0xF21B2436);
   static const Color textoPrincipal = Colors.white;
-  static const Color textoSecundario = Color(0xFF94A3B8);
+  static const Color textoSecundario = Color(0xFFB0B8C1);
   static const Color operativa = Color(0xFF4ADE80);
   static const Color mantenimiento = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
@@ -33,24 +33,26 @@ class TiemposColores {
   static const Color botonPrimario = Color(0xFF2563EB);
   static const Color botonSecundario = Color(0xFF7C3AED);
   static const Color divisor = Color(0xFF334155);
+  static const Color chipSeleccion = Color(0xFF3B82F6);
+  static const Color chipSeleccionTexto = Color(0xFFFFFFFF);
 
   static const LinearGradient gradienteFondo = LinearGradient(
     colors: [
-      Color(0xFF0056B3),
-      Color(0xFF000033),
+      Color(0xFF2563EB),
+      Color(0xFF10172B),
     ],
-    stops: [0.5, 1.0],
+    stops: [0.3, 1.0],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
 }
 
 class TiemposIconos {
-  static const IconData parque = Icons.castle;
-  static const IconData atraccion = Icons.attractions_rounded;
-  static const IconData ubicacion = Icons.location_on;
-  static const IconData clima = Icons.wb_sunny;
-  static const IconData errorIcon = Icons.error_outline;
+  static const IconData parque = Icons.park_rounded;
+  static const IconData atraccion = Icons.roller_shades_closed_rounded;
+  static const IconData ubicacion = Icons.location_on_rounded;
+  static const IconData clima = Icons.sunny;
+  static const IconData errorIcon = Icons.error_rounded;
 }
 
 class TiemposTamanos {

@@ -33,7 +33,7 @@ class TiemposViewModel extends ChangeNotifier {
   Position? _posicionUsuario;
 
   // Variables para lazy loading
-  static const int _parquesPorPagina = 10; // Parques a cargar por vez
+  static const int _parquesPorPagina = 6; // Reducido de 8 a 6 para mejor rendimiento
   int _paginaActual = 0;
   bool _hayMasParques = true;
 
@@ -204,6 +204,8 @@ class TiemposViewModel extends ChangeNotifier {
     if (_ordenActual == nuevoOrden) return; // No hacer nada si es el mismo orden
 
     _ordenActual = nuevoOrden;
+    // Restaurar la lista filtrada por continente ANTES de ordenar
+    _filtrarPorContinente(_continenteActual);
     if (nuevoOrden == 'Cercanía') {
       await obtenerPosicionUsuario();
       if (_posicionUsuario != null) {
@@ -246,15 +248,16 @@ class TiemposViewModel extends ChangeNotifier {
 
     List<Parque> resultado;
 
-    if (busqueda.length < 3) {
-      // Si la búsqueda es muy corta, mostrar todos los parques cargados
+    if (busqueda.isEmpty || busqueda.length < 3) {
+      // Si la búsqueda está vacía o es muy corta, mostrar todos los parques cargados
       resultado = _parquesCargados;
     } else {
       // Filtrar solo los parques que ya están cargados
+      final busquedaLower = busqueda.toLowerCase();
       resultado = _parquesCargados.where((p) =>
-      p.nombre.toLowerCase().contains(busqueda.toLowerCase()) ||
-          (p.ciudad.isNotEmpty && p.ciudad.toLowerCase().contains(busqueda.toLowerCase())) ||
-          p.pais.toLowerCase().contains(busqueda.toLowerCase())
+      p.nombre.toLowerCase().contains(busquedaLower) ||
+          (p.ciudad.isNotEmpty && p.ciudad.toLowerCase().contains(busquedaLower)) ||
+          p.pais.toLowerCase().contains(busquedaLower)
       ).toList();
     }
 
@@ -311,24 +314,6 @@ class TiemposViewModel extends ChangeNotifier {
         final clima = await obtenerClimaPorCiudad.ejecutar(ciudadConsulta);
         _datosClima[nombreParque] = clima;
 
-        // Actualizar el parque específico en la lista
-        _todosLosParques = _todosLosParques.map((p) {
-          if (p.nombre == nombreParque) {
-            return Parque(
-              id: p.id,
-              nombre: p.nombre,
-              pais: p.pais,
-              ciudad: p.ciudad,
-              latitud: p.latitud,
-              longitud: p.longitud,
-              continente: p.continente,
-              atracciones: p.atracciones,
-              clima: clima,
-            );
-          }
-          return p;
-        }).toList();
-
         // Limpiar cache del parque para forzar regeneración
         _parquesConClimaCache.remove(parque.id);
 
@@ -337,9 +322,10 @@ class TiemposViewModel extends ChangeNotifier {
 
         // Notificar cambios
         notifyListeners();
+        return;
       }
     } catch (e) {
-      // Crear un clima de error para evitar que se quede cargando indefinidamente
+      // Si hay error, crear un clima de error para evitar que se quede cargando indefinidamente
       final climaError = Clima(
         temperatura: 0.0,
         descripcion: 'Error al cargar',
@@ -348,31 +334,8 @@ class TiemposViewModel extends ChangeNotifier {
         ultimaActualizacion: DateTime.now().toIso8601String(),
         esAntiguo: false,
       );
-
       _datosClima[nombreParque] = climaError;
-
-      // Actualizar el parque con clima de error
-      _todosLosParques = _todosLosParques.map((p) {
-        if (p.nombre == nombreParque) {
-          return Parque(
-            id: p.id,
-            nombre: p.nombre,
-            pais: p.pais,
-            ciudad: p.ciudad,
-            latitud: p.latitud,
-            longitud: p.longitud,
-            continente: p.continente,
-            atracciones: p.atracciones,
-            clima: climaError,
-          );
-        }
-        return p;
-      }).toList();
-
-      // Limpiar cache del parque para forzar regeneración
       _parquesConClimaCache.remove(parque.id);
-
-      // Notificar cambios
       notifyListeners();
     }
   }
@@ -385,6 +348,36 @@ class TiemposViewModel extends ChangeNotifier {
       // Rate limiting entre requests
       await Future.delayed(const Duration(milliseconds: 200));
     }
+  }
+
+  Future<void> guardarClimaCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final climaMap = <String, dynamic>{};
+      _datosClima.forEach((key, clima) {
+        climaMap[key] = {
+          'temperatura': clima.temperatura,
+          'descripcion': clima.descripcion,
+          'codigoIcono': clima.codigoIcono,
+          'ciudad': clima.ciudad,
+          'ultimaActualizacion': clima.ultimaActualizacion,
+        };
+      });
+      await prefs.setString('clima_cache', jsonEncode(climaMap));
+      await prefs.setInt('clima_cache_timestamp', DateTime.now().millisecondsSinceEpoch);
+    } catch (e) {
+      // Silenciar errores de guardado de cache
+    }
+  }
+
+  // Nueva función para forzar actualización de clima de un parque
+  Future<void> forzarActualizarClima(String parqueId) async {
+    final parque = _todosLosParques.firstWhere((p) => p.id == parqueId);
+    // Elimina el clima del cache y vuelve a cargarlo
+    _datosClima.remove(parque.nombre);
+    _parquesConClimaCache.remove(parqueId);
+    await cargarClimaParaParque(parque.nombre, parque.latitud, parque.longitud, parque.pais);
+    notifyListeners();
   }
 
   Future<void> cargarClimaCache() async {
@@ -410,85 +403,14 @@ class TiemposViewModel extends ChangeNotifier {
             esAntiguo: esCacheAntiguo, // Marcar como antiguo si corresponde
           );
         }
-
-        // Si el cache es antiguo, actualizar en segundo plano
+        // Si el cache es antiguo, actualizar TODOS los parques filtrados (no solo favoritos)
         if (esCacheAntiguo) {
-          _actualizarClimaEnSegundoPlano();
+          for (final parque in _parquesFiltrados) {
+            await forzarActualizarClima(parque.id);
+            await Future.delayed(const Duration(milliseconds: 200));
+          }
         }
       }
-    } catch (e) {
-      // Silenciar errores de cache
-    }
-  }
-
-  Future<void> _actualizarClimaEnSegundoPlano() async {
-    // Actualizar solo los parques favoritos que tienen datos antiguos
-    final parquesAntiguos = _parquesFiltrados
-        .where((p) => _favoritos.contains(p.id) && _datosClima[p.nombre]?.esAntiguo == true)
-        .take(10) // Actualizar máximo 10 parques en segundo plano
-        .toList();
-
-    for (final parque in parquesAntiguos) {
-      try {
-        final ciudadConsulta = ClimaUtils.obtenerCiudadParaClima(parque.nombre, parque.latitud, parque.longitud, parque.pais);
-        if (ciudadConsulta.isNotEmpty) {
-          final clima = await obtenerClimaPorCiudad.ejecutar(ciudadConsulta);
-          _datosClima[parque.nombre] = clima;
-
-          // Actualizar el parque en la lista
-          _todosLosParques = _todosLosParques.map((p) {
-            if (p.nombre == parque.nombre) {
-              return Parque(
-                id: p.id,
-                nombre: p.nombre,
-                pais: p.pais,
-                ciudad: p.ciudad,
-                latitud: p.latitud,
-                longitud: p.longitud,
-                continente: p.continente,
-                atracciones: p.atracciones,
-                clima: clima,
-              );
-            }
-            return p;
-          }).toList();
-
-          // Limpiar cache del parque
-          _parquesConClimaCache.remove(parque.id);
-
-          // Rate limiting
-          await Future.delayed(const Duration(milliseconds: 200));
-        }
-      } catch (e) {
-        // Silenciar errores en segundo plano
-      }
-    }
-
-    // Guardar el cache actualizado
-    await guardarClimaCache();
-
-    // Notificar cambios una sola vez al final
-    notifyListeners();
-  }
-
-  Future<void> guardarClimaCache() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final Map<String, Map<String, dynamic>> climaData = {};
-
-      for (final entry in _datosClima.entries) {
-        climaData[entry.key] = {
-          'temperatura': entry.value.temperatura,
-          'descripcion': entry.value.descripcion,
-          'codigoIcono': entry.value.codigoIcono,
-          'ciudad': entry.value.ciudad,
-          'ultimaActualizacion': entry.value.ultimaActualizacion,
-          'esAntiguo': entry.value.esAntiguo,
-        };
-      }
-
-      await prefs.setString('clima_cache', jsonEncode(climaData));
-      await prefs.setInt('clima_cache_timestamp', DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
       // Silenciar errores de cache
     }
@@ -555,7 +477,7 @@ class TiemposViewModel extends ChangeNotifier {
       }
 
     } catch (e) {
-      debugPrint('❌ Error en lazy loading: $e');
+      // Silenciar errores de lazy loading
     } finally {
       _cargandoMas = false;
       notifyListeners();

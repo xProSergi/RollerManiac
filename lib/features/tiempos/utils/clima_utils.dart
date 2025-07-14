@@ -71,7 +71,7 @@ class ClimaUtils {
       'Playcenter': 'São Paulo, São Paulo, Brazil',
       'Terra Mítica': 'Benidorm, Alicante, Spain',
       'Isla Mágica': 'Seville, Andalusia, Spain',
-      'Parque de Atracciones de Madrid': 'Madrid, Spain',
+      'Parque de Atracciones de Madrid': 'COORDS:40.4165,-3.7026',
       'Tibidabo': 'Barcelona, Spain',
       'Siam Park': 'Adeje, Tenerife, Spain',
       'Loro Parque': 'Puerto de la Cruz, Tenerife, Spain',

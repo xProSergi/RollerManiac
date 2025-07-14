@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // Importación añadida
-
 import '../../../historial/data/datasources/historial_remote_datasource.dart';
 import '../../domain/entities/clima.dart';
 import '../viewmodel/tiempos_viewmodel.dart';
@@ -13,7 +11,7 @@ import '../../../perfil/presentation/view/perfil_screen.dart';
 import '../../../social/presentation/view/social_screen.dart';
 import '../../../historial/presentation/viewmodel/historial_view_model.dart';
 import '../../../historial/data/repositories/historial_repository_impl.dart';
-// import '../../../historial/data/datasources/historial_remote_datasource.dart'; // Duplicado, se puede borrar
+import '../../../historial/data/datasources/historial_remote_datasource.dart';
 import '../../../historial/domain/usecases/obtener_visitas_usecase.dart';
 import '../../../historial/domain/usecases/obtener_visitas_por_parque_usecase.dart';
 import '../../../../compartido/widgets/nav_bar.dart';
@@ -22,7 +20,7 @@ import '../../constantes/tiempos_constantes.dart';
 import '../../utils/parque_utils.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:flutter/rendering.dart'; // Para RepaintBoundary
+import 'package:flutter/rendering.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({Key? key}) : super(key: key);
@@ -53,10 +51,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         ),
         child: HistorialScreen(
           actualizarVisitas: () {
-            // Asegúrate de que el contexto esté montado antes de usarlo
-            if (mounted) {
-              Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
-            }
+            Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
           },
         ),
       ),
@@ -72,7 +67,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   Future<void> _verifyAuth(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null && mounted) { // Verificar mounted antes de navegar
+    if (user == null) {
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
@@ -91,7 +86,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 centerTitle: true,
-                title: const Text( // Añadido const
+                title: Text(
                   TiemposTextos.tituloApp,
                   style: TiemposEstilos.estiloTituloAppBar,
                 ),
@@ -123,9 +118,12 @@ class _ParquesListScreenState extends State<ParquesListScreen> with AutomaticKee
   String _busqueda = '';
   String _continenteSeleccionado = 'Europa';
   final ScrollController _scrollController = ScrollController();
-  bool _showScrollToTop = false;
-  bool _showSections = true;
 
+  // Usamos ValueNotifier para evitar rebuilds globales
+  final ValueNotifier<bool> _showScrollToTop = ValueNotifier(false);
+  final ValueNotifier<bool> _showSections = ValueNotifier(true);
+
+  // Variables para optimizar el scroll
   DateTime _lastScrollTime = DateTime.now();
   bool _isLoadingMore = false;
 
@@ -142,12 +140,15 @@ class _ParquesListScreenState extends State<ParquesListScreen> with AutomaticKee
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _showScrollToTop.dispose();
+    _showSections.dispose();
     super.dispose();
   }
 
   void _onScroll() {
     final now = DateTime.now();
 
+    // Throttling: solo ejecutar cada 50ms
     if (now.difference(_lastScrollTime).inMilliseconds < 50) {
       return;
     }
@@ -156,23 +157,21 @@ class _ParquesListScreenState extends State<ParquesListScreen> with AutomaticKee
     final offset = _scrollController.offset;
     final shouldShowSections = offset < 100;
 
-    // Solo actualiza el estado si hay un cambio para evitar reconstrucciones innecesarias
-    if (_showScrollToTop != (offset > 200) || _showSections != shouldShowSections) {
-      setState(() {
-        _showScrollToTop = offset > 200;
-        _showSections = shouldShowSections;
-      });
+    // Solo notificamos si cambia el valor
+    if (_showScrollToTop.value != (offset > 200)) {
+      _showScrollToTop.value = offset > 200;
+    }
+    if (_showSections.value != shouldShowSections) {
+      _showSections.value = shouldShowSections;
     }
 
-
+    // Cargar más parques si es necesario
     if (!_isLoadingMore && _scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       final viewModel = Provider.of<TiemposViewModel>(context, listen: false);
       if (viewModel.hayMasParques && !viewModel.cargandoMas) {
         _isLoadingMore = true;
         viewModel.cargarMasParques().then((_) {
-          if (mounted) { // Asegurarse de que el widget sigue montado
-            _isLoadingMore = false;
-          }
+          _isLoadingMore = false;
         });
       }
     }
@@ -196,10 +195,11 @@ class _ParquesListScreenState extends State<ParquesListScreen> with AutomaticKee
 
         return Column(
           children: [
+            // Campo de búsqueda
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextField(
-                decoration: const InputDecoration( // Añadido const
+                decoration: const InputDecoration(
                   hintText: 'Buscar parque...',
                   prefixIcon: Icon(Icons.search),
                   filled: true,
@@ -212,22 +212,29 @@ class _ParquesListScreenState extends State<ParquesListScreen> with AutomaticKee
                 onChanged: (value) => setState(() => _busqueda = value),
               ),
             ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: _showSections ? null : 0,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: _showSections ? 1.0 : 0.0,
-                child: _SeccionesWidget(
-                  continenteSeleccionado: _continenteSeleccionado,
-                  onContinenteChanged: (cont) {
-                    setState(() => _continenteSeleccionado = cont);
-                    viewModel.cambiarContinente(cont);
-                  },
-                  viewModel: viewModel,
-                ),
-              ),
+            // Secciones que se ocultan al hacer scroll
+            ValueListenableBuilder<bool>(
+              valueListenable: _showSections,
+              builder: (context, show, _) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: show ? null : 0,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: show ? 1.0 : 0.0,
+                    child: _SeccionesWidget(
+                      continenteSeleccionado: _continenteSeleccionado,
+                      onContinenteChanged: (cont) {
+                        setState(() => _continenteSeleccionado = cont);
+                        viewModel.cambiarContinente(cont);
+                      },
+                      viewModel: viewModel,
+                    ),
+                  ),
+                );
+              },
             ),
+            // Lista de parques
             Expanded(
               child: _ListaParquesWidget(
                 viewModel: viewModel,
@@ -318,6 +325,7 @@ class _SeccionesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Sección de continentes compacta
         Container(
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           child: Column(
@@ -341,24 +349,29 @@ class _SeccionesWidget extends StatelessWidget {
                     child: ChoiceChip(
                       label: Text(
                         cont,
-                        style: const TextStyle( // Añadido const
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
+                          color: continenteSeleccionado == cont
+                              ? TiemposColores.chipSeleccionTexto
+                              : TiemposColores.textoSecundario,
                         ),
                       ),
                       selected: continenteSeleccionado == cont,
                       onSelected: (_) => onContinenteChanged(cont),
-                      selectedColor: TiemposColores.botonPrimario,
+                      selectedColor: TiemposColores.chipSeleccion,
                       backgroundColor: Colors.white10,
                       labelStyle: TextStyle(
                         color: continenteSeleccionado == cont
-                            ? Colors.white
+                            ? TiemposColores.chipSeleccionTexto
                             : TiemposColores.textoSecundario,
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: const RoundedRectangleBorder( // Añadido const
+                      shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
+                      elevation: continenteSeleccionado == cont ? 4 : 0,
+                      shadowColor: TiemposColores.chipSeleccion.withOpacity(0.2),
                     ),
                   )).toList(),
                 ),
@@ -366,6 +379,7 @@ class _SeccionesWidget extends StatelessWidget {
             ],
           ),
         ),
+        // Sección de orden compacta
         Container(
           margin: const EdgeInsets.only(bottom: 12.0),
           child: Column(
@@ -414,7 +428,7 @@ class _ListaParquesWidget extends StatelessWidget {
   final TiemposViewModel viewModel;
   final List<Parque> parques;
   final ScrollController scrollController;
-  final bool showScrollToTop;
+  final ValueNotifier<bool> showScrollToTop;
   final VoidCallback onScrollToTop;
   final Future<void> Function(BuildContext, String, String) onRegistrarVisita;
   final bool isNavigating;
@@ -442,7 +456,7 @@ class _ListaParquesWidget extends StatelessWidget {
             ? Center(
           child: Text(
             '${TiemposTextos.errorCargar}: ${viewModel.error}',
-            style: const TextStyle(color: TiemposColores.error), // Añadido const
+            style: const TextStyle(color: TiemposColores.error),
           ),
         )
             : parques.isEmpty
@@ -454,20 +468,22 @@ class _ListaParquesWidget extends StatelessWidget {
                 ? 'No tienes parques favoritos.\nPulsa el corazón en un parque para añadirlo.'
                 : 'No hay parques para mostrar.',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: TiemposColores.textoSecundario), // Añadido const
+            style: TextStyle(color: TiemposColores.textoSecundario),
           ),
         )
             : ListView.builder(
           controller: scrollController,
           padding: const EdgeInsets.only(bottom: 80),
           itemCount: parques.length + (viewModel.hayMasParques ? 1 : 0),
+          // Optimizaciones de rendimiento
           addAutomaticKeepAlives: false,
-          addRepaintBoundaries: false, // Mantener en false aquí, usaremos RepaintBoundary en el item
+          addRepaintBoundaries: false,
           itemBuilder: (context, index) {
+            // Si es el último item y hay más parques, mostrar indicador de carga
             if (index == parques.length && viewModel.hayMasParques) {
               return Container(
                 padding: const EdgeInsets.all(20),
-                child: const Center( // Añadido const
+                child: const Center(
                   child: Column(
                     children: [
                       CircularProgressIndicator(color: TiemposColores.textoPrincipal),
@@ -483,6 +499,7 @@ class _ListaParquesWidget extends StatelessWidget {
             }
 
             final parque = parques[index];
+            // Obtener el parque con clima actualizado
             final parqueConClima = viewModel.getParqueConClima(parque.id);
             double? distanciaKm;
             if (viewModel.ordenActual == 'Cercanía' && viewModel.posicionUsuario != null) {
@@ -494,80 +511,83 @@ class _ListaParquesWidget extends StatelessWidget {
               );
             }
 
-            return RepaintBoundary( // <--- ¡Importante para el rendimiento del scroll!
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: VisibilityDetector(
-                  key: Key('parque_${parque.id}'),
-                  onVisibilityChanged: (info) {
-                    if (info.visibleFraction > 0.1 && viewModel.esFavorito(parque.id)) {
-                      if (viewModel.necesitaCargarClima(parque.nombre)) {
-                        viewModel.cargarClimaParaParque(
-                          parque.nombre,
-                          parque.latitud,
-                          parque.longitud,
-                          parque.pais,
-                        );
-                      }
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: VisibilityDetector(
+                key: Key('parque_${parque.id}'),
+                onVisibilityChanged: (info) {
+                  // Solo cargar clima si es favorito y está visible
+                  if (info.visibleFraction > 0.1 && viewModel.esFavorito(parque.id)) {
+                    // Solo cargar clima si es necesario (favorito y sin clima)
+                    if (viewModel.necesitaCargarClima(parque.nombre)) {
+                      viewModel.cargarClimaParaParque(
+                        parque.nombre,
+                        parque.latitud,
+                        parque.longitud,
+                        parque.pais,
+                      );
+                    }
+                  }
+                },
+                child: ParqueCard(
+                  parque: parqueConClima, // Usar el parque con clima actualizado
+                  esFavorito: viewModel.esFavorito(parque.id),
+                  onToggleFavorito: () => viewModel.toggleFavorito(parque.id),
+                  onTap: () async {
+                    if (isNavigating) return;
+                    onNavigatingChanged(true);
+                    try {
+                      final atracciones = await viewModel.cargarAtracciones(parque.id);
+                      final parqueConAtracciones = Parque(
+                        id: parque.id,
+                        nombre: parque.nombre,
+                        pais: parque.pais,
+                        ciudad: parque.ciudad,
+                        latitud: parque.latitud,
+                        longitud: parque.longitud,
+                        continente: parque.continente,
+                        atracciones: atracciones,
+                        clima: parqueConClima.clima, // Usar el clima actualizado
+                      );
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DetallesParqueScreen(parque: parqueConAtracciones),
+                        ),
+                      );
+                    } finally {
+                      onNavigatingChanged(false);
                     }
                   },
-                  child: ParqueCard(
-                    parque: parqueConClima,
-                    esFavorito: viewModel.esFavorito(parque.id),
-                    onToggleFavorito: () => viewModel.toggleFavorito(parque.id),
-                    onTap: () async {
-                      if (isNavigating) return; // Still important to prevent double taps/navigations
-                      onNavigatingChanged(true); // Signal that navigation is starting
-                      try {
-                        final atracciones = await viewModel.cargarAtracciones(parque.id);
-                        final parqueConAtracciones = Parque(
-                          id: parque.id,
-                          nombre: parque.nombre,
-                          pais: parque.pais,
-                          ciudad: parque.ciudad,
-                          latitud: parque.latitud,
-                          longitud: parque.longitud,
-                          continente: parque.continente,
-                          atracciones: atracciones,
-                          clima: parqueConClima.clima,
-                        );
-                        // No 'mounted' check needed here for Navigator.push,
-                        // as context is expected to be valid for this operation.
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => DetallesParqueScreen(parque: parqueConAtracciones),
-                          ),
-                        );
-                      } finally {
-                        // No 'mounted' check needed here. onNavigatingChanged updates parent state,
-                        // which is a StatefulWidget and handles its own mounted status.
-                        onNavigatingChanged(false); // Signal that navigation has finished
-                      }
-                    },
-                    onRegistrarVisita: () => onRegistrarVisita(context, parque.id.toString(), parque.nombre),
-                    distanciaKm: distanciaKm,
-                  ),
+                  onRegistrarVisita: () => onRegistrarVisita(context, parque.id.toString(), parque.nombre),
+                  distanciaKm: distanciaKm,
                 ),
               ),
             );
           },
         ),
-        if (showScrollToTop)
-          Positioned(
-            bottom: 100,
-            left: 20,
-            child: FloatingActionButton(
-              onPressed: onScrollToTop,
-              backgroundColor: TiemposColores.botonPrimario,
-              child: const Icon( // Añadido const
-                Icons.keyboard_arrow_up,
-                color: Colors.white,
-                size: 28,
+        // Botón de scroll to top
+        ValueListenableBuilder<bool>(
+          valueListenable: showScrollToTop,
+          builder: (context, show, _) {
+            return show
+                ? Positioned(
+              bottom: 100,
+              left: 20,
+              child: FloatingActionButton(
+                onPressed: onScrollToTop,
+                backgroundColor: TiemposColores.botonPrimario,
+                child: const Icon(
+                  Icons.keyboard_arrow_up,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                mini: true,
               ),
-              mini: true,
-            ),
-          ),
+            )
+                : const SizedBox.shrink();
+          },
+        ),
       ],
     );
   }
@@ -588,32 +608,35 @@ class _OrdenButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(16)), // Añadido const
-        boxShadow: selected ? [
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        boxShadow: selected
+            ? [
           BoxShadow(
-            color: TiemposColores.botonPrimario.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3), // Añadido const
+            color: TiemposColores.chipSeleccion.withOpacity(0.25),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
-        ] : null,
+        ]
+            : null,
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: selected ? TiemposColores.botonPrimario : Colors.white10,
-          foregroundColor: selected ? Colors.white : TiemposColores.textoSecundario,
-          shape: const RoundedRectangleBorder( // Añadido const
+          backgroundColor: selected ? TiemposColores.chipSeleccion : Colors.white10,
+          foregroundColor: selected ? TiemposColores.chipSeleccionTexto : TiemposColores.textoSecundario,
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Añadido const
+          elevation: selected ? 2 : 0,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         onPressed: onTap,
         child: Text(
           label,
-          style: const TextStyle( // Añadido const
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
+            color: selected ? TiemposColores.chipSeleccionTexto : TiemposColores.textoSecundario,
           ),
         ),
       ),
@@ -641,81 +664,125 @@ class ParqueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<TiemposViewModel>(context, listen: false);
+    final clima = parque.clima;
+    final bool mostrarBotonActualizar = clima != null && (clima.esAntiguo || clima.descripcion == 'Error al cargar');
     return GestureDetector(
       onTap: onTap,
       child: Card(
         color: TiemposColores.tarjeta,
         elevation: 6,
-        margin: const EdgeInsets.symmetric(horizontal: 8), // Añadido const
-        shape: const RoundedRectangleBorder( // Añadido const
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(18)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(18), // Añadido const
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon( // Añadido const
-                    TiemposIconos.parque,
-                    color: TiemposColores.textoPrincipal,
-                    size: 32,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: Icon(
+                      TiemposIconos.parque,
+                      color: TiemposColores.textoPrincipal,
+                      size: 28,
+                    ),
                   ),
-                  const SizedBox(width: 12), // Añadido const
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          parque.nombre,
-                          style: TiemposEstilos.estiloTitulo.copyWith(fontSize: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                parque.nombre,
+                                style: TiemposEstilos.estiloTitulo.copyWith(fontSize: 18),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (distanciaKm != null)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 6.0),
+                                child: _DistanciaWidget(distanciaKm: distanciaKm!),
+                              ),
+                          ],
                         ),
-                        const SizedBox(height: 4), // Añadido const
+                        const SizedBox(height: 2),
                         Text(
                           parque.ciudad.isNotEmpty ? '${parque.ciudad}, ${parque.pais}' : parque.pais,
-                          style: TiemposEstilos.estiloSubtitulo,
+                          style: TiemposEstilos.estiloSubtitulo.copyWith(fontSize: 13),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         if (parque.clima != null) ...[
-                          const SizedBox(height: 4), // Añadido const
+                          const SizedBox(height: 2),
                           _ClimaWidget(clima: parque.clima!),
                         ] else if (esFavorito) ...[
-                          const SizedBox(height: 4), // Añadido const
-                          const _ClimaLoadingWidget(), // Añadido const
+                          const SizedBox(height: 2),
+                          const _ClimaLoadingWidget(),
                         ],
                       ],
                     ),
                   ),
-                  if (distanciaKm != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0), // Añadido const
-                      child: _DistanciaWidget(distanciaKm: distanciaKm!),
-                    ),
                   IconButton(
                     icon: Icon(
-                      esFavorito ? Icons.favorite : Icons.favorite_border,
-                      color: esFavorito ? Colors.red : Colors.grey,
+                      esFavorito ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      color: esFavorito ? Colors.redAccent : Colors.grey,
+                      size: 26,
                     ),
                     onPressed: onToggleFavorito,
                     tooltip: esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos',
                   ),
                 ],
               ),
-              const SizedBox(height: 12), // Añadido const
+              if (mostrarBotonActualizar)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0, bottom: 2.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: TiemposColores.info,
+                        side: const BorderSide(color: TiemposColores.info, width: 1),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        textStyle: const TextStyle(fontSize: 12),
+                      ),
+                      icon: const Icon(Icons.refresh, size: 16),
+                      label: const Text('Actualizar clima'),
+                      onPressed: () async {
+                        await viewModel.forzarActualizarClima(parque.id);
+                      },
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton.icon(
                   onPressed: onRegistrarVisita,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: TiemposColores.botonPrimario,
-                    shape: const RoundedRectangleBorder( // Añadido const
+                    shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    elevation: 2,
                   ),
-                  icon: const Icon(Icons.add_location_alt_rounded, size: 20), // Añadido const
+                  icon: const Icon(Icons.add_location_alt_rounded, size: 18),
                   label: Text(
                     TiemposTextos.registrarVisita,
-                    style: TiemposEstilos.estiloBotonPrimario,
+                    style: TiemposEstilos.estiloBotonPrimario.copyWith(fontSize: 13),
                   ),
                 ),
               ),
@@ -735,55 +802,53 @@ class _ClimaWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            CachedNetworkImage( // <--- Usando CachedNetworkImage para optimizar la carga de imágenes
-              imageUrl: 'https:${clima.codigoIcono}',
-              width: 24,
-              height: 24,
-              placeholder: (context, url) => const SizedBox( // Añadido const
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.blue,
-                ),
-              ),
-              errorWidget: (context, url, error) => const Icon( // Añadido const
-                TiemposIconos.clima,
-                size: 24,
-                color: Colors.yellow,
-              ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Image.network(
+            'https:${clima.codigoIcono}',
+            width: 22,
+            height: 22,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => const Icon(
+              TiemposIconos.clima,
+              size: 20,
+              color: Colors.yellow,
             ),
-            const SizedBox(width: 8), // Añadido const
-            Text(
-              '${clima.temperatura.toStringAsFixed(1)}°C',
-              style: TiemposEstilos.estiloSubtitulo,
-            ),
-            if (clima.esAntiguo) ...[
-              const SizedBox(width: 4), // Añadido const
-              const Icon( // Añadido const
-                Icons.schedule,
-                size: 16,
-                color: Colors.orange,
-              ),
-              const SizedBox(width: 4), // Añadido const
-              Text(
-                'Actualizando...',
-                style: TiemposEstilos.estiloSubtitulo.copyWith(
-                  color: Colors.orange,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
+          ),
         ),
+        const SizedBox(width: 6),
         Text(
-          clima.descripcion,
-          style: TiemposEstilos.estiloSubtitulo,
+          '${clima.temperatura.toStringAsFixed(1)}°C',
+          style: TiemposEstilos.estiloSubtitulo.copyWith(fontWeight: FontWeight.bold, fontSize: 13),
+        ),
+        if (clima.esAntiguo) ...[
+          const SizedBox(width: 4),
+          const Icon(
+            Icons.schedule,
+            size: 14,
+            color: Colors.orange,
+          ),
+          const SizedBox(width: 2),
+          Text(
+            'Actualizando',
+            style: TiemposEstilos.estiloSubtitulo.copyWith(
+              color: Colors.orange,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            clima.descripcion,
+            style: TiemposEstilos.estiloSubtitulo.copyWith(fontSize: 12),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -792,26 +857,28 @@ class _ClimaWidget extends StatelessWidget {
 
 // Widget optimizado para mostrar carga de clima
 class _ClimaLoadingWidget extends StatelessWidget {
-  const _ClimaLoadingWidget(); // Añadido const
+  const _ClimaLoadingWidget();
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox( // Añadido const
-          width: 24,
-          height: 24,
+        const SizedBox(
+          width: 18,
+          height: 18,
           child: CircularProgressIndicator(
             strokeWidth: 2,
             color: Colors.blue,
           ),
         ),
-        const SizedBox(width: 8), // Añadido const
+        const SizedBox(width: 6),
         Text(
           'Cargando clima...',
           style: TiemposEstilos.estiloSubtitulo.copyWith(
             color: Colors.blue,
-            fontSize: 12,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -823,17 +890,17 @@ class _ClimaLoadingWidget extends StatelessWidget {
 class _DistanciaWidget extends StatelessWidget {
   final double distanciaKm;
 
-  const _DistanciaWidget({required this.distanciaKm}); // Añadido const
+  const _DistanciaWidget({required this.distanciaKm});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.place, color: Colors.cyanAccent, size: 18), // Añadido const
-        const SizedBox(width: 2), // Añadido const
+        const Icon(Icons.place, color: Colors.cyanAccent, size: 18),
+        const SizedBox(width: 2),
         Text(
           '${distanciaKm.toStringAsFixed(1)} km',
-          style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold), // Añadido const
+          style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
         ),
       ],
     );
