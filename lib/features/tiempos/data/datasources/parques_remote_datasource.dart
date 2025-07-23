@@ -7,6 +7,7 @@ import '../../utils/parque_utils.dart';
 abstract class ParquesRemoteDataSource {
   Future<List<Parque>> obtenerParques();
   Future<List<Atraccion>> obtenerAtraccionesDeParque(String parqueId);
+  Future<List<Parque>> obtenerParquesPaginados({Parque? ultimoParque, int limite});
 }
 
 class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
@@ -111,4 +112,68 @@ class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
       return [];
     }
   }
+  @override
+  Future<List<Parque>> obtenerParquesPaginados({Parque? ultimoParque, int limite = 10}) async {
+    try {
+      final response = await client.get(Uri.parse('https://queue-times.com/parks.json'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as List<dynamic>;
+        final List<Parque> parques = [];
+
+        for (final grupo in data) {
+          final List<dynamic>? subparques = grupo['parks'];
+          if (subparques != null) {
+            for (final parque in subparques) {
+              final id = parque['id']?.toString() ?? '0';
+              final nombre = parque['name']?.toString() ?? 'Sin nombre';
+              final pais = parque['country']?.toString() ?? 'Desconocido';
+              final ciudad = '';
+              final lat = double.tryParse(parque['latitude']?.toString() ?? '') ?? 0.0;
+              final lon = double.tryParse(parque['longitude']?.toString() ?? '') ?? 0.0;
+              final continente = obtenerContinente(pais);
+
+              parques.add(Parque(
+                id: id,
+                nombre: nombre,
+                pais: pais,
+                ciudad: ciudad,
+                latitud: lat,
+                longitud: lon,
+                continente: continente,
+                atracciones: [],
+              ));
+            }
+          }
+        }
+
+        // Ordenamos por nombre para tener un criterio consistente
+        parques.sort((a, b) => a.nombre.compareTo(b.nombre));
+
+        // Si no hay último parque, devuelve los primeros N
+        if (ultimoParque == null) {
+          return parques.take(limite).toList();
+        }
+
+        // Buscar índice del último parque
+        final indexUltimo = parques.indexWhere((p) => p.id == ultimoParque.id);
+
+        if (indexUltimo == -1 || indexUltimo + 1 >= parques.length) {
+          return [];
+        }
+
+        // Tomar el siguiente bloque después del último parque
+        final startIndex = indexUltimo + 1;
+        final endIndex = (startIndex + limite) > parques.length ? parques.length : (startIndex + limite);
+
+        return parques.sublist(startIndex, endIndex);
+      } else {
+        throw Exception('Error al cargar los parques: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en obtenerParquesPaginados: $e');
+      return [];
+    }
+  }
+
+
 }

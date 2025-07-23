@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/validation_utils.dart';
+import '../constantes/recuperar_password_constantes.dart';
 
 class RecuperarPasswordScreen extends StatefulWidget {
   const RecuperarPasswordScreen({super.key});
 
-  static String routeName = 'RecuperarPassword';
-  static String routePath = '/recuperar';
+  static String routeName = RecuperarPasswordConstantes.routeName;
+  static String routePath = RecuperarPasswordConstantes.routePath;
 
   @override
   State<RecuperarPasswordScreen> createState() => _RecuperarPasswordScreenState();
@@ -38,21 +39,21 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Correo de recuperación enviado. Por favor, revisa tu bandeja de entrada.'),
+          content: Text(RecuperarPasswordConstantes.correoEnviado),
           duration: Duration(seconds: 5),
         ),
       );
     } on FirebaseAuthException catch (e) {
       String message = switch (e.code) {
-        'invalid-email' => 'El correo electrónico no es válido.',
-        'user-not-found' => 'No existe ninguna cuenta con ese correo.',
-        'too-many-requests' => 'Demasiados intentos. Por favor, intenta más tarde.',
-        _ => 'Error: ${e.message}',
+        'invalid-email' => RecuperarPasswordConstantes.errorEmailInvalido,
+        'user-not-found' => RecuperarPasswordConstantes.errorNoExiste,
+        'too-many-requests' => RecuperarPasswordConstantes.errorDemasiadosIntentos,
+        _ => 'Error:  [31m${e.message} [0m',
       };
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ocurrió un error al enviar el correo')),
+        const SnackBar(content: Text(RecuperarPasswordConstantes.errorEnvio)),
       );
     }
   }
@@ -66,10 +67,10 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('img/fotoRecPassword.jpg'),
+                  image: AssetImage(RecuperarPasswordConstantes.imagenFondo),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
-                    Colors.black.withAlpha(153),
+                    RecuperarPasswordConstantes.colorFondoOscuro.withAlpha(RecuperarPasswordConstantes.alphaFondo),
                     BlendMode.darken,
                   ),
                 ),
@@ -87,26 +88,26 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                   Container(
                     padding: const EdgeInsets.all(24.0),
                     decoration: BoxDecoration(
-                        color: Colors.grey[850]!.withAlpha(179),
-                        borderRadius: BorderRadius.circular(20),
+                      color: RecuperarPasswordConstantes.colorFondoOscuro.withAlpha(RecuperarPasswordConstantes.alphaFondo),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Recuperar contraseña',
+                          RecuperarPasswordConstantes.titulo,
                           style: GoogleFonts.poppins(
                             fontSize: 22,
-                            color: Colors.white,
+                            color: RecuperarPasswordConstantes.colorBlanco,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Introduce tu correo electrónico para recibir las instrucciones:',
+                          RecuperarPasswordConstantes.instrucciones,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: Colors.white70,
+                            color: RecuperarPasswordConstantes.colorBlanco70,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -115,19 +116,19 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                           style: GoogleFonts.poppins(color: Colors.black87),
                           validator: ValidationUtils.validateEmail,
                           decoration: InputDecoration(
-                            hintText: 'Correo electrónico',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey[600]),
+                            hintText: RecuperarPasswordConstantes.hintCorreo,
+                            hintStyle: GoogleFonts.poppins(color: RecuperarPasswordConstantes.colorGris600),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
                             filled: true,
-                            fillColor: Colors.grey[200],
+                            fillColor: RecuperarPasswordConstantes.colorGris200,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 16,
                               horizontal: 20,
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.grey[600]),
+                            prefixIcon: Icon(Icons.email, color: RecuperarPasswordConstantes.colorGris600),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -137,7 +138,7 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                             onPressed: _enviarCorreoRecuperacion,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
-                              foregroundColor: Colors.white,
+                              foregroundColor: RecuperarPasswordConstantes.colorBlanco,
                               elevation: 3,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -145,7 +146,7 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
                             child: Text(
-                              'Enviar correo de confirmación',
+                              RecuperarPasswordConstantes.enviarCorreo,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -162,14 +163,14 @@ class _RecuperarPasswordScreenState extends State<RecuperarPasswordScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                        color: Colors.green[800]!.withAlpha(179),
-                        borderRadius: BorderRadius.circular(12),
+                          color: RecuperarPasswordConstantes.colorFondoVerde.withAlpha(RecuperarPasswordConstantes.alphaVerde),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          'Revisa tu correo para continuar con el cambio de contraseña.',
+                          RecuperarPasswordConstantes.revisaCorreo,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: Colors.white,
+                            color: RecuperarPasswordConstantes.colorBlanco,
                           ),
                         ),
                       ),

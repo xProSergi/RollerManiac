@@ -10,21 +10,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Versión 1.2 RollerManiac (en proceso)">
+      <change afterPath="$PROJECT_DIR$/lib/features/auth/constantes/recuperar_password_constantes.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/lista_parques_widget.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/parques_list_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/secciones_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/.filecache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/app.dill" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/debug_android_application.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/debug_android_application.stamp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/flutter_assets.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/flutter_assets.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.stamp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/compartido/widgets/nav_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/compartido/widgets/nav_bar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/constantes/tiempos_constantes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/constantes/tiempos_constantes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/constantes/login_constantes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/constantes/login_constantes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/presentation/login_roller_maniac_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/presentation/login_roller_maniac_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/auth/presentation/recuperar_password_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/presentation/recuperar_password_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/perfil/presentation/widgets/perfil_opciones_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/perfil/presentation/widgets/perfil_opciones_list.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/social/data/datasources/social_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/social/data/datasources/social_remote_datasource.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/tiempos/data/datasources/clima_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/data/datasources/clima_remote_datasource.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/data/datasources/parques_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/data/datasources/parques_remote_datasource.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/data/repositories/parques_repository_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/data/repositories/parques_repository_impl.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/domain/repositories/parques_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/domain/repositories/parques_repository.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/pantalla_principal.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/pantalla_principal.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/utils/clima_utils.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/utils/clima_utils.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -678,7 +685,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751149334457</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Versión 1.2 RollerManiac (en proceso)">
+      <option name="closed" value="true" />
+      <created>1752497876902</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1752497876902</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="ToolWindowManager">

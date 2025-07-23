@@ -213,12 +213,12 @@ class SocialRemoteDataSource {
         email: data['email'] ?? '',
         displayName: data['displayName'] ?? '',
         username: data['username'] ?? '',
-        cantidadParques: 0, // Se calcula abajo igual que para los amigos
+        cantidadParques: 0,
       );
       amigos.add(currentUser);
     }
 
-    // Calcular cantidad de parques para todos (amigos + usuario)
+
     for (final amigo in amigos) {
       final visitas = await firestore
           .collection('usuarios')

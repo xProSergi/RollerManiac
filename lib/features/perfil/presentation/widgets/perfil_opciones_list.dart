@@ -153,12 +153,12 @@ class PerfilOpcionesList extends StatelessWidget {
                 if (nuevoNombre.isEmpty) return;
                 try {
                   await user?.updateDisplayName(nuevoNombre);
-                  // Si usas Firestore para el username:
+
                   await FirebaseFirestore.instance
                       .collection('usuarios')
                       .doc(user?.uid)
                       .update({'username': nuevoNombre});
-                  // Actualiza el ViewModel para que se refleje el cambio
+
                   await viewModel.reloadUser();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

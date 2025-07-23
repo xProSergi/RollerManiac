@@ -22,12 +22,12 @@ class ClimaRemoteDataSourceImpl implements ClimaRemoteDataSource {
         final coords = ciudadOcoords.replaceFirst('COORDS:', '').split(',');
         final lat = coords[0];
         final lon = coords[1];
-        // Cambia aquí tu API KEY y la URL si usas OpenWeather
+
         url = 'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=8275d8318ca6f13de6e6a135e98240a6&units=metric&lang=es';
         final respuesta = await client.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
         if (respuesta.statusCode == 200) {
           final data = json.decode(respuesta.body);
-          // Adaptar a tu modelo Clima
+
           return Clima(
             temperatura: data['main']['temp'].toDouble(),
             descripcion: data['weather'][0]['description'],
@@ -40,7 +40,7 @@ class ClimaRemoteDataSourceImpl implements ClimaRemoteDataSource {
           throw Exception('Error OpenWeather: ${respuesta.statusCode}');
         }
       } else {
-        // Limpiar y codificar la ciudad para la URL
+
         final ciudadCodificada = Uri.encodeComponent(ciudadOcoords.trim());
         final respuesta = await client.get(
           Uri.parse('$_urlBase?key=$_claveApi&q=$ciudadCodificada&lang=es&aqi=no'),
@@ -48,7 +48,7 @@ class ClimaRemoteDataSourceImpl implements ClimaRemoteDataSource {
 
         if (respuesta.statusCode == 200) {
           final data = json.decode(respuesta.body);
-          // Verificar si hay error en la respuesta de la API
+
           if (data.containsKey('error')) {
             throw Exception('Error de la API del clima: ${data['error']['message']}');
           }
