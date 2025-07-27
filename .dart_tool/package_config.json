@@ -116,6 +116,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "dartz",
+      "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/dartz-0.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "equatable",
       "rootUri": "file:///home/debian/.pub-cache/hosted/pub.dev/equatable-2.0.7",
       "packageUri": "lib/",

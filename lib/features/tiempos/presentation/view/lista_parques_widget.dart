@@ -60,20 +60,31 @@ class ListaParquesWidget extends StatelessWidget {
           ),
         )
             : ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
           controller: scrollController,
           padding: const EdgeInsets.only(bottom: 80),
-          itemCount: parques.length,
+          itemCount: parques.length + (viewModel.cargandoMas ? 1 : 0),
           addAutomaticKeepAlives: false, // Mejor rendimiento para listas muy largas
           addRepaintBoundaries: false, // Mejor rendimiento para listas muy largas
           itemBuilder: (context, index) {
+            if (index >= parques.length) {
+              // Es el indicador de carga
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(color: TiemposColores.textoPrincipal),
+                ),
+              );
+            }
             final parque = parques[index];
             // Asegurarse de obtener el parque con clima del ViewModel si existe
             final parqueConClima = viewModel.getParqueConClima(parque.id) ?? parque;
             double? distanciaKm;
-            if (viewModel.ordenActual == 'Cercanía' && viewModel.posicionUsuario != null) {
+            final userPosition = viewModel.posicionUsuario;
+            if (viewModel.ordenActual == 'Cercanía' && userPosition != null) {
               distanciaKm = calcularDistancia(
-                viewModel.posicionUsuario!.latitude,
-                viewModel.posicionUsuario!.longitude,
+                userPosition.latitude,
+                userPosition.longitude,
                 parque.latitud,
                 parque.longitud,
               );
@@ -86,14 +97,8 @@ class ListaParquesWidget extends StatelessWidget {
                 onVisibilityChanged: (info) {
                   // Cargar el clima solo si el parque es favorito, es visible y necesita ser actualizado
                   if (info.visibleFraction > 0.1 && viewModel.esFavorito(parque.id)) {
-                    if (viewModel.necesitaCargarClima(parque.id)) { // Usar ID en lugar de nombre si el VM lo soporta
-                      viewModel.cargarClimaParaParque(
-                        parque.id, // Pasar el ID del parque
-                        parque.nombre,
-                        parque.latitud,
-                        parque.longitud,
-                        parque.pais,
-                      );
+                    if (viewModel.necesitaCargarClima(parque.id)) {
+                      viewModel.cargarClimaParaParque(parque);
                     }
                   }
                 },

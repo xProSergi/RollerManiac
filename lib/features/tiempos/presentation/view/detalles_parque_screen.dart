@@ -64,11 +64,11 @@ class _DetallesParqueScreenState extends State<DetallesParqueScreen> {
     );
 
     try {
-      await FirebaseService.registrarVisitaAtraccion(
-        widget.parque.id,
-        widget.parque.nombre,
-        atraccionNombre,
-      );
+      // await FirebaseService.registrarVisitaAtraccion(
+      //   widget.parque.id,
+      //   widget.parque.nombre,
+      //   atraccionNombre,
+      // );
 
       await Future.delayed(const Duration(seconds: 2));
 

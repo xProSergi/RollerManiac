@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import '../../../historial/data/datasources/historial_remote_datasource.dart';
-
+import '../../../../compartido/widgets/nav_bar.dart';
+import '../../../historial/presentation/viewmodel/reporte_diario_viewmodel.dart';
 import '../viewmodel/tiempos_viewmodel.dart';
 import 'parques_list_screen.dart';
-
 import '../../../historial/presentation/pages/historial_screen.dart';
 import '../../../perfil/presentation/view/perfil_screen.dart';
 import '../../../social/presentation/view/social_screen.dart';
-import '../../../historial/presentation/viewmodel/historial_view_model.dart';
-import '../../../historial/data/repositories/historial_repository_impl.dart';
-
-import '../../../historial/domain/usecases/obtener_visitas_usecase.dart';
-import '../../../historial/domain/usecases/obtener_visitas_por_parque_usecase.dart';
-import '../../../../compartido/widgets/nav_bar.dart';
 import '../../constantes/tiempos_constantes.dart';
-
+import '../../../historial/presentation/pages/resumen_dia_screen.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({Key? key}) : super(key: key);
@@ -27,37 +20,23 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   int _selectedIndex = 0;
-  late List<Widget> _pages;
+  bool _showFinishButton = false;
+  String? _currentParkId;
+  String? _currentParkName;
+
+  final List<Widget> _pages = [
+    const ParquesListScreen(),
+    const HistorialScreen(),
+    const SocialScreen(),
+    const PerfilScreen(),
+  ];
 
   @override
   void initState() {
     super.initState();
-
-    final historialDataSource = HistorialRemoteDataSourceImpl();
-    final historialRepository = HistorialRepositoryImpl(remoteDataSource: historialDataSource);
-    final obtenerVisitasUseCase = ObtenerVisitasUseCase(historialRepository);
-    final obtenerVisitasPorParqueUseCase = ObtenerVisitasPorParqueUseCase(historialRepository);
-
-    _pages = [
-      const ParquesListScreen(),
-      ChangeNotifierProvider(
-        create: (_) => HistorialViewModel(
-          obtenerVisitasUseCase: obtenerVisitasUseCase,
-          obtenerVisitasPorParqueUseCase: obtenerVisitasPorParqueUseCase,
-        ),
-        child: HistorialScreen(
-          actualizarVisitas: () {
-            Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
-          },
-        ),
-      ),
-      const SocialScreen(),
-      const PerfilScreen(),
-    ];
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _verifyAuth(context);
-      Provider.of<TiemposViewModel>(context, listen: false).cargarParques();
+      Provider.of<TiemposViewModel>(context, listen: false).inicializar();
     });
   }
 
@@ -65,6 +44,55 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
+  }
+
+  void _onVisitaRegistrada(String parkId, String parkName) {
+    setState(() {
+      _showFinishButton = true;
+      _currentParkId = parkId;
+      _currentParkName = parkName;
+    });
+  }
+
+  Future<void> _finalizarVisita(BuildContext context) async {
+    try {
+      final reporteDiarioViewModel = context.read<ReporteDiarioViewModel>();
+      final ahora = DateTime.now();
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+
+      if (userId == null) throw Exception('Usuario no autenticado');
+
+      // Esperar a que finalice correctamente
+      final exito = await reporteDiarioViewModel.finalizarDia();
+
+      if (exito && mounted) {
+        // Obtener el ID del reporte actualizado
+        final reporteId = reporteDiarioViewModel.reporteActual?.id;
+        if (reporteId != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResumenDiaScreen(
+                reporteId: reporteId,
+              ),
+            ),
+          );
+        }
+
+        setState(() {
+          _showFinishButton = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al finalizar: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -88,7 +116,24 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                 ),
               ),
               Expanded(
-                child: _pages[_selectedIndex],
+                child: IndexedStack(
+                  index: _selectedIndex,
+                  children: _pages.asMap().entries.map((entry) {
+                    final int index = entry.key;
+                    final Widget page = entry.value;
+
+                    if (index == 0) {
+                      return NotificationListener<VisitaRegistradaNotification>(
+                        onNotification: (notification) {
+                          _onVisitaRegistrada(notification.parqueId, notification.parqueNombre);
+                          return true;
+                        },
+                        child: page,
+                      );
+                    }
+                    return page;
+                  }).toList(),
+                ),
               ),
             ],
           ),
@@ -98,6 +143,23 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
       ),
+      floatingActionButton: _showFinishButton
+          ? FloatingActionButton.extended(
+        heroTag: 'finish_visit_fab',
+        onPressed: () => _finalizarVisita(context),
+        icon: const Icon(Icons.flag),
+        label: const Text('Finalizar Visita'),
+        backgroundColor: Colors.green,
+      )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+}
+
+class VisitaRegistradaNotification extends Notification {
+  final String parqueId;
+  final String parqueNombre;
+
+  VisitaRegistradaNotification(this.parqueId, this.parqueNombre);
 }

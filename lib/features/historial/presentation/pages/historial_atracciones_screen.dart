@@ -6,11 +6,13 @@ import '../../constantes/historial_constantes.dart';
 class HistorialAtraccionesScreen extends StatefulWidget {
   final String parqueId;
   final String parqueNombre;
+  final String reporteId;
 
   const HistorialAtraccionesScreen({
     Key? key,
     required this.parqueId,
     required this.parqueNombre,
+    required this.reporteId,
   }) : super(key: key);
 
   @override
@@ -22,7 +24,7 @@ class _HistorialAtraccionesScreenState extends State<HistorialAtraccionesScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<HistorialViewModel>().cargarVisitasPorParque(widget.parqueId);
+      context.read<HistorialViewModel>().cargarVisitasPorParque(widget.parqueId, widget.reporteId);
     });
   }
 
@@ -70,7 +72,7 @@ class _HistorialAtraccionesScreenState extends State<HistorialAtraccionesScreen>
                             ),
                             const SizedBox(height: 16),
                             ElevatedButton(
-                              onPressed: () => viewModel.cargarVisitasPorParque(widget.parqueId),
+                              onPressed: () => viewModel.cargarVisitasPorParque(widget.parqueId, widget.reporteId),
                               child: const Text('Reintentar'),
                             ),
                           ],

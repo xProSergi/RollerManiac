@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../domain/entities/visita_entity.dart';
-import '../../domain/usecases/obtener_visitas_usecase.dart';
+import '../../domain/entities/visita_atraccion_entity.dart';
+import '../../domain/usecases/obtener_visitas_usecase.dart' hide ObtenerVisitasPorParqueUseCase;
 import '../../domain/usecases/obtener_visitas_por_parque_usecase.dart';
 
 class HistorialViewModel extends ChangeNotifier {
@@ -9,7 +9,7 @@ class HistorialViewModel extends ChangeNotifier {
   final ObtenerVisitasPorParqueUseCase _obtenerVisitasPorParqueUseCase;
   final FirebaseAuth _auth;
 
-  List<VisitaEntity> _visitas = [];
+  List<VisitaAtraccionEntity> _visitas = [];
   Map<String, int> _conteoAtracciones = {};
   bool _isLoading = false;
   String? _error;
@@ -22,50 +22,90 @@ class HistorialViewModel extends ChangeNotifier {
         _obtenerVisitasPorParqueUseCase = obtenerVisitasPorParqueUseCase,
         _auth = auth ?? FirebaseAuth.instance;
 
-  List<VisitaEntity> get visitas => _visitas;
+  List<VisitaAtraccionEntity> get visitas => _visitas;
   Map<String, int> get conteoAtracciones => _conteoAtracciones;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> cargarVisitas() async {
+  Future<void> cargarVisitas({String? reporteId}) async {
     _setLoading(true);
+    _error = null;
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) throw Exception('Usuario no autenticado');
-      _visitas = await _obtenerVisitasUseCase(userId);
-      notifyListeners();
+
+      final result = await _obtenerVisitasUseCase(
+        userId: userId,
+        reporteId: reporteId ?? '', // Provide default or handle null case
+      );
+
+      result.fold(
+            (failure) {
+          _error = failure.message;
+          _visitas = [];
+        },
+            (visitas) {
+          _visitas = visitas;
+          _conteoAtracciones = _contarVisitasPorAtraccion(visitas);
+        },
+      );
     } catch (e) {
       _error = e.toString();
+      _visitas = [];
+    } finally {
+      _setLoading(false);
       notifyListeners();
     }
-    _setLoading(false);
   }
 
-  Future<void> cargarVisitasPorParque(String parqueId) async {
+  Future<void> cargarVisitasPorParque(String parqueId, String reporteId) async {
     _setLoading(true);
+    _error = null;
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) throw Exception('Usuario no autenticado');
-      _visitas = await _obtenerVisitasPorParqueUseCase(parqueId, userId);
-      _conteoAtracciones = _contarVisitasPorAtraccion(_visitas);
-      notifyListeners();
+
+      // Fix the call to match your use case implementation
+      final result = await _obtenerVisitasPorParqueUseCase(
+        userId,
+        parqueId,
+        reporteId
+      );
+
+      result.fold(
+            (failure) {
+          _error = failure.message;
+          _visitas = [];
+          _conteoAtracciones = {};
+        },
+            (visitas) {
+          _visitas = visitas;
+          _conteoAtracciones = _contarVisitasPorAtraccion(visitas);
+        },
+      );
     } catch (e) {
       _error = e.toString();
+      _visitas = [];
+      _conteoAtracciones = {};
+    } finally {
+      _setLoading(false);
       notifyListeners();
     }
-    _setLoading(false);
   }
 
-  Map<String, int> _contarVisitasPorAtraccion(List<VisitaEntity> visitas) {
+  // Inside your HistorialViewModel (or whichever class contains this method)
+
+  Map<String, int> _contarVisitasPorAtraccion(List<VisitaAtraccionEntity> visitas) {
     final Map<String, int> conteo = {};
     for (var visita in visitas) {
-      if (visita.atraccionNombre != null && visita.atraccionNombre!.isNotEmpty) {
-        conteo[visita.atraccionNombre!] = (conteo[visita.atraccionNombre!] ?? 0) + 1;
+      // CHANGE THIS LINE:
+      final nombreAtraccion = visita.atraccionNombre; // <--- Changed 'nombre' to 'nombreAtraccion'
+      if (nombreAtraccion.isNotEmpty) {
+        conteo[nombreAtraccion] = (conteo[nombreAtraccion] ?? 0) + 1;
       }
     }
     return conteo;
   }
-
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();

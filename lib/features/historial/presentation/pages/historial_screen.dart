@@ -75,7 +75,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
               );
             }
 
-            final visitasPorParque = _agruparVisitasPorParque(viewModel.visitas);
+            final visitasPorParque = _agruparVisitasPorParque(viewModel.visitas.cast<VisitaEntity>());
             return _buildHistorialContent(visitasPorParque);
           },
         ),
@@ -113,7 +113,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
           final parqueVisitas = visitasPorParque[parqueNombre]!;
           final parqueId = parqueVisitas.first.parqueId;
           final ultimaVisita = parqueVisitas.first.fecha;
-
+          final reporteId = parqueVisitas.first.reporteId;
           final dia = ultimaVisita.day.toString().padLeft(2, '0');
           final mes = ultimaVisita.month.toString().padLeft(2, '0');
           final anio = ultimaVisita.year.toString();
@@ -165,6 +165,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                       child: HistorialAtraccionesScreen(
                         parqueId: parqueId,
                         parqueNombre: parqueNombre,
+                        reporteId: reporteId,
                       ),
                     ),
                   ),

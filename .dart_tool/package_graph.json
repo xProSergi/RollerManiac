@@ -12,6 +12,7 @@
         "cached_network_image",
         "cloud_firestore",
         "collection",
+        "dartz",
         "file_picker",
         "firebase_auth",
         "firebase_core",
@@ -34,6 +35,7 @@
         "sqflite",
         "timeago",
         "url_launcher",
+        "uuid",
         "visibility_detector"
       ],
       "devDependencies": [
@@ -132,6 +134,16 @@
         "plugin_platform_interface",
         "web",
         "win32"
+      ]
+    },
+    {
+      "name": "uuid",
+      "version": "4.5.1",
+      "dependencies": [
+        "crypto",
+        "fixnum",
+        "meta",
+        "sprintf"
       ]
     },
     {
@@ -326,6 +338,11 @@
       "dependencies": [
         "flutter"
       ]
+    },
+    {
+      "name": "dartz",
+      "version": "0.10.1",
+      "dependencies": []
     },
     {
       "name": "cloud_firestore",
@@ -641,6 +658,16 @@
         "meta",
         "vector_math"
       ]
+    },
+    {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "sprintf",
+      "version": "7.0.0",
+      "dependencies": []
     },
     {
       "name": "url_launcher_windows",
@@ -1165,16 +1192,6 @@
       ]
     },
     {
-      "name": "uuid",
-      "version": "4.5.1",
-      "dependencies": [
-        "crypto",
-        "fixnum",
-        "meta",
-        "sprintf"
-      ]
-    },
-    {
       "name": "rxdart",
       "version": "0.27.7",
       "dependencies": []
@@ -1186,16 +1203,6 @@
         "collection",
         "meta"
       ]
-    },
-    {
-      "name": "fixnum",
-      "version": "1.1.1",
-      "dependencies": []
-    },
-    {
-      "name": "sprintf",
-      "version": "7.0.0",
-      "dependencies": []
     }
   ],
   "configVersion": 1
