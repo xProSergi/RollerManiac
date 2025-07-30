@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart'; // No se utiliza directamente aquí, pero es común en el dominio
 import '../../domain/entities/visita_atraccion_entity.dart';
 
 class VisitaAtraccionModel extends VisitaAtraccionEntity {
@@ -16,7 +15,7 @@ class VisitaAtraccionModel extends VisitaAtraccionEntity {
     Duration? duracion,
     int? valoracion,
     String? notas,
-    required DateTime fecha, // <-- AÑADIDO: Campo 'fecha' en el constructor
+    required DateTime fecha,
   }) : super(
     id: id,
     reporteDiarioId: reporteDiarioId,
@@ -30,50 +29,45 @@ class VisitaAtraccionModel extends VisitaAtraccionEntity {
     duracion: duracion,
     valoracion: valoracion,
     notas: notas,
-    fecha: fecha, // <-- AÑADIDO: Pasando 'fecha' al super constructor
+    fecha: fecha,
   );
 
   factory VisitaAtraccionModel.fromFirestore(
       DocumentSnapshot doc,
-      // reporteDiarioId ya no se necesita aquí si lo traes de los datos del documento
-      // o si la entidad ya lo tiene. Si lo necesitas para el fromFirestore,
-      // el documento de la atracción debería tenerlo.
-      // Vamos a asumir que el documento de la atracción contiene 'reporteDiarioId'.
-      String reporteDiarioIdFromParam, // Se usa si el doc.data() no lo tiene directamente
+      String reporteDiarioIdFromParam,
       ) {
     final data = doc.data() as Map<String, dynamic>;
     return VisitaAtraccionModel(
       id: doc.id,
-      // Usar el reporteDiarioId del documento si está disponible, o del parámetro
       reporteDiarioId: data['reporteDiarioId'] as String? ?? reporteDiarioIdFromParam,
       parqueId: data['parqueId'] as String,
       parqueNombre: data['parqueNombre'] as String,
       atraccionId: data['atraccionId'] as String,
       atraccionNombre: data['atraccionNombre'] as String,
       userId: data['userId'] as String,
-      horaInicio: (data['horaInicio'] as Timestamp).toDate(), // <-- Usar 'horaInicio' si es el campo real
+      horaInicio: (data['horaInicio'] as Timestamp).toDate(),
       horaFin: data['horaFin'] != null ? (data['horaFin'] as Timestamp).toDate() : null,
       duracion: data['duracion'] != null ? Duration(seconds: data['duracion'] as int) : null,
       valoracion: data['valoracion'] as int?,
       notas: data['notas'] as String?,
-      fecha: (data['fecha'] as Timestamp).toDate(), // <-- AÑADIDO: Mapeando 'fecha' desde Firestore
+      fecha: (data['fecha'] as Timestamp).toDate(),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'reporteDiarioId': reporteDiarioId, // Asegurarse de que esté en el mapa
+      'reporteDiarioId': reporteDiarioId,
       'parqueId': parqueId,
       'parqueNombre': parqueNombre,
       'atraccionId': atraccionId,
       'atraccionNombre': atraccionNombre,
       'userId': userId,
-      'horaInicio': Timestamp.fromDate(horaInicio), // <-- Usar 'horaInicio' para el campo
+      'horaInicio': Timestamp.fromDate(horaInicio),
       'horaFin': horaFin != null ? Timestamp.fromDate(horaFin!) : null,
       'duracion': duracion?.inSeconds,
       'valoracion': valoracion,
       'notas': notas,
-      'fecha': Timestamp.fromDate(fecha), // <-- AÑADIDO: Mapeando 'fecha' para Firestore
+      'fecha': Timestamp.fromDate(fecha),
     };
   }
 
@@ -91,7 +85,7 @@ class VisitaAtraccionModel extends VisitaAtraccionEntity {
       duracion: entity.duracion,
       valoracion: entity.valoracion,
       notas: entity.notas,
-      fecha: entity.fecha, // <-- AÑADIDO: Pasando 'fecha' desde la entidad
+      fecha: entity.fecha,
     );
   }
 
@@ -110,7 +104,7 @@ class VisitaAtraccionModel extends VisitaAtraccionEntity {
       duracion: duracion,
       valoracion: valoracion,
       notas: notas,
-      fecha: fecha, // <-- AÑADIDO: Pasando 'fecha' a la entidad
+      fecha: fecha,
     );
   }
 
@@ -128,7 +122,7 @@ class VisitaAtraccionModel extends VisitaAtraccionEntity {
     Duration? duracion,
     int? valoracion,
     String? notas,
-    DateTime? fecha, // <-- AÑADIDO: Campo 'fecha' en copyWith
+    DateTime? fecha,
   }) {
     return VisitaAtraccionModel(
       id: id ?? this.id,
@@ -143,7 +137,7 @@ class VisitaAtraccionModel extends VisitaAtraccionEntity {
       duracion: duracion ?? this.duracion,
       valoracion: valoracion ?? this.valoracion,
       notas: notas ?? this.notas,
-      fecha: fecha ?? this.fecha, // <-- AÑADIDO: Usando 'fecha' en copyWith
+      fecha: fecha ?? this.fecha,
     );
   }
 }

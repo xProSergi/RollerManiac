@@ -1,16 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:roller_maniac/features/tiempos/presentation/view/pantalla_principal.dart';
 
 import '../../constantes/tiempos_constantes.dart';
 import '../viewmodel/tiempos_viewmodel.dart';
 import 'secciones_widget.dart';
 import 'lista_parques_widget.dart';
-import '../../../historial/presentation/viewmodel/reporte_diario_viewmodel.dart';
 
 class ParquesListScreen extends StatefulWidget {
-  const ParquesListScreen({Key? key}) : super(key: key);
+  final void Function(String parqueId, String parqueNombre)? onVisitaRegistrada;
+  const ParquesListScreen({Key? key, this.onVisitaRegistrada}) : super(key: key);
 
   @override
   State<ParquesListScreen> createState() => _ParquesListScreenState();
@@ -156,17 +155,8 @@ class _ParquesListScreenState extends State<ParquesListScreen>
     );
 
     try {
-      final reporteDiarioViewModel = context.read<ReporteDiarioViewModel>();
-      await reporteDiarioViewModel.cargarReporteActual(user.uid, DateTime.now());
-
-      if (!reporteDiarioViewModel.tieneReporteActivo) {
-        await reporteDiarioViewModel.iniciarNuevoDia(
-          parqueId: parqueId,
-          parqueNombre: parqueNombre,
-        );
-      }
-
-      VisitaRegistradaNotification(parqueId, parqueNombre).dispatch(context);
+      final viewModel = Provider.of<TiemposViewModel>(context, listen: false);
+      await viewModel.registrarVisitaParque(parqueId, parqueNombre);
 
       await Future.delayed(const Duration(seconds: 2));
       if (!context.mounted) return;
@@ -179,6 +169,11 @@ class _ParquesListScreenState extends State<ParquesListScreen>
           duration: const Duration(seconds: 2),
         ),
       );
+
+      // Notifica a la pantalla principal para mostrar el botón de finalizar visita
+      if (widget.onVisitaRegistrada != null) {
+        widget.onVisitaRegistrada!(parqueId, parqueNombre);
+      }
     } catch (e) {
       await Future.delayed(const Duration(seconds: 2));
       if (!context.mounted) return;

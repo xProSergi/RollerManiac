@@ -68,7 +68,7 @@ class VisitaModel extends VisitaEntity {
 
   Map<String, dynamic> toFirestore() {
     return {
-      // 'id': id, // Consider if you need to store the ID as a field or rely on doc.id
+
       'parqueId': parqueId,
       'parqueNombre': parqueNombre,
       'atraccionId': atraccionId,

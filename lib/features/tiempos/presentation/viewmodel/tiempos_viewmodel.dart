@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/entities/atraccion.dart';
@@ -13,18 +14,23 @@ import '../../domain/usecases/get_parques.dart';
 import '../../domain/usecases/obtener_clima_por_ciudad.dart';
 import '../../utils/parque_utils.dart';
 
+import '../../../historial/domain/repositories/historial_repository.dart';
+
 class TiemposViewModel extends ChangeNotifier {
   final GetParques _getParques;
   final ObtenerClimaPorCiudad _obtenerClimaPorCiudad;
   final ParquesRepository _parquesRepository;
+  final HistorialRepository _historialRepository;
 
   TiemposViewModel({
     required GetParques getParques,
     required ObtenerClimaPorCiudad obtenerClimaPorCiudad,
-    required ParquesRepository parquesRepository,  // <-- Añadido
+    required ParquesRepository parquesRepository,
+    required HistorialRepository historialRepository, // <-- Añadido
   })  : _getParques = getParques,
         _obtenerClimaPorCiudad = obtenerClimaPorCiudad,
-        _parquesRepository = parquesRepository;   // <-- Añadido
+        _parquesRepository = parquesRepository,
+        _historialRepository = historialRepository;
 
   // STATE
   bool _cargando = false;
@@ -81,6 +87,37 @@ class TiemposViewModel extends ChangeNotifier {
       _parquesVisibles.addAll(nuevos);
       _setCargandoMas(false);
     });
+  }
+
+  Future<void> registrarVisitaParque(String parqueId, String parqueNombre) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        _error = 'Debes iniciar sesión para registrar visitas';
+        notifyListeners();
+        return;
+      }
+
+      // 1. Buscar si ya hay un reporte diario activo (sin fechaFin) para hoy
+      final reporte = await _historialRepository.obtenerReporteDiarioActual(user.uid, DateTime.now());
+
+      if (reporte != null && reporte.fechaFin == null) {
+        // Ya hay un reporte activo, no crees uno nuevo
+        // Puedes notificar a la UI si quieres
+        return;
+      }
+
+      // 2. Si no hay reporte activo, crea uno nuevo
+      await _historialRepository.iniciarNuevoDia(
+        userId: user.uid,
+        parqueId: parqueId,
+        parqueNombre: parqueNombre,
+        fecha: DateTime.now(),
+      );
+    } catch (e) {
+      _error = 'Error al registrar visita al parque: $e';
+      notifyListeners();
+    }
   }
 
   Future<void> cambiarContinente(String nuevoContinente) async {

@@ -24,16 +24,17 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   String? _currentParkId;
   String? _currentParkName;
 
-  final List<Widget> _pages = [
-    const ParquesListScreen(),
-    const HistorialScreen(),
-    const SocialScreen(),
-    const PerfilScreen(),
-  ];
+  late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
+    _pages = [
+      ParquesListScreen(onVisitaRegistrada: onVisitaRegistrada),
+      const HistorialScreen(),
+      const SocialScreen(),
+      const PerfilScreen(),
+    ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _verifyAuth(context);
       Provider.of<TiemposViewModel>(context, listen: false).inicializar();
@@ -47,7 +48,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     }
   }
 
-  void _onVisitaRegistrada(String parkId, String parkName) {
+  void onVisitaRegistrada(String parkId, String parkName) {
     setState(() {
       _showFinishButton = true;
       _currentParkId = parkId;
@@ -58,24 +59,37 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   Future<void> _finalizarVisita(BuildContext context) async {
     try {
       final reporteDiarioViewModel = context.read<ReporteDiarioViewModel>();
-      final ahora = DateTime.now();
       final userId = FirebaseAuth.instance.currentUser?.uid;
 
       if (userId == null) throw Exception('Usuario no autenticado');
 
-      // Esperar a que finalice correctamente
       final exito = await reporteDiarioViewModel.finalizarDia();
 
       if (exito && mounted) {
-        // Obtener el ID del reporte actualizado
-        final reporteId = reporteDiarioViewModel.reporteActual?.id;
+        // Espera a que el reporteActual tenga el id actualizado
+        String? reporteId;
+        int retries = 0;
+        while (retries < 10) {
+          reporteId = reporteDiarioViewModel.reporteActual?.id;
+          if (reporteId != null) break;
+          await Future.delayed(const Duration(milliseconds: 100));
+          retries++;
+        }
+
         if (reporteId != null) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => ResumenDiaScreen(
-                reporteId: reporteId,
+                reporteId: reporteId!,
               ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No se pudo obtener el reporte finalizado.'),
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -83,6 +97,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         setState(() {
           _showFinishButton = false;
         });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo finalizar la visita.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -118,21 +139,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
               Expanded(
                 child: IndexedStack(
                   index: _selectedIndex,
-                  children: _pages.asMap().entries.map((entry) {
-                    final int index = entry.key;
-                    final Widget page = entry.value;
-
-                    if (index == 0) {
-                      return NotificationListener<VisitaRegistradaNotification>(
-                        onNotification: (notification) {
-                          _onVisitaRegistrada(notification.parqueId, notification.parqueNombre);
-                          return true;
-                        },
-                        child: page,
-                      );
-                    }
-                    return page;
-                  }).toList(),
+                  children: _pages,
                 ),
               ),
             ],
@@ -155,11 +162,4 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
-}
-
-class VisitaRegistradaNotification extends Notification {
-  final String parqueId;
-  final String parqueNombre;
-
-  VisitaRegistradaNotification(this.parqueId, this.parqueNombre);
 }

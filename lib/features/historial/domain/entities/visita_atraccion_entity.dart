@@ -1,4 +1,3 @@
-// features/historial/domain/entities/visita_atraccion_entity.dart
 import 'package:equatable/equatable.dart';
 
 class VisitaAtraccionEntity extends Equatable {
@@ -14,7 +13,7 @@ class VisitaAtraccionEntity extends Equatable {
   final Duration? duracion;
   final int? valoracion;
   final String? notas;
-  final DateTime fecha; // <--- AÑADE ESTO
+  final DateTime fecha;
 
   const VisitaAtraccionEntity({
     required this.id,
@@ -29,7 +28,7 @@ class VisitaAtraccionEntity extends Equatable {
     this.duracion,
     this.valoracion,
     this.notas,
-    required this.fecha, // <--- AÑADE ESTO
+    required this.fecha,
   });
 
   VisitaAtraccionEntity copyWith({
@@ -45,7 +44,7 @@ class VisitaAtraccionEntity extends Equatable {
     Duration? duracion,
     int? valoracion,
     String? notas,
-    DateTime? fecha, // <--- AÑADE ESTO
+    DateTime? fecha,
   }) {
     return VisitaAtraccionEntity(
       id: id ?? this.id,
@@ -60,7 +59,7 @@ class VisitaAtraccionEntity extends Equatable {
       duracion: duracion ?? this.duracion,
       valoracion: valoracion ?? this.valoracion,
       notas: notas ?? this.notas,
-      fecha: fecha ?? this.fecha, // <--- AÑADE ESTO
+      fecha: fecha ?? this.fecha,
     );
   }
 
@@ -78,6 +77,6 @@ class VisitaAtraccionEntity extends Equatable {
     duracion,
     valoracion,
     notas,
-    fecha, // <--- AÑADE ESTO
+    fecha,
   ];
 }

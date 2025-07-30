@@ -1,8 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:roller_maniac/features/historial/domain/entities/visita_atraccion_entity.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/visita_entity.dart';
+import '../entities/visita_atraccion_entity.dart';
 import '../repositories/historial_repository.dart';
+import '../../../../core/error/failures.dart';
 
 class ObtenerVisitasPorParqueUseCase {
   final HistorialRepository repository;
@@ -10,9 +9,9 @@ class ObtenerVisitasPorParqueUseCase {
   ObtenerVisitasPorParqueUseCase(this.repository);
 
   Future<Either<Failure, List<VisitaAtraccionEntity>>> call(
-      String parqueId,
       String userId,
-      String reporteId, // Add the missing parameter
+      String parqueId,
+      String reporteId,
       ) async {
     return await repository.obtenerVisitasPorParque(parqueId, userId, reporteId);
   }

@@ -11,7 +11,10 @@ abstract class HistorialRepository {
 
   Future<Either<Failure, List<VisitaAtraccionEntity>>> obtenerVisitasPorParque(String parqueId, String userId, String reporteId);
 
-  // Daily Report methods
+
+  Future<Either<Failure, List<VisitaAtraccionEntity>>> obtenerTodasLasVisitas(String userId);
+
+
   Future<Either<Failure, ReporteDiarioEntity>> obtenerReportePorId(String userId, String reporteId);
   Stream<ReporteDiarioEntity?> obtenerReporteEnTiemReal(String reporteId, String userId);
   Stream<List<VisitaAtraccionEntity>> obtenerVisitasAtraccionEnTiempoReal(
@@ -36,15 +39,6 @@ abstract class HistorialRepository {
       VisitaAtraccionEntity visita,
       String userId,
       );
-
-  Future<Either<Failure, ReporteDiarioEntity>> finalizarVisitaAtraccion(
-      String reporteId,
-      String visitaId,
-      String userId,
-      {
-        int? valoracion,
-        String? notas,
-      });
 
   Future<Either<Failure, ReporteDiarioEntity>> finalizarDia({
     required String reporteId,

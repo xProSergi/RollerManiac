@@ -5,6 +5,8 @@ import '../../domain/entities/parque.dart';
 import '../../domain/entities/atraccion.dart';
 import '../../../../services/firebase_service.dart';
 import '../../constantes/tiempos_constantes.dart';
+import 'package:provider/provider.dart';
+import '../../../historial/presentation/viewmodel/reporte_diario_viewmodel.dart';
 
 class DetallesParqueScreen extends StatefulWidget {
   final Parque parque;
@@ -34,7 +36,7 @@ class _DetallesParqueScreenState extends State<DetallesParqueScreen> {
     return atracciones;
   }
 
-  Future<void> _registrarVisitaAtraccion(BuildContext context, String atraccionNombre) async {
+  Future<void> _registrarVisitaAtraccion(BuildContext context, String atraccionNombre, String atraccionId) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final user = FirebaseAuth.instance.currentUser;
 
@@ -64,13 +66,12 @@ class _DetallesParqueScreenState extends State<DetallesParqueScreen> {
     );
 
     try {
-      // await FirebaseService.registrarVisitaAtraccion(
-      //   widget.parque.id,
-      //   widget.parque.nombre,
-      //   atraccionNombre,
-      // );
-
-      await Future.delayed(const Duration(seconds: 2));
+      await context.read<ReporteDiarioViewModel>().agregarVisitaAtraccion(
+        parqueId: widget.parque.id,
+        parqueNombre: widget.parque.nombre,
+        atraccionId: atraccionId,
+        atraccionNombre: atraccionNombre,
+      );
 
       if (!context.mounted) return;
 
@@ -83,10 +84,7 @@ class _DetallesParqueScreenState extends State<DetallesParqueScreen> {
         ),
       );
     } catch (e) {
-      await Future.delayed(const Duration(seconds: 2));
-
       if (!context.mounted) return;
-
       scaffoldMessenger.hideCurrentSnackBar();
       scaffoldMessenger.showSnackBar(
         SnackBar(
@@ -180,7 +178,7 @@ class _DetallesParqueScreenState extends State<DetallesParqueScreen> {
                           style: TiemposEstilos.estiloSubtitulo,
                         ),
                         trailing: ElevatedButton(
-                          onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre),
+                          onPressed: () => _registrarVisitaAtraccion(context, atraccion.nombre, atraccion.nombre),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TiemposColores.botonPrimario,
                             shape: RoundedRectangleBorder(

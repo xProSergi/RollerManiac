@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/reporte_diario_entity.dart';
 import '../../domain/entities/visita_atraccion_entity.dart';
-import 'visita_atraccion_model.dart'; // Make sure this path is correct
+import 'visita_atraccion_model.dart';
 
 class ReporteDiarioModel extends ReporteDiarioEntity {
   const ReporteDiarioModel({
@@ -40,7 +40,7 @@ class ReporteDiarioModel extends ReporteDiarioEntity {
       fechaFin: json['fechaFin'] != null
           ? (json['fechaFin'] as Timestamp).toDate()
           : null,
-      atraccionesVisitadas: [], // Initialize empty, repository will populate
+      atraccionesVisitadas: [],
       tiempoTotalEnParque: json['tiempoTotalEnParque'] != null
           ? Duration(seconds: json['tiempoTotalEnParque'] as int)
           : null,
@@ -76,7 +76,7 @@ class ReporteDiarioModel extends ReporteDiarioEntity {
       fechaFin: data['fechaFin'] != null
           ? (data['fechaFin'] as Timestamp).toDate()
           : null,
-      atraccionesVisitadas: [], // Se cargarán por separado
+      atraccionesVisitadas: [],
       tiempoTotalEnParque: data['tiempoTotalEnParque'] != null
           ? Duration(seconds: data['tiempoTotalEnParque'] as int)
           : null,

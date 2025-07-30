@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart'; // Make sure this is imported if used
-
 import 'visita_atraccion_entity.dart';
 
 class ReporteDiarioEntity extends Equatable {
@@ -10,7 +8,7 @@ class ReporteDiarioEntity extends Equatable {
   final String parqueNombre;
   final DateTime fecha;
   final DateTime? fechaFin;
-  final List<VisitaAtraccionEntity> atraccionesVisitadas; // Will be populated by repository
+  final List<VisitaAtraccionEntity> atraccionesVisitadas;
   final Duration? tiempoTotalEnParque;
   final String? notas;
   final double? valoracionPromedio;
@@ -23,14 +21,13 @@ class ReporteDiarioEntity extends Equatable {
     required this.parqueNombre,
     required this.fecha,
     this.fechaFin,
-    required this.atraccionesVisitadas, // This list is populated by the repository after fetching the main report
+    required this.atraccionesVisitadas,
     this.tiempoTotalEnParque,
     this.notas,
     this.valoracionPromedio,
     this.sincronizado = false,
   });
 
-  // Getters for computed properties (already good)
   int get totalAtracciones => atraccionesVisitadas.length;
 
   double? get valoracionPromedioCalculado {
@@ -38,22 +35,18 @@ class ReporteDiarioEntity extends Equatable {
         .where((v) => v.valoracion != null)
         .map((v) => v.valoracion!)
         .toList();
-
     if (valoraciones.isEmpty) return null;
     return valoraciones.reduce((a, b) => a + b) / valoraciones.length;
   }
 
   Duration? get tiempoTotalCalculado {
     if (atraccionesVisitadas.isEmpty) return null;
-
     final visitasFinalizadas = atraccionesVisitadas.where((v) => v.horaFin != null);
     if (visitasFinalizadas.isEmpty) return null;
-
     final primera = visitasFinalizadas.reduce(
             (a, b) => a.horaInicio.isBefore(b.horaInicio) ? a : b);
     final ultima = visitasFinalizadas.reduce(
             (a, b) => a.horaFin!.isAfter(b.horaFin!) ? a : b);
-
     return ultima.horaFin!.difference(primera.horaInicio);
   }
 
@@ -93,11 +86,6 @@ class ReporteDiarioEntity extends Equatable {
     parqueNombre,
     fecha,
     fechaFin,
-    // Note: atraccionesVisitadas requires careful handling with Equatable
-    // if you want changes within the list to trigger equality checks.
-    // For simplicity with subcollections, we often don't include complex nested lists directly.
-    // However, if your use case demands it, consider iterating through the list's IDs for comparison.
-    // For now, it's included as is, assuming a new list instance implies change.
     atraccionesVisitadas,
     tiempoTotalEnParque,
     notas,

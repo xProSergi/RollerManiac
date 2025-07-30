@@ -8,16 +8,14 @@ import '../../../../core/error/failures.dart';
 
 import '../../domain/entities/reporte_diario_entity.dart';
 import '../../domain/entities/visita_atraccion_entity.dart';
-// import '../../domain/entities/visita_entity.dart'; // REMOVED: If not used
 import '../../domain/repositories/historial_repository.dart';
 import '../datasources/historial_remote_datasource.dart';
 import '../models/reporte_diario_model.dart';
 import '../models/visita_atraccion_model.dart';
-// import '../models/visita_model.dart'; // REMOVED: If not used
 
 class HistorialRepositoryImpl implements HistorialRepository {
   final HistorialRemoteDataSource remoteDataSource;
-  final FirebaseFirestore firestore; // Injected for specific queries not handled by remoteDataSource directly
+  final FirebaseFirestore firestore;
   final Uuid uuid;
 
   HistorialRepositoryImpl({
@@ -26,13 +24,10 @@ class HistorialRepositoryImpl implements HistorialRepository {
     this.uuid = const Uuid(),
   });
 
-  // --- Visita Atracción / Reporte Diario Methods ---
-
   @override
   Future<Either<Failure, List<VisitaAtraccionEntity>>> obtenerVisitas(
       String userId, String reporteId) async {
     try {
-      // Delegate to remoteDataSource, which now uses the correct direct path
       final result = await remoteDataSource.obtenerVisitas(userId, reporteId);
       return Right(result.map((model) => model.toEntity()).toList());
     } on ServerException catch (e) {
@@ -48,8 +43,21 @@ class HistorialRepositoryImpl implements HistorialRepository {
   Future<Either<Failure, List<VisitaAtraccionEntity>>> obtenerVisitasPorParque(
       String parqueId, String userId, String reporteId) async {
     try {
-      // Delegate to remoteDataSource, which now uses the correct direct path and filters
       final result = await remoteDataSource.obtenerVisitasPorParque(parqueId, userId, reporteId);
+      return Right(result.map((model) => model.toEntity()).toList());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on PermissionDeniedException catch (e) {
+      return Left(PermissionDeniedFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Error inesperado: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<VisitaAtraccionEntity>>> obtenerTodasLasVisitas(String userId) async {
+    try {
+      final result = await remoteDataSource.obtenerTodasLasVisitas(userId);
       return Right(result.map((model) => model.toEntity()).toList());
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -65,8 +73,8 @@ class HistorialRepositoryImpl implements HistorialRepository {
       String userId, String reporteId) async {
     try {
       final reporteModel = await remoteDataSource.obtenerReportePorId(userId, reporteId);
-      // Fetch attractions separately since they are in a different collection
-      final atracciones = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteId).first;
+
+      final atracciones = await remoteDataSource.obtenerVisitas(userId, reporteId);
 
       return Right(reporteModel.toEntity().copyWith(
         atraccionesVisitadas: atracciones.map((e) => e.toEntity()).toList(),
@@ -85,11 +93,9 @@ class HistorialRepositoryImpl implements HistorialRepository {
   @override
   Stream<List<VisitaAtraccionEntity>> obtenerVisitasAtraccionEnTiempoReal(
       String userId, String reporteId) {
-    // Delegate to remoteDataSource, which handles the direct collection stream
     return remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteId)
         .map((models) => models.map((model) => model.toEntity()).toList())
         .handleError((error) {
-      // You can catch specific exceptions here if needed
       debugPrint('Error en stream de atracciones del repositorio: $error');
       throw ServerFailure(message: 'Error en tiempo real de atracciones: ${error.toString()}');
     });
@@ -97,8 +103,6 @@ class HistorialRepositoryImpl implements HistorialRepository {
 
   @override
   Stream<ReporteDiarioEntity?> obtenerReporteEnTiemReal(String reporteId, String userId) {
-    // This stream now returns a ReporteDiarioModel *without* populated attractions.
-    // The ViewModel needs to combine this with the attractions stream.
     return remoteDataSource.obtenerReporteEnTiemReal(reporteId, userId)
         .map((reporteModel) => reporteModel?.toEntity())
         .handleError((error) {
@@ -113,9 +117,8 @@ class HistorialRepositoryImpl implements HistorialRepository {
       final reporteModel = await remoteDataSource.obtenerReporteDiarioActual(userId, fecha);
       if (reporteModel == null) return null;
 
-      // Fetch attractions separately for the current report
-      final atracciones = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteModel.id).first; // Get current state
 
+      final atracciones = await remoteDataSource.obtenerVisitas(userId, reporteModel.id);
       return reporteModel.toEntity().copyWith(atraccionesVisitadas: atracciones.map((e) => e.toEntity()).toList());
     } on ServerException catch (e) {
       debugPrint('Server error in obtenerReporteDiarioActual: ${e.message}');
@@ -141,8 +144,8 @@ class HistorialRepositoryImpl implements HistorialRepository {
 
       final List<ReporteDiarioEntity> reportesConAtracciones = [];
       for (var reporteModel in reportesModels) {
-        // Fetch attractions for each report
-        final atracciones = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteModel.id).first;
+
+        final atracciones = await remoteDataSource.obtenerVisitas(userId, reporteModel.id);
         reportesConAtracciones.add(reporteModel.toEntity().copyWith(
           atraccionesVisitadas: atracciones.map((e) => e.toEntity()).toList(),
         ));
@@ -172,7 +175,6 @@ class HistorialRepositoryImpl implements HistorialRepository {
         parqueNombre: parqueNombre,
         fecha: fecha,
       );
-      // Return the new report, without any attractions initially
       return Right(reporteModel.toEntity().copyWith(atraccionesVisitadas: []));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -190,11 +192,7 @@ class HistorialRepositoryImpl implements HistorialRepository {
       String userId,
       ) async {
     try {
-      // Ensure the ID is set on the entity if not already
       final visitaWithId = visita.id.isEmpty ? visita.copyWith(id: uuid.v4(), fecha: DateTime.now()) : visita.copyWith(fecha: DateTime.now());
-      debugPrint('Agregando visita con ID: ${visitaWithId.id}, ReporteID: $reporteId, Atraccion: ${visitaWithId.atraccionNombre}');
-
-      // Convert entity to model for remote data source
       final visitaModel = VisitaAtraccionModel.fromEntity(visitaWithId);
 
       final reporteActualizadoModel = await remoteDataSource.agregarVisitaAtraccion(
@@ -203,8 +201,8 @@ class HistorialRepositoryImpl implements HistorialRepository {
         visita: visitaModel,
       );
 
-      // Fetch the latest attractions to ensure the returned entity is complete
-      final atraccionesActualizadas = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteId).first;
+
+      final atraccionesActualizadas = await remoteDataSource.obtenerVisitas(userId, reporteId);
 
       return Right(reporteActualizadoModel.toEntity().copyWith(
         atraccionesVisitadas: atraccionesActualizadas.map((e) => e.toEntity()).toList(),
@@ -221,39 +219,6 @@ class HistorialRepositoryImpl implements HistorialRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, ReporteDiarioEntity>> finalizarVisitaAtraccion(
-      String reporteId,
-      String visitaId,
-      String userId, {
-        int? valoracion,
-        String? notas,
-      }) async {
-    try {
-      final reporteActualizadoModel = await remoteDataSource.finalizarVisitaAtraccion(
-        reporteId: reporteId,
-        visitaId: visitaId,
-        userId: userId,
-        valoracion: valoracion,
-        notas: notas,
-      );
-
-      // Fetch the latest attractions to ensure the returned entity is complete
-      final atraccionesActualizadas = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteId).first;
-
-      return Right(reporteActualizadoModel.toEntity().copyWith(
-        atraccionesVisitadas: atraccionesActualizadas.map((e) => e.toEntity()).toList(),
-      ));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } on PermissionDeniedException catch (e) {
-      return Left(PermissionDeniedFailure(message: e.message));
-    } on NotFoundException catch (e) {
-      return Left(NotFoundFailure(message: e.message));
-    } catch (e) {
-      return Left(ServerFailure(message: 'Error inesperado: $e'));
-    }
-  }
 
   @override
   Future<Either<Failure, ReporteDiarioEntity>> finalizarDia({
@@ -266,8 +231,8 @@ class HistorialRepositoryImpl implements HistorialRepository {
         userId: userId,
       );
 
-      // Fetch the latest attractions to ensure the returned entity is complete
-      final atraccionesActualizadas = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(userId, reporteId).first;
+
+      final atraccionesActualizadas = await remoteDataSource.obtenerVisitas(userId, reporteId);
 
       return Right(reporteActualizadoModel.toEntity().copyWith(
         atraccionesVisitadas: atraccionesActualizadas.map((e) => e.toEntity()).toList(),
@@ -290,8 +255,8 @@ class HistorialRepositoryImpl implements HistorialRepository {
       final reporteModel = ReporteDiarioModel.fromEntity(reporte);
       final reporteActualizadoModel = await remoteDataSource.actualizarReporteDiario(reporteModel);
 
-      // Fetch the latest attractions to ensure the returned entity is complete
-      final atraccionesActualizadas = await remoteDataSource.obtenerVisitasAtraccionEnTiempoReal(reporte.userId, reporte.id).first;
+
+      final atraccionesActualizadas = await remoteDataSource.obtenerVisitas(reporte.userId, reporte.id);
 
       return Right(reporteActualizadoModel.toEntity().copyWith(
         atraccionesVisitadas: atraccionesActualizadas.map((e) => e.toEntity()).toList(),

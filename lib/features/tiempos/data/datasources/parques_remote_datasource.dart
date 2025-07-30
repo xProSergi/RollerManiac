@@ -146,22 +146,22 @@ class ParquesRemoteDataSourceImpl implements ParquesRemoteDataSource {
           }
         }
 
-        // Ordenamos por nombre para tener un criterio consistente
+
         parques.sort((a, b) => a.nombre.compareTo(b.nombre));
 
-        // Si no hay último parque, devuelve los primeros N
+
         if (ultimoParque == null) {
           return parques.take(limite).toList();
         }
 
-        // Buscar índice del último parque
+
         final indexUltimo = parques.indexWhere((p) => p.id == ultimoParque.id);
 
         if (indexUltimo == -1 || indexUltimo + 1 >= parques.length) {
           return [];
         }
 
-        // Tomar el siguiente bloque después del último parque
+
         final startIndex = indexUltimo + 1;
         final endIndex = (startIndex + limite) > parques.length ? parques.length : (startIndex + limite);
 

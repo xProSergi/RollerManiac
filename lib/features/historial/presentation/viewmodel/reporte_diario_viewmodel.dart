@@ -1,7 +1,7 @@
-import 'dart:async'; // For StreamSubscription
-import 'package:dartz/dartz.dart'; // For Either
-import 'package:flutter/material.dart'; // For ChangeNotifier and debugPrint
-import 'package:uuid/uuid.dart'; // For unique IDs
+import 'dart:async';
+import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/auth_helper.dart';
@@ -19,7 +19,7 @@ class ReporteDiarioViewModel with ChangeNotifier {
   final ObtenerReporteDiarioUseCase _obtenerReporteDiarioUseCase;
   final IniciarNuevoDiaUseCase _iniciarNuevoDiaUseCase;
   final AgregarVisitaAtraccionUseCase _agregarVisitaAtraccionUseCase;
-  final FinalizarVisitaAtraccionUseCase _finalizarVisitaAtraccionUseCase;
+
   final FinalizarDiaUseCase _finalizarDiaUseCase;
   final HistorialRepository _historialRepository;
 
@@ -41,13 +41,13 @@ class ReporteDiarioViewModel with ChangeNotifier {
     required ObtenerReporteDiarioUseCase obtenerReporteDiarioUseCase,
     required IniciarNuevoDiaUseCase iniciarNuevoDiaUseCase,
     required AgregarVisitaAtraccionUseCase agregarVisitaAtraccionUseCase,
-    required FinalizarVisitaAtraccionUseCase finalizarVisitaAtraccionUseCase,
+
     required FinalizarDiaUseCase finalizarDiaUseCase,
     required HistorialRepository historialRepository,
   })  : _obtenerReporteDiarioUseCase = obtenerReporteDiarioUseCase,
         _iniciarNuevoDiaUseCase = iniciarNuevoDiaUseCase,
         _agregarVisitaAtraccionUseCase = agregarVisitaAtraccionUseCase,
-        _finalizarVisitaAtraccionUseCase = finalizarVisitaAtraccionUseCase,
+
         _finalizarDiaUseCase = finalizarDiaUseCase,
         _historialRepository = historialRepository;
 
@@ -98,10 +98,12 @@ class ReporteDiarioViewModel with ChangeNotifier {
       return;
     }
 
+    // Solo usar reportes activos (sin fechaFin)
     final existingReport = await _historialRepository.obtenerReporteDiarioActual(userId, DateTime.now());
-    if (existingReport != null) {
+    if (existingReport != null && existingReport.fechaFin == null) {
       _reporteActual = existingReport;
       suscribirActualizaciones(existingReport.id);
+      _establecerCargando(false);
       return;
     }
 
@@ -147,7 +149,8 @@ class ReporteDiarioViewModel with ChangeNotifier {
       if (_reporteActual == null || _reporteActual!.fechaFin != null) {
         await cargarReporteActual(userId, DateTime.now());
 
-        if (_reporteActual == null) {
+        // Si no hay reporte activo o el reporte está finalizado, crear uno nuevo
+        if (_reporteActual == null || _reporteActual!.fechaFin != null) {
           await iniciarNuevoDia(
             parqueId: parqueId,
             parqueNombre: parqueNombre,
@@ -202,56 +205,7 @@ class ReporteDiarioViewModel with ChangeNotifier {
     }
   }
 
-  Future<void> finalizarVisitaAtraccion({
-    required String atraccionId,
-    required int? valoracion,
-    required String? notas,
-  }) async {
-    _establecerCargando(true);
-    _error = null;
-    try {
-      final userId = AuthHelper.obtenerUsuarioActual();
-      if (userId == null) {
-        _error = 'Usuario no autenticado para finalizar visita a atracción. Por favor, inicia sesión.';
-        notifyListeners();
-        _establecerCargando(false);
-        return;
-      }
-      if (_reporteActual == null || _reporteActual!.fechaFin != null) {
-        _error = 'No hay un reporte diario activo para finalizar la visita a la atracción.';
-        notifyListeners();
-        _establecerCargando(false);
-        return;
-      }
-
-      final existingVisit = _reporteActual!.atraccionesVisitadas.firstWhere(
-            (v) => v.atraccionId == atraccionId && v.horaFin == null,
-        orElse: () => throw NotFoundFailure(message: 'No se encontró una visita activa para esta atracción.'),
-      );
-
-      final result = await _finalizarVisitaAtraccionUseCase(
-        FinalizarVisitaAtraccionParams(
-          reporteId: _reporteActual!.id,
-          visitaId: existingVisit.id,
-          userId: userId,
-          valoracion: valoracion,
-          notas: notas,
-        ),
-      );
-
-      result.fold(
-            (failure) => _error = _mapearError(failure),
-            (reporteActualizado) {
-          _reporteActual = reporteActualizado;
-        },
-      );
-    } catch (e) {
-      debugPrint('Error al finalizar visita a atracción: $e');
-      _error = 'Error inesperado al finalizar visita a atracción: ${e.toString()}';
-    } finally {
-      _establecerCargando(false);
-    }
-  }
+  // Elimina finalizarVisitaAtraccion y toda referencia a finalizar visita a atracción
 
   Future<bool> finalizarDia({
     VoidCallback? onReportFinished,
@@ -271,11 +225,20 @@ class ReporteDiarioViewModel with ChangeNotifier {
       await cargarReporteActual(userId, DateTime.now());
     }
 
-    if (_reporteActual == null || _reporteActual!.fechaFin != null) {
+    if (_reporteActual == null) {
       _error = 'No hay un reporte diario activo para finalizar. Por favor, registra una visita primero.';
       notifyListeners();
       _establecerCargando(false);
       return false;
+    }
+
+    // Si el reporte ya está finalizado, no hacer nada y retornar éxito
+    if (_reporteActual!.fechaFin != null) {
+      debugPrint('Reporte ya finalizado: ${_reporteActual!.fechaFin}');
+      _error = null;
+      onReportFinished?.call();
+      _establecerCargando(false);
+      return true;
     }
 
     final result = await _finalizarDiaUseCase(
@@ -287,16 +250,25 @@ class ReporteDiarioViewModel with ChangeNotifier {
 
     var exito = false;
 
-    result.fold(
-          (failure) {
+    await result.fold(
+          (failure) async {
         _error = _mapearError(failure);
         exito = false;
       },
-          (reporteActualizado) {
+          (reporteActualizado) async {
         _reporteActual = reporteActualizado;
         _error = null;
+        // Recarga las atracciones visitadas para el reporte finalizado
+        final atracciones = await _historialRepository.obtenerVisitas(
+          userId, _reporteActual!.id,
+        );
+        atracciones.fold(
+              (failure) => _atraccionesVisitadas = [],
+              (lista) => _atraccionesVisitadas = lista,
+        );
         exito = true;
         onReportFinished?.call();
+        notifyListeners();
       },
     );
 
@@ -335,9 +307,18 @@ class ReporteDiarioViewModel with ChangeNotifier {
     _atraccionesSubscription = _historialRepository
         .obtenerVisitasAtraccionEnTiempoReal(userId, reporteId)
         .listen(
-          (atracciones) {
-        debugPrint('Atracciones actualizadas en ViewModel: ${atracciones.length}');
-        _atraccionesVisitadas = atracciones;
+          (atracciones) async {
+        // Si el stream devuelve 0 pero el reporte está finalizado, recarga manualmente
+        if (atracciones.isEmpty && _reporteActual?.fechaFin != null) {
+          final result = await _historialRepository.obtenerVisitas(userId, reporteId);
+          result.fold(
+                (failure) => _atraccionesVisitadas = [],
+                (lista) => _atraccionesVisitadas = lista,
+          );
+        } else {
+          _atraccionesVisitadas = atracciones;
+        }
+        debugPrint('Atracciones actualizadas en ViewModel: ${_atraccionesVisitadas.length}');
         notifyListeners();
       },
       onError: (error) {
@@ -395,6 +376,49 @@ class ReporteDiarioViewModel with ChangeNotifier {
     _atraccionesSubscription?.cancel();
     _atraccionesVisitadas = [];
     notifyListeners();
+  }
+
+  Future<void> crearNuevoReporte({
+    required String parqueId,
+    required String parqueNombre,
+  }) async {
+    _establecerCargando(true);
+    _error = null;
+
+    // Limpiar estado actual
+    _reporteSubscription?.cancel();
+    _atraccionesSubscription?.cancel();
+    _atraccionesVisitadas = [];
+    _reporteActual = null;
+
+    final userId = AuthHelper.obtenerUsuarioActual();
+    if (userId == null) {
+      _error = 'Usuario no autenticado. Por favor, inicia sesión.';
+      _establecerCargando(false);
+      return;
+    }
+
+    final result = await _iniciarNuevoDiaUseCase(
+      IniciarNuevoDiaParams(
+        userId: userId,
+        parqueId: parqueId,
+        parqueNombre: parqueNombre,
+        fecha: DateTime.now(),
+      ),
+    );
+
+    result.fold(
+          (failure) {
+        _error = _mapearError(failure);
+        _establecerCargando(false);
+      },
+          (reporte) {
+        _reporteActual = reporte;
+        _error = null;
+        _establecerCargando(false);
+        suscribirActualizaciones(reporte.id);
+      },
+    );
   }
 
   @override
