@@ -71,31 +71,46 @@ Cada **feature** se divide en:
 ✅ Preparado para inyección de dependencias (si se desea)  
 
 ## 🧪 Fase de pruebas y validación real
- -Pruebas en 10 dispositivos físicos reales mediante testers
- -Simulación de escenarios offline
- -Feedback continuo de usuarios reales 
- -Modificaciones sobre interfaz y usabilidad según feedback
+ - Pruebas en 10 dispositivos físicos reales mediante testers
+ - Simulación de escenarios offline
+ - Feedback continuo de usuarios reales 
+ - Modificaciones sobre interfaz y usabilidad según feedback
 
 
 ## 📌 Retos técnicos superados
- -Configuración avanzada de inicio de sesión con Google y claves SHA-1/SHA-256
- -Tratamiento de JSONs inconsistentes en Queue-Times con lógica adaptativa
- -Implementación modular y desacoplada con arquitectura robusta
- -Gestión eficiente del estado con Provider y reconstrucciones controladas
+ - Configuración avanzada de inicio de sesión con Google y claves SHA-1/SHA-256
+ - Tratamiento de JSONs inconsistentes en Queue-Times con lógica adaptativa
+ - Implementación modular y desacoplada con arquitectura robusta
+ - Gestión eficiente del estado con Provider y reconstrucciones controladas
 
 
 
 ## 🔭 Futuras mejoras
 RollerManiac está en una fase avanzada, pero diseñada para escalar. Algunas líneas de evolución previstas:
 
--Sistema de logros y medallas por visitas
--Ranking global entre todos los usuarios registrados
--Estadísticas visuales y panel de usuario con gráficos sobre visitas mensuales/anuales
--Integración de mapas interactivos con ubicaciones de atracciones
--Datos técnicos de montañas rusas (altura, velocidad, fuerzas Gs...)
+- Sistema de logros y medallas por visitas
+- Ranking global entre todos los usuarios registrados
+- Estadísticas visuales y panel de usuario con gráficos sobre visitas mensuales/anuales
+- Integración de mapas interactivos con ubicaciones de atracciones
+- Datos técnicos de montañas rusas (altura, velocidad, fuerzas Gs...)
 
 
+👤 Sobre mí
+
+Soy Sergio López, desarrollador de software titulado en el Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM). A lo largo de mi formación he trabajado con tecnologías como Java, Python, SQL, PL/SQL, Kotlin, .NET y bases de datos tanto relacionales como NoSQL.
+
+Además de RollerManiac, he desarrollado una aplicación real para el Colegio Internacional Kolbe, utilizada por el personal para registrar fichajes de entrada/salida y visualizar gráficos de horas trabajadas. Esto me ha permitido aplicar mis conocimientos en proyectos reales, con requisitos funcionales concretos y lógica empresarial.
+
+Este proyecto representa para mí un importante paso tanto a nivel profesional como personal. Profesionalmente, me ha permitido consolidar habilidades clave en desarrollo móvil y gestión de bases de datos, así como la integración de arquitecturas limpias y buenas prácticas de programación. A nivel personal, ha supuesto un desafío que me ha impulsado a mejorar mi capacidad de planificación, resolución de problemas y atención al detalle, fortaleciendo mi compromiso con la calidad y la innovación en el desarrollo de software.
+
+📫 Contacto
+
+Si quieres conocer más sobre mi forma de trabajar, colaborar en algún proyecto o estás interesado en conectar conmigo, no dudes en contactarme:
+
+💼 [LinkedIn](https://www.linkedin.com/in/sergio-lopez-dev/)
+📧 slopezmar3@gmail.com
 
 
-
+🧩 Licencia
+Este proyecto es personal y académico. Puedes consultarlo, usar partes para aprendizaje, pero no está licenciado para uso comercial directo sin permiso.
 ---
