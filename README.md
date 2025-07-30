@@ -111,6 +111,6 @@ Si quieres conocer más sobre mi forma de trabajar, colaborar en algún proyecto
 📧 slopezmar3@gmail.com
 
 
-🧩 Licencia
-Este proyecto es personal y académico. Puedes consultarlo, usar partes para aprendizaje, pero no está licenciado para uso comercial directo sin permiso.
+## 🧩 Licencia
+- Este proyecto es personal y académico. Puedes consultarlo, usar partes para aprendizaje, pero no está licenciado para uso comercial directo sin permiso.
 ---
