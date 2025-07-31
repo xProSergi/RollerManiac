@@ -25,7 +25,7 @@
 
 ## 🧠 ¿Por qué este proyecto?
 
-**RollerManiac** nace con el propósito de unir mi pasión por los parques de atracciones con mi formación como desarrollador. Mi objetivo fue crear una aplicación funcional, realista y escalable, aplicando estándares propios de entornos profesionales. Este proyecto me permitió trabajar desde cero en un producto completo, cubriendo tanto el diseño técnico como la experiencia de usuario, y me enfrentó a retos reales de desarrollo. Los principales objetivos fueron:
+**RollerManiac** nace con el propósito de unir mi pasión por los parques de atracciones con mi formación como desarrollador. Mi objetivo fue crear una aplicación funcional, realista y escalable. Este proyecto me permitió trabajar desde cero en un producto completo, cubriendo tanto el diseño técnico como la experiencia de usuario, y me enfrentó a retos reales de desarrollo. Los principales objetivos fueron:
 
 - Diseñar una app con valor real para el usuario final, mejorando su experiencia en parques de atracciones y facilitando la interacción social entre gente con la misma afición.
 - Integrar servicios reales: trabajar con Firebase (Auth, Firestore) y otras APIs, gestionando datos en tiempo real.
@@ -33,7 +33,7 @@
 - Aplicar buenas prácticas de arquitectura de software, utilizando MVVM y Clean Architecture con separación clara de capas, código modular, mantenible y preparado para testeo e inyección de dependencias.
 - Desarrollar competencias profesionales: desde la planificación, la implementación modular, la validación de formularios y flujos, hasta el testing y la preparación del proyecto para producción.
 
-Este proyecto ha sido una experiencia **realista y transversal** que demuestra mi capacidad para desarrollar, escalar y mantener una aplicación profesional de principio a fin, trabajando con tecnologías actuales y aplicando prácticas alineadas con las exigencias del sector IT.
+Este proyecto ha sido una experiencia **realista y transversal** que demuestra mi capacidad para desarrollar, escalar y mantener una aplicación profesional de principio a fin, trabajando con tecnologías actuales.
 
 ---
 
@@ -88,10 +88,8 @@ Cada **feature** se divide en:
 ✅ Preparado para inyección de dependencias (si se desea)  
 
 ## 🧪 Fase de pruebas y validación real
- - Aplicación testeada por 10 usuarios
- - Simulación de escenarios offline
- - Feedback continuo de usuarios reales 
- - Modificaciones sobre interfaz y usabilidad según feedback
+- Validación funcional y de usabilidad realizada con 10 usuarios reales, todos aficionados a parques, quienes confirmaron la utilidad y funcionalidad de la app en escenarios reales.
+- Actualmente en proceso de implementación de pruebas automatizadas unitarias y de integración para garantizar calidad y estabilidad en el código.
 
 Este proyecto ha sido desarrollado **100% por mí**, desde la planificación, el diseño de interfaz y la arquitectura, hasta la implementación y la validación final. Ha supuesto un desafío completo que refleja no solo mis habilidades técnicas, sino también mi compromiso con la calidad, la autonomía y la mejora continua.
 
