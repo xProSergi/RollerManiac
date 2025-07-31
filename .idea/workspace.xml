@@ -9,73 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Versión 1.2 RollerManiac (en proceso)">
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/launch_image.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/logoRoller.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/logoRollerManiac.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_todas_visitas_usecase.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/presentation/screens/splash_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/dartpad/web_plugin_registrant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/dartpad/web_plugin_registrant.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/.filecache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/app.dill" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/debug_android_application.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/debug_android_application.stamp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/flutter_assets.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/flutter_assets.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/kernel_snapshot_program.stamp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/outputs.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/ae66f6954890ec7f6e2a8893c5ae6f4e/outputs.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/dart_plugin_registrant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/dart_plugin_registrant.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config_subset" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config_subset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_graph.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android" beforeDir="false" afterPath="$PROJECT_DIR$/android" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-v21/launch_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable/launch_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values-night/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values-night/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/lib/features/tiempos/presentation/view/detalles_parque_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/android/lib/features/tiempos/presentation/view/detalles_parque_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable-v21/launch_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/launch_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Base.lproj/LaunchScreen.storyboard" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Base.lproj/LaunchScreen.storyboard" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/error/failures.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/error/failures.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/injection_container.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/injection_container.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/utils/auth_helper.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/utils/auth_helper.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/auth/constantes/login_constantes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/constantes/login_constantes.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/datasources/historial_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/datasources/historial_remote_datasource.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/models/reporte_diario_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/models/reporte_diario_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/models/visita_atraccion_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/models/visita_atraccion_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/models/visita_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/models/visita_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/data/repositories/historial_repository_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/data/repositories/historial_repository_impl.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/domain/entities/reporte_diario_entity.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/domain/entities/reporte_diario_entity.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/domain/entities/visita_atraccion_entity.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/domain/entities/visita_atraccion_entity.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/domain/repositories/historial_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/domain/repositories/historial_repository.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/domain/usecases/finalizar_visita_atraccion_usecase.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/finalizar_visita_atraccion_usecase.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_visitas_por_parque_usecase.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_visitas_por_parque_usecase.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_visitas_usecase.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/domain/usecases/obtener_visitas_usecase.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/pages/historial_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/pages/historial_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/pages/resumen_dia_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/pages/resumen_dia_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/viewmodel/historial_view_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/viewmodel/historial_view_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/historial/presentation/viewmodel/reporte_diario_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/historial/presentation/viewmodel/reporte_diario_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/data/datasources/parques_remote_datasource.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/data/datasources/parques_remote_datasource.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/detalles_parque_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/detalles_parque_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/pantalla_principal.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/pantalla_principal.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/parques_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/view/parques_list_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/tiempos/presentation/viewmodel/tiempos_viewmodel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/firebase_options.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" afterDir="false" />
-    </list>
+    <list default="true" id="7afd30f6-ad4c-4952-b8f1-1b0f1bf9cdf2" name="Changes" comment="Versión 1.2 RollerManiac (en proceso)" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
