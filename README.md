@@ -83,10 +83,6 @@ Cada **feature** se divide en:
 - domain/ → entidades, repositorios  
 - presentation/ → widgets, pantallas, ViewModels  
 
-✅ Separación clara de responsabilidades  
-✅ Fácil de testear y escalar  
-✅ Preparado para inyección de dependencias (si se desea)  
-
 ## 🧪 Fase de pruebas y validación real
 - Validación funcional y de usabilidad realizada con 10 usuarios reales, todos aficionados a parques, quienes confirmaron la utilidad y funcionalidad de la app en escenarios reales.
 - Actualmente en proceso de implementación de pruebas automatizadas unitarias y de integración para garantizar calidad y estabilidad en el código.
