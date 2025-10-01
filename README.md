@@ -57,7 +57,7 @@ Incluyo aquí capturas de pantalla de:
 
 ### ℹ️ Nota sobre los datos de prueba
 
-*Los datos mostrados en las capturas son ficticios y fueron generados exclusivamente para testear las distintas funcionalidades de la app. Por ello, puede aparecer más de un parque visitado en el mismo día u otros patrones poco realistas. En producción, los datos reflejarán la actividad real del usuario.*
+*Los datos mostrados en las capturas son ficticios y fueron generados exclusivamente para testear las distintas funcionalidades de la app. En producción, los datos reflejarán la actividad real del usuario.*
 
 
 ## 🛠️ Tecnologías y herramientas
